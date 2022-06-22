@@ -31,7 +31,7 @@ import net.pingfang.common.enums.BusinessType;
 
 /**
  * @author 王超
- * @description TODO
+ * @description 场站信息
  * @date 2022-06-22 11:36
  */
 @RestController
@@ -128,6 +128,7 @@ public class BtpAreaController extends BaseController {
 			return AjaxResult.error("修改场站'" + area.getAreaNo() + "'失败，场站号已存在");
 		}
 		area.setUpdateBy(getUsername());
+		area.setUpdateTime(new Date());
 		return toAjax(areaService.updateById(area));
 	}
 
