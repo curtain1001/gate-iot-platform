@@ -136,3 +136,4 @@ xss:
 liquibase:
   changelog:
     - /database/business/btpArea.xml
+    - /database/business/btpLane.xml

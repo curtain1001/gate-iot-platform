@@ -24,6 +24,10 @@
             <column name="update_time" remarks="更新时间" type="datetime(6)" />
             <column name="remark" remarks="备注" type="VARCHAR(500)" />
         </createTable>
+        <createIndex tableName="btp_area" indexName="area_Idx">
+            <column name="area_no"/>
+            <column name="area_name"/>
+        </createIndex>
     </changeSet>
 
 </databaseChangeLog>

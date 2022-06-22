@@ -112,20 +112,20 @@ public class BtpAreaController extends BaseController {
 	 * 修改参数配置
 	 */
 	@PreAuthorize("@ss.hasPermi('business:area:edit')")
-	@Log(title = "参数管理", businessType = BusinessType.UPDATE)
+	@Log(title = "场站管理", businessType = BusinessType.UPDATE)
 	@PutMapping
 	public AjaxResult edit(@Validated @RequestBody BtpArea area) {
 		LambdaQueryWrapper<BtpArea> wrapper = Wrappers.lambdaQuery();
 		wrapper.eq(BtpArea::getAreaName, area.getAreaName());
 		BtpArea btpArea = areaService.getOne(wrapper);
 		if (btpArea != null && !btpArea.getAreaId().equals(area.getAreaId())) {
-			return AjaxResult.error("新增场站'" + area.getAreaNo() + "'失败，场站名已存在");
+			return AjaxResult.error("修改场站'" + area.getAreaName() + "'失败，场站名已存在");
 		}
 		wrapper = Wrappers.lambdaQuery();
 		wrapper.eq(BtpArea::getAreaNo, area.getAreaNo());
 		btpArea = areaService.getOne(wrapper);
 		if (btpArea != null && !btpArea.getAreaId().equals(area.getAreaId())) {
-			return AjaxResult.error("新增场站'" + area.getAreaNo() + "'失败，场站号已存在");
+			return AjaxResult.error("修改场站'" + area.getAreaNo() + "'失败，场站号已存在");
 		}
 		area.setUpdateBy(getUsername());
 		return toAjax(areaService.updateById(area));
@@ -135,7 +135,7 @@ public class BtpAreaController extends BaseController {
 	 * 删除参数配置
 	 */
 	@PreAuthorize("@ss.hasPermi('business:area:remove')")
-	@Log(title = "参数管理", businessType = BusinessType.DELETE)
+	@Log(title = "场站管理", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{areaIds}")
 	public AjaxResult remove(@PathVariable Long[] areaIds) {
 		areaService.removeByIds(Arrays.asList(areaIds));

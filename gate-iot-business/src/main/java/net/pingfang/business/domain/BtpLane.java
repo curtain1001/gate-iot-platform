@@ -1,5 +1,7 @@
 package net.pingfang.business.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 
 import javax.validation.constraints.NotBlank;
@@ -23,6 +25,7 @@ public class BtpLane extends BaseEntity implements Serializable {
 	/**
 	 * 车道id
 	 */
+	@TableId(type = IdType.AUTO)
 	private String laneId;
 	/**
 	 * 车道名称
