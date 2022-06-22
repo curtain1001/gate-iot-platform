@@ -1,0 +1,39 @@
+{
+  "properties": [
+    {
+      "name": "gate-iot.name",
+      "type": "java.lang.String",
+      "description": "Description for gate-iot.name."
+    },
+    {
+      "name": "gate-iot.version",
+      "type": "java.lang.String",
+      "description": "Description for gate-iot.version."
+    },
+    {
+      "name": "gate-iot.copyrightYear",
+      "type": "java.lang.String",
+      "description": "Description for gate-iot.copyrightYear."
+    },
+    {
+      "name": "gate-iot.demoEnabled",
+      "type": "java.lang.String",
+      "description": "Description for gate-iot.demoEnabled."
+    },
+    {
+      "name": "gate-iot.profile",
+      "type": "java.lang.String",
+      "description": "Description for gate-iot.profile."
+    },
+    {
+      "name": "gate-iot.addressEnabled",
+      "type": "java.lang.String",
+      "description": "Description for gate-iot.addressEnabled."
+    },
+    {
+      "name": "gate-iot.captchaType",
+      "type": "java.lang.String",
+      "description": "Description for gate-iot.captchaType."
+    }
+  ]
+}
