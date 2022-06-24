@@ -23,7 +23,6 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
 import net.pingfang.business.domain.BtpLane;
 import net.pingfang.business.service.IBtpLaneService;
-import net.pingfang.business.values.LaneConfig;
 import net.pingfang.common.annotation.Log;
 import net.pingfang.common.core.controller.BaseController;
 import net.pingfang.common.core.domain.AjaxResult;
@@ -56,6 +55,7 @@ public class BtpLaneController extends BaseController {
 		queryWrapper.like(StringUtils.checkValNotNull(lane.getLaneNo()), BtpLane::getLaneNo, lane.getLaneNo());
 		queryWrapper.like(StringUtils.checkValNotNull(lane.getLaneName()), BtpLane::getLaneName, lane.getLaneName());
 		queryWrapper.like(StringUtils.checkValNotNull(lane.getAreaNo()), BtpLane::getAreaNo, lane.getAreaNo());
+		queryWrapper.like(StringUtils.checkValNotNull(lane.getType()), BtpLane::getType, lane.getType());
 		queryWrapper.like(StringUtils.checkValNotNull(lane.getCustomsLaneNo()), BtpLane::getCustomsLaneNo,
 				lane.getCustomsLaneNo());
 		List<BtpLane> list = laneService.list(queryWrapper);
@@ -166,15 +166,6 @@ public class BtpLaneController extends BaseController {
 	public AjaxResult remove(@PathVariable Long[] laneIds) {
 		laneService.removeByIds(Arrays.asList(laneIds));
 		return success();
-	}
-
-	/* ------------------------- 通道配置----------------------------- */
-	/**
-	 * 获取通道配置属性项
-	 */
-	@GetMapping(value = "/config/options/list")
-	public AjaxResult getList() {
-		return AjaxResult.success(LaneConfig.values());
 	}
 
 }

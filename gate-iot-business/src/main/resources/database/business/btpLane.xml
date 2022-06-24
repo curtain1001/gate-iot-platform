@@ -18,6 +18,7 @@
             <column name="lane_name" type="varchar(64)" remarks="车道名称" />
             <column name="lane_no" type="varchar(24)" remarks="车道号" />
             <column name="area_no" type="varchar(24)" remarks="车道号" />
+            <column name="type" type="char(1)" remarks="进出道类型（0:进；1：出）" />
             <column name="customs_lane_no" type="varchar(24)" remarks="海关通道号" />
             <column name="create_by" defaultValue="" remarks="创建者" type="VARCHAR(64)" />
             <column name="create_time" remarks="创建时间" type="datetime(6)" />
@@ -30,6 +31,31 @@
             <column name="lane_name" />
             <column name="area_no" />
             <column name="customs_lane_no" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="wangchao" id="btp_lane_config::create">
+        <createTable tableName="btp_lane_config" remarks="车道配置信息表">
+            <column name="lane_config_id" remarks="主键" type="BIGINT(20)" incrementBy="1" startWith="1"
+                    autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="lane_id" type="BIGINT(20)" remarks="车道id">
+                <constraints foreignKeyName="fk_lane_id_config_id" referencedColumnNames="lane_id"
+                        referencedTableName="btp_lane" />
+            </column>
+            <column name="lane_config_key" type="varchar(24)" remarks="键名" />
+            <column name="lane_config_value" type="varchar(64)" remarks="键值" />
+            <column name="status" type="char(1)" remarks="键值(0=正常,1=停用)" />
+            <column name="create_by" defaultValue="" remarks="创建者" type="VARCHAR(64)" />
+            <column name="create_time" remarks="创建时间" type="datetime(6)" />
+            <column name="update_by" defaultValue="" remarks="更新者" type="VARCHAR(64)" />
+            <column name="update_time" remarks="更新时间" type="datetime(6)" />
+            <column name="remark" remarks="备注" type="VARCHAR(500)" />
+        </createTable>
+        <createIndex tableName="btp_lane_config" indexName="lane_config_idx">
+            <column name="lane_id" />
+            <column name="lane_config_key" />
         </createIndex>
     </changeSet>
 

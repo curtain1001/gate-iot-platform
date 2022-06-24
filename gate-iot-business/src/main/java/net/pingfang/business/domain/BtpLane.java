@@ -1,14 +1,16 @@
 package net.pingfang.business.domain;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import net.pingfang.common.core.domain.BaseEntity;
 
@@ -19,6 +21,8 @@ import net.pingfang.common.core.domain.BaseEntity;
  */
 @SuperBuilder
 @TableName(value = "btp_lane")
+@AllArgsConstructor
+@NoArgsConstructor
 public class BtpLane extends BaseEntity implements Serializable {
 
 	private static final long serialVersionUID = -5792869601575018184L;
@@ -48,7 +52,7 @@ public class BtpLane extends BaseEntity implements Serializable {
 	private String customsLaneNo;
 
 	/**
-	 * 进出类型
+	 * 进出类型（0:进；1：出）
 	 */
 	private String type;
 
@@ -94,5 +98,13 @@ public class BtpLane extends BaseEntity implements Serializable {
 
 	public void setCustomsLaneNo(String customsLaneNo) {
 		this.customsLaneNo = customsLaneNo;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 }

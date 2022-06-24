@@ -35,9 +35,7 @@ mybatis-plus:
 # 日志配置
 logging:
   level:
-    net.pingfang: debug
-    org.springframework.test: warn
-    liquibase.changelog: debug
+    net.pingfang: info
 # PageHelper分页插件
 pagehelper:
   helperDialect: mysql

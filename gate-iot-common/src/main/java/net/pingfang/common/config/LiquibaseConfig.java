@@ -31,6 +31,8 @@ import net.pingfang.common.utils.MigrationsUtils;
 @ConditionalOnBean(value = LiquibaseProperties.class)
 @Slf4j
 public class LiquibaseConfig {
+//	public static List<String> database = Lists.newCopyOnWriteArrayList();
+
 	@Resource
 	LiquibaseProperties properties;
 

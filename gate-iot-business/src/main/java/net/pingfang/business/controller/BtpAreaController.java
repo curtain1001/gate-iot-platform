@@ -58,6 +58,17 @@ public class BtpAreaController extends BaseController {
 	}
 
 	/**
+	 * 获取所有场站信息
+	 *
+	 * @return 所有场站信息
+	 */
+	@GetMapping("/all")
+	public AjaxResult getAreaLists() {
+		List<BtpArea> list = areaService.list();
+		return AjaxResult.success(list);
+	}
+
+	/**
 	 * 根据参数编号获取详细信息
 	 */
 	@PreAuthorize("@ss.hasPermi('business:area:query')")

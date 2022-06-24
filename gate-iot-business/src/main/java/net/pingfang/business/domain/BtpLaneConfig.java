@@ -1,6 +1,7 @@
 package net.pingfang.business.domain;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -36,22 +37,31 @@ public class BtpLaneConfig extends BaseEntity {
 	/**
 	 * 配置参数键名
 	 */
-	private String configKey;
+	private String laneConfigKey;
 	/**
 	 * 配置参数值
 	 */
-	private String configValue;
+	private String laneConfigValue;
 	/**
 	 * 状态 "0=正常,1=停用"
 	 */
 	private String status;
 
-	@NotBlank(message = "车道id不能为空")
+	@NotNull(message = "车道id不能为空")
 	public Long getLaneId() {
 		return laneId;
 	}
 
 	public void setLaneId(Long laneId) {
 		this.laneId = laneId;
+	}
+
+	@NotBlank(message = "配置键名不能为空")
+	public String getLaneConfigKey() {
+		return laneConfigKey;
+	}
+
+	public void setLaneConfigKey(String laneConfigKey) {
+		this.laneConfigKey = laneConfigKey;
 	}
 }

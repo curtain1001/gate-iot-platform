@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(AccessDeniedException.class)
 	public AjaxResult handleAccessDeniedException(AccessDeniedException e, HttpServletRequest request) {
 		String requestURI = request.getRequestURI();
-		log.error("请求地址'{}',权限校验失败'{}'", requestURI, e.getMessage());
+		log.error("请求地址'{}',请求方式'{}',权限校验失败'{}'", requestURI, request.getMethod(), e.getMessage());
 		return AjaxResult.error(HttpStatus.FORBIDDEN, "没有权限，请联系管理员授权");
 	}
 
@@ -63,7 +63,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(RuntimeException.class)
 	public AjaxResult handleRuntimeException(RuntimeException e, HttpServletRequest request) {
 		String requestURI = request.getRequestURI();
-		log.error("请求地址'{}',发生未知异常.", requestURI, e);
+		log.error("请求地址'{}',请求方式'{}',发生未知异常.", requestURI, request.getMethod(), e);
 		return AjaxResult.error(e.getMessage());
 	}
 
@@ -73,7 +73,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(Exception.class)
 	public AjaxResult handleException(Exception e, HttpServletRequest request) {
 		String requestURI = request.getRequestURI();
-		log.error("请求地址'{}',发生系统异常.", requestURI, e);
+		log.error("请求地址'{}',请求方式'{}',发生系统异常.", requestURI, request.getMethod(), e);
 		return AjaxResult.error(e.getMessage());
 	}
 
