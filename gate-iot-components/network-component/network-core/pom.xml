@@ -2,14 +2,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>gate-iot</artifactId>
         <groupId>net.pingfang</groupId>
+        <artifactId>network-component</artifactId>
         <version>1.0.0</version>
-        <relativePath>../../../pom.xml</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>network-core</artifactId>
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -32,21 +36,11 @@
             <artifactId>vertx-core</artifactId>
             <version>4.2.5</version>
         </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>org.hswebframework.web</groupId>-->
-        <!--            <artifactId>hsweb-starter</artifactId>-->
-        <!--            <version>${hsweb.framework.version}</version>-->
-        <!--        </dependency>-->
         <dependency>
             <groupId>org.hswebframework.web</groupId>
             <artifactId>hsweb-core</artifactId>
             <version>${hsweb.framework.version}</version>
         </dependency>
     </dependencies>
-
-    <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-    </properties>
 
 </project>

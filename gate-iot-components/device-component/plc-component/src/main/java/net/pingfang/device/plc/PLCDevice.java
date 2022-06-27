@@ -6,7 +6,9 @@ import java.util.Map;
 import net.pingfang.device.core.DeviceInfo;
 import net.pingfang.iot.common.EncodedMessage;
 import net.pingfang.iot.common.ValueObject;
+import net.pingfang.network.DefaultNetworkType;
 import net.pingfang.network.NetworkManager;
+import net.pingfang.network.tcp.client.TcpClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -22,6 +24,7 @@ public class PLCDevice implements DeviceInfo, ValueObject {
 	final String deviceName;
 	final HashMap<String, Object> properties;
 	final NetworkManager networkManager;
+	final Mono<TcpClient> tcpClient;
 
 	public PLCDevice(String deviceId, String laneId, String deviceCode, String deviceName,
 			HashMap<String, Object> properties, NetworkManager networkManager) {
@@ -31,6 +34,7 @@ public class PLCDevice implements DeviceInfo, ValueObject {
 		this.deviceName = deviceName;
 		this.properties = properties;
 		this.networkManager = networkManager;
+		tcpClient = networkManager.getNetwork(DefaultNetworkType.TCP_CLIENT, DefaultNetworkType.TCP_CLIENT + "::001");
 	}
 
 	@Override
@@ -75,6 +79,11 @@ public class PLCDevice implements DeviceInfo, ValueObject {
 
 	@Override
 	public Mono<Boolean> send(EncodedMessage message) {
+//
+//		byte[] payload = DebugUtils.stringToBytes(message);
+//
+//		return tcpClient.flatMap(client -> client.send(new TcpMessage(Unpooled.wrappedBuffer(payload))))
+//				.thenReturn("推送成功").flux();
 		return null;
 	}
 

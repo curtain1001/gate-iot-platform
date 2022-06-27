@@ -292,7 +292,6 @@
         <module>gate-iot-common</module>
         <module>gate-iot-components</module>
         <module>gate-iot-business</module>
-        <module>gate-iot-components</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -325,16 +324,18 @@
         </plugins>
     </build>
 
-    <repositories>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <url>http://114.115.203.170:8081/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
         <repository>
-            <id>public</id>
-            <name>aliyun nexus</name>
-            <url>https://maven.aliyun.com/repository/public</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
+            <id>releases</id>
+            <url>http://114.115.203.170:8081/nexus/content/repositories/releases</url>
         </repository>
-    </repositories>
+    </distributionManagement>
+
 
     <pluginRepositories>
         <pluginRepository>

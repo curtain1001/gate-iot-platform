@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>gate-iot</artifactId>
         <groupId>net.pingfang</groupId>
+        <artifactId>network-component</artifactId>
         <version>1.0.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -18,6 +18,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>net.pingfang</groupId>
+            <artifactId>network-core</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
@@ -27,15 +32,8 @@
         </dependency>
         <dependency>
             <groupId>net.pingfang</groupId>
-            <artifactId>network-core</artifactId>
-            <version>1.0.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.pingfang</groupId>
             <artifactId>common-component</artifactId>
             <version>1.0.0</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -45,16 +43,9 @@
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-test</artifactId>
-            <version>3.4.12</version>
             <scope>test</scope>
         </dependency>
 
-
-        <!-- 通用工具-->
-        <dependency>
-            <groupId>net.pingfang</groupId>
-            <artifactId>gate-iot-common</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
