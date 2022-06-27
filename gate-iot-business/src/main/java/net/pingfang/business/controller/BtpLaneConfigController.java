@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
@@ -69,10 +70,19 @@ public class BtpLaneConfigController extends BaseController {
 		return getDataTable(list);
 	}
 
-	@PostMapping("")
+	/**
+	 * 根据参数编号获取详细信息
+	 */
+	@PreAuthorize("@ss.hasPermi('business:laneconfig:query')")
+	@GetMapping(value = "/{laneConfigId}")
+	public AjaxResult load(@PathVariable Long laneConfigId) {
+		return AjaxResult.success(laneConfigService.getById(laneConfigId));
+	}
+
+	@PostMapping()
 	@PreAuthorize("@ss.hasPermi('business:laneconfig:add')")
 	@Log(title = "通道管理(配置信息)", businessType = BusinessType.UPDATE)
-	public AjaxResult add(BtpLaneConfig laneConfig) {
+	public AjaxResult add(@Validated @RequestBody BtpLaneConfig laneConfig) {
 		LambdaQueryWrapper<BtpLaneConfig> wrapper = Wrappers.lambdaQuery();
 		wrapper.eq(BtpLaneConfig::getLaneConfigKey, laneConfig.getLaneConfigKey());
 		wrapper.eq(BtpLaneConfig::getLaneId, laneConfig.getLaneId());
@@ -101,6 +111,19 @@ public class BtpLaneConfigController extends BaseController {
 		laneConfig.setUpdateBy(getUsername());
 		laneConfig.setUpdateTime(new Date());
 		return toAjax(laneConfigService.updateById(laneConfig));
+	}
+
+	/**
+	 * 修改参数配置
+	 */
+	@PreAuthorize("@ss.hasPermi('business:laneconfig:edit')")
+	@Log(title = "通道管理(配置信息)", businessType = BusinessType.UPDATE)
+	@PutMapping("/status/{laneConfigId}")
+	public AjaxResult editStatus(@PathVariable Long laneConfigId, @Validated @RequestBody String status) {
+		LambdaUpdateWrapper<BtpLaneConfig> wrapper = Wrappers.lambdaUpdate();
+		wrapper.eq(true, BtpLaneConfig::getLaneConfigId, laneConfigId);
+		wrapper.set(StringUtils.checkValNotNull(status), BtpLaneConfig::getStatus, status);
+		return toAjax(laneConfigService.update(wrapper));
 	}
 
 	/**

@@ -14,5 +14,10 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
+    <modules>
+        <module>network-component</module>
+        <module>common-component</module>
+        <module>device-component</module>
+    </modules>
 
 </project>

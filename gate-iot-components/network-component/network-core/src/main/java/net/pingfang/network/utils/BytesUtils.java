@@ -5,7 +5,6 @@ package net.pingfang.network.utils;
  *
  * @author zhouhao
  */
-@Deprecated
 public class BytesUtils {
 
 	/**

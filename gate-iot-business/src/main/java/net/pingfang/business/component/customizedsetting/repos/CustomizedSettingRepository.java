@@ -11,6 +11,7 @@ import net.pingfang.business.component.customizedsetting.values.CustomizedSettin
 import net.pingfang.business.component.customizedsetting.values.DefaultCustomized;
 import net.pingfang.business.component.customizedsetting.values.Options;
 import net.pingfang.common.utils.JsonUtils;
+import net.pingfang.common.utils.StringUtils;
 
 @AllArgsConstructor
 public class CustomizedSettingRepository {
@@ -20,7 +21,7 @@ public class CustomizedSettingRepository {
 			return CustomizedSettingData.builder() //
 					.customizeType(x.getCustomizeType())//
 					.attribute(x) //
-					.options("select".equals(x.getType()) ? JsonUtils.toArray(x.getOptions(), Options.class)
+					.options(StringUtils.isNotEmpty(x.getOptions()) ? JsonUtils.toArray(x.getOptions(), Options.class)
 							: x.getOptions())//
 					.label(x.getLabel())//
 					.value(x.getValue())//

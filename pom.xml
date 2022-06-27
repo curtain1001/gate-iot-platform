@@ -247,6 +247,13 @@
                 <artifactId>gate-iot-business</artifactId>
                 <version>${gate-iot.version}</version>
             </dependency>
+
+            <!--        业务组件-->
+            <dependency>
+                <groupId>net.pingfang</groupId>
+                <artifactId>gate-iot-components</artifactId>
+                <version>${gate-iot.version}</version>
+            </dependency>
             <!-- mybatis-plus 增强CRUD -->
             <dependency>
                 <groupId>com.baomidou</groupId>
@@ -271,6 +278,8 @@
                 <artifactId>mybatis-plus-boot-starter-test</artifactId>
                 <version>3.5.2</version>
             </dependency>
+
+
         </dependencies>
     </dependencyManagement>
 
@@ -282,11 +291,8 @@
         <module>gate-iot-generator</module>
         <module>gate-iot-common</module>
         <module>gate-iot-components</module>
-        <module>gate-iot-components/network-component</module>
-        <module>gate-iot-components/common-component</module>
-        <module>gate-iot-components/network-component/network-core</module>
-        <module>gate-iot-components/network-component/tcp-component</module>
         <module>gate-iot-business</module>
+        <module>gate-iot-components</module>
     </modules>
     <packaging>pom</packaging>
 

@@ -5,7 +5,7 @@
         <artifactId>gate-iot</artifactId>
         <groupId>net.pingfang</groupId>
         <version>1.0.0</version>
-        <relativePath>../../pom.xml</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -16,4 +16,21 @@
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
 
+
+    <dependencies>
+        <!-- 通用工具-->
+        <dependency>
+            <groupId>net.pingfang</groupId>
+            <artifactId>gate-iot-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>net.pingfang</groupId>
+            <artifactId>common-component</artifactId>
+        </dependency>
+    </dependencies>
+    <modules>
+        <module>network-core</module>
+        <module>tcp-component</module>
+    </modules>
 </project>

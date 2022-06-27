@@ -20,8 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.google.common.collect.Lists;
 
 import net.pingfang.business.domain.BtpLane;
+import net.pingfang.business.domain.BtpLaneConfig;
+import net.pingfang.business.service.IBtpLaneConfigService;
 import net.pingfang.business.service.IBtpLaneService;
 import net.pingfang.common.annotation.Log;
 import net.pingfang.common.core.controller.BaseController;
@@ -40,6 +43,9 @@ public class BtpLaneController extends BaseController {
 
 	@Resource
 	private IBtpLaneService laneService;
+
+	@Resource
+	private IBtpLaneConfigService laneConfigService;
 
 	/**
 	 * 分页列表
@@ -164,8 +170,19 @@ public class BtpLaneController extends BaseController {
 	@Log(title = "通道管理", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{laneIds}")
 	public AjaxResult remove(@PathVariable Long[] laneIds) {
-		laneService.removeByIds(Arrays.asList(laneIds));
-		return success();
+		List<Long> nutDelete = Lists.newArrayList();
+		Arrays.asList(laneIds).forEach(laneId -> {
+			LambdaQueryWrapper<BtpLaneConfig> configLambdaQueryWrapper = Wrappers.lambdaQuery();
+			configLambdaQueryWrapper.eq(true, BtpLaneConfig::getLaneId, laneId);
+			int count = laneConfigService.count(configLambdaQueryWrapper);
+			if (count > 0) {
+				nutDelete.add(laneId);
+			} else {
+				laneService.removeById(laneId);
+			}
+		});
+		return success(
+				"未进行删除操作：" + net.pingfang.common.utils.StringUtils.join(nutDelete, "，") + "；原因：存在配置信息，请先删除所有的配置信息");
 	}
 
 }

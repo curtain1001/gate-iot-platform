@@ -5,18 +5,6 @@
 //import java.util.function.Function;
 //import java.util.function.Supplier;
 //
-//import org.jetlinks.community.PropertyConstants;
-//import org.jetlinks.core.device.DeviceConfigKey;
-//import org.jetlinks.core.device.DeviceOperator;
-//import org.jetlinks.core.device.DeviceRegistry;
-//import org.jetlinks.core.message.*;
-//import org.jetlinks.core.message.state.DeviceStateCheckMessage;
-//import org.jetlinks.core.message.state.DeviceStateCheckMessageReply;
-//import org.jetlinks.core.server.session.ChildrenDeviceSession;
-//import org.jetlinks.core.server.session.DeviceSession;
-//import org.jetlinks.core.server.session.DeviceSessionManager;
-//import org.jetlinks.core.server.session.KeepOnlineSession;
-//import org.jetlinks.supports.server.DecodedClientMessageHandler;
 //import org.springframework.util.StringUtils;
 //
 //import lombok.AllArgsConstructor;

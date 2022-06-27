@@ -46,7 +46,7 @@
             </column>
             <column name="lane_config_key" type="varchar(24)" remarks="键名" />
             <column name="lane_config_value" type="varchar(64)" remarks="键值" />
-            <column name="status" type="char(1)" remarks="键值(0=正常,1=停用)" />
+            <column name="status" type="char(1)" remarks="键值(0=正常,1=停用)" defaultValue="0" />
             <column name="create_by" defaultValue="" remarks="创建者" type="VARCHAR(64)" />
             <column name="create_time" remarks="创建时间" type="datetime(6)" />
             <column name="update_by" defaultValue="" remarks="更新者" type="VARCHAR(64)" />
@@ -58,5 +58,4 @@
             <column name="lane_config_key" />
         </createIndex>
     </changeSet>
-
 </databaseChangeLog>
