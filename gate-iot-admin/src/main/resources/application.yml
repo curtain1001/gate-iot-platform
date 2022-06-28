@@ -137,3 +137,5 @@ liquibase:
   changelog:
     - /database/business/btpArea.xml
     - /database/business/btpLane.xml
+    - /database/business/btpNetworkConfig.xml
+    - /database/business/btpCertificate.xml

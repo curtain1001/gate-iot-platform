@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 
 import net.pingfang.network.security.Certificate;
 import net.pingfang.network.security.CertificateManager;
-import reactor.core.publisher.Mono;
 
 /**
  * @author 王超
@@ -15,7 +14,7 @@ import reactor.core.publisher.Mono;
 public class CertificateService implements CertificateManager {
 
 	@Override
-	public Mono<Certificate> getCertificate(String id) {
+	public Certificate getCertificate(String id) {
 		return null;
 	}
 }

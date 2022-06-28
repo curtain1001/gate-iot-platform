@@ -1,5 +1,7 @@
 package net.pingfang.network;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +23,11 @@ public interface NetworkType {
 	 */
 	default String getName() {
 		return getId();
+	}
+
+	default String generateId() {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMddHHmmssSSS");
+		return getName() + "::" + dateFormat.format(new Date());
 	}
 
 	/**

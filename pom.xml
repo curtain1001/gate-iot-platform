@@ -151,6 +151,12 @@
                 </exclusions>
             </dependency>
 
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis-spring</artifactId>
+                <version>2.0.7</version>
+            </dependency>
+
             <!-- io常用工具类 -->
             <dependency>
                 <groupId>commons-io</groupId>
@@ -248,12 +254,7 @@
                 <version>${gate-iot.version}</version>
             </dependency>
 
-            <!--        业务组件-->
-            <dependency>
-                <groupId>net.pingfang</groupId>
-                <artifactId>gate-iot-components</artifactId>
-                <version>${gate-iot.version}</version>
-            </dependency>
+
             <!-- mybatis-plus 增强CRUD -->
             <dependency>
                 <groupId>com.baomidou</groupId>
@@ -290,8 +291,8 @@
         <module>gate-iot-quartz</module>
         <module>gate-iot-generator</module>
         <module>gate-iot-common</module>
-        <module>gate-iot-components</module>
         <module>gate-iot-business</module>
+        <module>gate-iot-components</module>
     </modules>
     <packaging>pom</packaging>
 

@@ -24,7 +24,7 @@ public class PLCDevice implements DeviceInfo, ValueObject {
 	final String deviceName;
 	final HashMap<String, Object> properties;
 	final NetworkManager networkManager;
-	final Mono<TcpClient> tcpClient;
+	final TcpClient tcpClient;
 
 	public PLCDevice(String deviceId, String laneId, String deviceCode, String deviceName,
 			HashMap<String, Object> properties, NetworkManager networkManager) {
@@ -34,7 +34,7 @@ public class PLCDevice implements DeviceInfo, ValueObject {
 		this.deviceName = deviceName;
 		this.properties = properties;
 		this.networkManager = networkManager;
-		tcpClient = networkManager.getNetwork(DefaultNetworkType.TCP_CLIENT, DefaultNetworkType.TCP_CLIENT + "::001");
+		tcpClient = (TcpClient) networkManager.getNetwork(DefaultNetworkType.TCP_CLIENT, deviceId);
 	}
 
 	@Override

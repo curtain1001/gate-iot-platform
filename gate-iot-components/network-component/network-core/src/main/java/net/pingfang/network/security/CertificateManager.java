@@ -1,7 +1,5 @@
 package net.pingfang.network.security;
 
-import reactor.core.publisher.Mono;
-
 /**
  * 证书管理接口
  *
@@ -9,6 +7,6 @@ import reactor.core.publisher.Mono;
  */
 public interface CertificateManager {
 
-	Mono<Certificate> getCertificate(String id);
+	Certificate getCertificate(String id);
 
 }

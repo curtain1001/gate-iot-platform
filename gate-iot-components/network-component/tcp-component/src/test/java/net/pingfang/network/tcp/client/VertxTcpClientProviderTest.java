@@ -3,23 +3,24 @@ package net.pingfang.network.tcp.client;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.net.NetClientOptions;
+import lombok.extern.slf4j.Slf4j;
 import net.pingfang.network.tcp.TcpMessage;
 import net.pingfang.network.tcp.parser.DefaultPayloadParserBuilder;
 import net.pingfang.network.tcp.parser.PayloadParserType;
-import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @RunWith(SpringRunner.class)
-class VertxTcpClientProviderTest {
+@Slf4j
+public class VertxTcpClientProviderTest {
 
 	@Test
-	void test() {
+	public void test() {
 		Vertx vertx = Vertx.vertx();
 
 		vertx.createNetServer().connectHandler(socket -> {
@@ -27,8 +28,7 @@ class VertxTcpClientProviderTest {
 			socket.write("ttest");
 		}).listen(12311);
 
-		VertxTcpClientProvider provider = new VertxTcpClientProvider(id -> Mono.empty(), vertx,
-				new DefaultPayloadParserBuilder());
+		VertxTcpClientProvider provider = new VertxTcpClientProvider(null, vertx, new DefaultPayloadParserBuilder());
 
 		TcpClientProperties properties = new TcpClientProperties();
 		properties.setHost("127.0.0.1");

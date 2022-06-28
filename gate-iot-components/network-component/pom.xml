@@ -17,14 +17,7 @@
     </properties>
 
 
-    <dependencies>
-        <!-- 通用工具-->
-        <dependency>
-            <groupId>net.pingfang</groupId>
-            <artifactId>gate-iot-common</artifactId>
-        </dependency>
-
-    </dependencies>
+    <dependencies></dependencies>
 
 
     <modules>

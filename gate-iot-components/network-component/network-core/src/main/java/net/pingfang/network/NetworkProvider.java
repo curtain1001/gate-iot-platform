@@ -1,9 +1,5 @@
 package net.pingfang.network;
 
-import javax.annotation.Nonnull;
-
-import reactor.core.publisher.Mono;
-
 /**
  * 网络组件支持提供商
  *
@@ -15,7 +11,6 @@ public interface NetworkProvider<P> {
 	 * @return 类型
 	 * @see DefaultNetworkType
 	 */
-	@Nonnull
 	NetworkType getType();
 
 	/**
@@ -24,8 +19,7 @@ public interface NetworkProvider<P> {
 	 * @param properties 配置信息
 	 * @return 网络组件
 	 */
-	@Nonnull
-	Network createNetwork(@Nonnull P properties);
+	Network createNetwork(P properties);
 
 	/**
 	 * 重新加载网络组件
@@ -33,7 +27,7 @@ public interface NetworkProvider<P> {
 	 * @param network    网络组件
 	 * @param properties 配置信息
 	 */
-	void reload(@Nonnull Network network, @Nonnull P properties);
+	void reload(Network network, P properties);
 
 	/**
 	 * 根据可序列化的配置信息创建网络组件配置
@@ -41,7 +35,6 @@ public interface NetworkProvider<P> {
 	 * @param properties 原始配置信息
 	 * @return 网络配置信息
 	 */
-	@Nonnull
-	Mono<P> createConfig(@Nonnull NetworkProperties properties);
+	P createConfig(NetworkProperties properties);
 
 }

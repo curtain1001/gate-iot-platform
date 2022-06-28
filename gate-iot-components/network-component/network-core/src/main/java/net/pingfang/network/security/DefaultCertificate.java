@@ -15,7 +15,12 @@ import javax.net.ssl.X509TrustManager;
 import org.springframework.util.Assert;
 
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.net.*;
+import io.vertx.core.net.JksOptions;
+import io.vertx.core.net.KeyCertOptions;
+import io.vertx.core.net.PemKeyCertOptions;
+import io.vertx.core.net.PemTrustOptions;
+import io.vertx.core.net.PfxOptions;
+import io.vertx.core.net.TrustOptions;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
@@ -27,7 +32,7 @@ import lombok.SneakyThrows;
 public class DefaultCertificate implements Certificate {
 
 	@Getter
-	private final String id;
+	private final Long id;
 
 	@Getter
 	private final String name;
@@ -38,7 +43,7 @@ public class DefaultCertificate implements Certificate {
 
 	private static final X509Certificate[] EMPTY = new X509Certificate[0];
 
-	public DefaultCertificate(String id, String name) {
+	public DefaultCertificate(Long id, String name) {
 		this.id = id;
 		this.name = name;
 	}

@@ -6,22 +6,22 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import org.hswebframework.web.bean.FastBeanCopier;
 import org.springframework.stereotype.Component;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import lombok.extern.slf4j.Slf4j;
+import net.pingfang.common.utils.bean.BeanUtils;
 import net.pingfang.network.DefaultNetworkType;
 import net.pingfang.network.Network;
 import net.pingfang.network.NetworkProperties;
 import net.pingfang.network.NetworkProvider;
 import net.pingfang.network.NetworkType;
+import net.pingfang.network.security.Certificate;
 import net.pingfang.network.security.CertificateManager;
 import net.pingfang.network.security.VertxKeyCertTrustOptions;
 import net.pingfang.network.tcp.parser.PayloadParserBuilder;
-import reactor.core.publisher.Mono;
 
 /**
  * TCP服务提供商
@@ -101,20 +101,20 @@ public class TcpServerProvider implements NetworkProvider<TcpServerProperties> {
 
 	@Nonnull
 	@Override
-	public Mono<TcpServerProperties> createConfig(@Nonnull NetworkProperties properties) {
-		return Mono.defer(() -> {
-			TcpServerProperties config = FastBeanCopier.copy(properties.getConfigurations(), new TcpServerProperties());
-			config.setId(properties.getId());
-			if (config.getOptions() == null) {
-				config.setOptions(new NetServerOptions());
-			}
-			if (config.isSsl()) {
-				config.getOptions().setSsl(true);
-				return certificateManager.getCertificate(config.getCertId()).map(VertxKeyCertTrustOptions::new)
-						.doOnNext(config.getOptions()::setKeyCertOptions).doOnNext(config.getOptions()::setTrustOptions)
-						.thenReturn(config);
-			}
-			return Mono.just(config);
-		});
+	public TcpServerProperties createConfig(@Nonnull NetworkProperties properties) {
+		TcpServerProperties config = new TcpServerProperties();
+		BeanUtils.copyBeanProp(config, properties.getConfigurations());
+		config.setId(properties.getId());
+		if (config.getOptions() == null) {
+			config.setOptions(new NetServerOptions());
+		}
+		if (config.isSsl()) {
+			config.getOptions().setSsl(true);
+			Certificate certificate = certificateManager.getCertificate(config.getCertId());
+			VertxKeyCertTrustOptions vertxKeyCertTrustOptions = new VertxKeyCertTrustOptions(certificate);
+			config.getOptions().setKeyCertOptions(vertxKeyCertTrustOptions);
+			config.getOptions().setTrustOptions(vertxKeyCertTrustOptions);
+		}
+		return config;
 	}
 }

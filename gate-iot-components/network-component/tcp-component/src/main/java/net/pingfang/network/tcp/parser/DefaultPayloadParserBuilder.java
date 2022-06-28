@@ -12,7 +12,6 @@ import net.pingfang.iot.common.ValueObject;
 import net.pingfang.network.tcp.parser.strateies.DelimitedPayloadParserBuilder;
 import net.pingfang.network.tcp.parser.strateies.DirectPayloadParserBuilder;
 import net.pingfang.network.tcp.parser.strateies.FixLengthPayloadParserBuilder;
-import net.pingfang.network.tcp.parser.strateies.ScriptPayloadParserBuilder;
 
 @Component
 public class DefaultPayloadParserBuilder implements PayloadParserBuilder, BeanPostProcessor {
@@ -22,7 +21,7 @@ public class DefaultPayloadParserBuilder implements PayloadParserBuilder, BeanPo
 	public DefaultPayloadParserBuilder() {
 		register(new FixLengthPayloadParserBuilder());
 		register(new DelimitedPayloadParserBuilder());
-		register(new ScriptPayloadParserBuilder());
+//		register(new ScriptPayloadParserBuilder());
 		register(new DirectPayloadParserBuilder());
 	}
 

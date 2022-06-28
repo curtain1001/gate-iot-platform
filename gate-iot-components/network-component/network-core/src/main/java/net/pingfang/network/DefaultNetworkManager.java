@@ -3,6 +3,7 @@ package net.pingfang.network;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,7 +20,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * 默认网络管理器
@@ -41,9 +41,9 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor 
 	}
 
 	@Override
-	public Mono<Void> reload(NetworkType type, String id) {
-		return Mono.justOrEmpty(getNetworkStore(type).get(id)).doOnNext(Network::shutdown).then(getNetwork(type, id))
-				.then();
+	public void reload(NetworkType type, String id) {
+		getNetworkStore(type).get(id).shutdown();
+		getNetwork(type, id);
 	}
 
 	@PostConstruct
@@ -57,15 +57,18 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor 
 	protected void checkNetwork() {
 		// 获取并过滤所有停止的网络组件
 		// 重新加载启动状态的网络组件
-		Flux.fromIterable(store.values()).flatMapIterable(Map::values).filter(i -> !i.isAlive()).flatMap(network -> {
+		Collection<Map<String, Network>> networks = store.values();
+		networks.stream().flatMap(m -> m.values().stream()).filter(x -> !x.isAlive()).forEach(network -> {
 			NetworkProvider<Object> provider = providerSupport.get(network.getType().getId());
 			if (provider == null || !network.isAutoReload()) {
-				return Mono.empty();
+				return;
 			}
-			return configManager.getConfig(network.getType(), network.getId()).filter(NetworkProperties::isEnabled)
-					.flatMap(provider::createConfig).map(conf -> this.doCreate(provider, network.getId(), conf))
-					.onErrorContinue((err, res) -> log.warn("reload network [{}] error", network, err));
-		}).subscribe(net -> log.info("reloaded network :{}", net));
+			NetworkProperties properties = configManager.getConfig(network.getType(), network.getId());
+			if (properties != null && properties.isEnabled()) {
+				Object o = provider.createConfig(properties);
+				this.doCreate(provider, network.getId(), o);
+			}
+		});
 	}
 
 	private Map<String, Network> getNetworkStore(String type) {
@@ -77,10 +80,13 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor 
 	}
 
 	@Override
-	public <T extends Network> Mono<T> getNetwork(NetworkType type, String id) {
+	public <T extends Network> Network getNetwork(NetworkType type, String id) {
 		Map<String, Network> networkMap = getNetworkStore(type);
-		return Mono.justOrEmpty(networkMap.get(id)).filter(Network::isAlive)
-				.switchIfEmpty(Mono.defer(() -> createNetwork(type, id))).map(n -> (T) n);
+		Network network = networkMap.get(id);
+		if (network == null || !network.isAlive()) {
+			network = createNetwork(type, id);
+		}
+		return network;
 	}
 
 	/**
@@ -103,16 +109,20 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor 
 		});
 	}
 
-	public Mono<Network> createNetwork(NetworkType type, String id) {
-		return Mono.justOrEmpty(providerSupport.get(type.getId()))
-				.switchIfEmpty(Mono.error(() -> new UnsupportedOperationException("不支持的类型:" + type.getName())))
-				.flatMap(provider -> configManager.getConfig(type, id)
-						.switchIfEmpty(Mono.error(
-								() -> new UnsupportedOperationException("网络[" + type.getName() + "]配置[" + id + "]不存在")))
-						.filter(NetworkProperties::isEnabled)
-						.switchIfEmpty(Mono.error(
-								() -> new UnsupportedOperationException("网络[" + type.getName() + "]配置[" + id + "]已禁用")))
-						.flatMap(provider::createConfig).map(config -> doCreate(provider, id, config)));
+	public Network createNetwork(NetworkType type, String id) {
+		NetworkProvider<Object> provider = providerSupport.get(type.getId());
+		if (provider == null) {
+			throw new UnsupportedOperationException("不支持的类型:" + type.getName());
+		} else {
+			NetworkProperties properties = configManager.getConfig(type, id);
+			if (properties == null) {
+				throw new UnsupportedOperationException("网络[" + type.getName() + "]配置[" + id + "]不存在");
+			} else if (!properties.isEnabled()) {
+				throw new UnsupportedOperationException("网络[" + type.getName() + "]配置[" + id + "]已禁用");
+			}
+			Object config = provider.createConfig(properties);
+			return doCreate(provider, id, config);
+		}
 	}
 
 	public void register(NetworkProvider<Object> provider) {
@@ -133,9 +143,11 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor 
 	}
 
 	@Override
-	public Mono<Void> shutdown(NetworkType type, String id) {
-
-		return Mono.justOrEmpty(getNetworkStore(type).get(id)).doOnNext(Network::shutdown).then();
+	public void shutdown(NetworkType type, String id) {
+		Network network = getNetworkStore(type).get(id);
+		if (network != null) {
+			network.shutdown();
+		}
 	}
 
 	@Getter

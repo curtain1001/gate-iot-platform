@@ -6,7 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,16 +35,16 @@ import net.pingfang.system.service.ISysRoleService;
  */
 @Service
 public class SysRoleServiceImpl implements ISysRoleService {
-	@Autowired
+	@Resource
 	private SysRoleMapper roleMapper;
 
-	@Autowired
+	@Resource
 	private SysRoleMenuMapper roleMenuMapper;
 
-	@Autowired
+	@Resource
 	private SysUserRoleMapper userRoleMapper;
 
-	@Autowired
+	@Resource
 	private SysRoleDeptMapper roleDeptMapper;
 
 	/**

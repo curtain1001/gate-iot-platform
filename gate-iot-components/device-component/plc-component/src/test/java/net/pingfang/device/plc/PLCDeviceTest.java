@@ -2,7 +2,7 @@ package net.pingfang.device.plc;
 
 import javax.annotation.Resource;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -17,17 +17,15 @@ import net.pingfang.network.NetworkManager;
  */
 @RunWith(SpringRunner.class)
 @Slf4j
-//@MapperScan("net.pingfang.**.mapper")
-
 @SpringBootTest(classes = TestApplication.class)
-class PLCDeviceTest {
+public class PLCDeviceTest {
 
 	@Resource
 	public NetworkManager networkManager;
 
 	@Test
 	public void constructorTest() {
-		PLCDevice device = new PLCDevice("111", "111", "eee", "eee", null, networkManager);
+		PLCDevice device = new PLCDevice("TCP_CLIENT::001", "111", "eee", "eee", null, networkManager);
 		log.info(device.getDeviceId());
 	}
 

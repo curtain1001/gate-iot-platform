@@ -14,7 +14,7 @@ import javax.net.ssl.X509KeyManager;
  */
 public interface Certificate {
 
-	String getId();
+	Long getId();
 
 	String getName();
 

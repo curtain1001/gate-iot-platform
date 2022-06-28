@@ -2,8 +2,6 @@ package net.pingfang.network;
 
 import java.util.List;
 
-import reactor.core.publisher.Mono;
-
 /**
  * 网络服务管理器
  * <p>
@@ -22,7 +20,7 @@ public interface NetworkManager {
 	 * @param <T>  NetWork子类泛型
 	 * @return 网络组件
 	 */
-	<T extends Network> Mono<T> getNetwork(NetworkType type, String id);
+	<T extends Network> Network getNetwork(NetworkType type, String id);
 
 	/**
 	 * 获取所有的网络组件支持提供商
@@ -38,7 +36,7 @@ public interface NetworkManager {
 	 * @param id   网络组件ID
 	 * @return void
 	 */
-	Mono<Void> reload(NetworkType type, String id);
+	void reload(NetworkType type, String id);
 
 	/**
 	 * 停止网络组件
@@ -47,5 +45,5 @@ public interface NetworkManager {
 	 * @param id   网络组件ID
 	 * @return void
 	 */
-	Mono<Void> shutdown(NetworkType type, String id);
+	void shutdown(NetworkType type, String id);
 }

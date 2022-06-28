@@ -5,13 +5,17 @@ import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import net.pingfang.business.enums.NetworkConfigState;
 import net.pingfang.common.core.domain.BaseEntity;
-import net.pingfang.network.NetworkConfigState;
 import net.pingfang.network.NetworkProperties;
 import net.pingfang.network.NetworkType;
 
@@ -21,13 +25,16 @@ import net.pingfang.network.NetworkType;
  * @date 2022-06-27 17:43
  */
 @EqualsAndHashCode(callSuper = true)
-@TableName("network_config")
 @Data
 @SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
+@TableName("network_config")
 public class BtpNetworkConfig extends BaseEntity implements Serializable {
 
 	private static final long serialVersionUID = -2425794209203640447L;
-	private String id;
+	@TableId(type = IdType.AUTO)
+	private String networkConfigId;
 
 	private String name;
 
@@ -35,8 +42,6 @@ public class BtpNetworkConfig extends BaseEntity implements Serializable {
 
 	@NotNull(message = "类型不能为空")
 	private String type;
-
-	private String description;
 
 	private NetworkConfigState state;
 
@@ -50,7 +55,7 @@ public class BtpNetworkConfig extends BaseEntity implements Serializable {
 		NetworkProperties properties = new NetworkProperties();
 		properties.setConfigurations(configuration);
 		properties.setEnabled(state == NetworkConfigState.enabled);
-		properties.setId(getId());
+		properties.setId(getNetworkConfigId());
 		properties.setName(name);
 
 		return properties;

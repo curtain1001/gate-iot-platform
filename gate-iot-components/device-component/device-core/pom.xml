@@ -17,6 +17,16 @@
 
 
     <dependencies>
+        <!--        &lt;!&ndash; 通用工具&ndash;&gt;-->
+        <!--        <dependency>-->
+        <!--            <groupId>net.pingfang</groupId>-->
+        <!--            <artifactId>gate-iot-common</artifactId>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>net.pingfang</groupId>-->
+        <!--            <artifactId>common-component</artifactId>-->
+        <!--            <version>${project.version}</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>net.pingfang</groupId>
             <artifactId>common-component</artifactId>

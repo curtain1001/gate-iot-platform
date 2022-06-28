@@ -1,19 +1,13 @@
 package net.pingfang.network;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.hswebframework.web.dict.Dict;
-import org.hswebframework.web.dict.EnumDict;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-@Dict("network-type")
-public enum DefaultNetworkType implements NetworkType, EnumDict<String> {
+public enum DefaultNetworkType implements NetworkType {
 
 	TCP_CLIENT("TCP客户端"), TCP_SERVER("TCP服务"),
 
@@ -40,25 +34,26 @@ public enum DefaultNetworkType implements NetworkType, EnumDict<String> {
 		return name();
 	}
 
-	@Override
-	public String getText() {
-		return name;
-	}
-
-	@Override
-	public String getValue() {
-		return name();
-	}
-
-	@Override
-	public Object getWriteJSONObject() {
-		if (isWriteJSONObjectEnabled()) {
-			Map<String, Object> jsonObject = new HashMap<>();
-			jsonObject.put("value", getValue());
-			jsonObject.put("text", getText());
-			jsonObject.put("name", getText());
-			return jsonObject;
-		}
-		return name();
-	}
+	//
+//	@Override
+//	public String getText() {
+//		return name;
+//	}
+//
+//	@Override
+//	public String getValue() {
+//		return name();
+//	}
+//
+//	@Override
+//	public Object getWriteJSONObject() {
+//		if (isWriteJSONObjectEnabled()) {
+//			Map<String, Object> jsonObject = new HashMap<>();
+//			jsonObject.put("value", getValue());
+//			jsonObject.put("text", getText());
+//			jsonObject.put("name", getText());
+//			return jsonObject;
+//		}
+//		return name();
+//	}
 }

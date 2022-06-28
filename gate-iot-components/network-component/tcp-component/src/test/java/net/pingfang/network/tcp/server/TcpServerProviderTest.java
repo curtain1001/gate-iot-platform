@@ -13,7 +13,6 @@ import net.pingfang.network.tcp.TcpMessage;
 import net.pingfang.network.tcp.client.TcpClient;
 import net.pingfang.network.tcp.parser.DefaultPayloadParserBuilder;
 import net.pingfang.network.tcp.parser.PayloadParserType;
-import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @Slf4j
@@ -27,8 +26,7 @@ class TcpServerProviderTest {
 				.options(new NetServerOptions()).parserType(PayloadParserType.FIXED_LENGTH)
 				.parserConfiguration(Collections.singletonMap("size", 5)).build();
 
-		TcpServerProvider provider = new TcpServerProvider((id) -> Mono.empty(), Vertx.vertx(),
-				new DefaultPayloadParserBuilder());
+		TcpServerProvider provider = new TcpServerProvider(null, Vertx.vertx(), new DefaultPayloadParserBuilder());
 
 		tcpServer = provider.createNetwork(properties);
 	}

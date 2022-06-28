@@ -3,8 +3,9 @@ package net.pingfang.iot.common;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hswebframework.web.bean.FastBeanCopier;
 import org.springframework.util.StringUtils;
+
+import net.pingfang.common.utils.JsonUtils;
 
 public interface ValueObject {
 
@@ -79,8 +80,7 @@ public interface ValueObject {
 	}
 
 	default <T> Optional<T> get(String name, Class<T> type) {
-		return get(name)
-				.map(obj -> FastBeanCopier.DEFAULT_CONVERT.convert(obj, type, FastBeanCopier.EMPTY_CLASS_ARRAY));
+		return get(name).map(obj -> JsonUtils.toObject(JsonUtils.toJsonBytes(obj), type));
 	}
 
 	static ValueObject of(Map<String, Object> mapVal) {
@@ -88,6 +88,7 @@ public interface ValueObject {
 	}
 
 	default <T> T as(Class<T> type) {
-		return FastBeanCopier.copy(values(), type);
+//		return FastBeanCopier.copy(values(), type);
+		return null;
 	}
 }
