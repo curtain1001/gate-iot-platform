@@ -3,11 +3,15 @@ package net.pingfang.device.plc;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.netty.buffer.Unpooled;
 import net.pingfang.device.core.DeviceInfo;
+import net.pingfang.device.plc.codec.PlcDeviceMessageCodec;
 import net.pingfang.iot.common.EncodedMessage;
+import net.pingfang.iot.common.SimpleEncodedMessage;
 import net.pingfang.iot.common.ValueObject;
 import net.pingfang.network.DefaultNetworkType;
 import net.pingfang.network.NetworkManager;
+import net.pingfang.network.tcp.TcpMessage;
 import net.pingfang.network.tcp.client.TcpClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -25,6 +29,7 @@ public class PLCDevice implements DeviceInfo, ValueObject {
 	final HashMap<String, Object> properties;
 	final NetworkManager networkManager;
 	final TcpClient tcpClient;
+	final PlcDeviceMessageCodec messageCodec = new PlcDeviceMessageCodec();
 
 	public PLCDevice(String deviceId, String laneId, String deviceCode, String deviceName,
 			HashMap<String, Object> properties, NetworkManager networkManager) {
@@ -79,12 +84,8 @@ public class PLCDevice implements DeviceInfo, ValueObject {
 
 	@Override
 	public Mono<Boolean> send(EncodedMessage message) {
-//
-//		byte[] payload = DebugUtils.stringToBytes(message);
-//
-//		return tcpClient.flatMap(client -> client.send(new TcpMessage(Unpooled.wrappedBuffer(payload))))
-//				.thenReturn("推送成功").flux();
-		return null;
+		SimpleEncodedMessage encodedMessage = messageCodec.decode(message.getPayload());
+		return tcpClient.send(new TcpMessage(Unpooled.wrappedBuffer(encodedMessage.getPayload())));
 	}
 
 	@Override
