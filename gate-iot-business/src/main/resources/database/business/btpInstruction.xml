@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <property name="blob.type" dbms="mssql" value="varbinary(max)" />
+    <property name="blob.type" dbms="mysql" value="longblob" />
+    <property name="blob.type" dbms="h2" value="blob" />
+
+    <property name="clob.type" dbms="mssql" value="varchar(max)" />
+    <property name="clob.type" dbms="mysql" value="longtext" />
+    <property name="clob.type" dbms="h2" value="longtext" />
+
+    <changeSet author="wangchao" id="btp_instruction::create">
+        <createTable tableName="btp_instruction" remarks="场站信息表">
+            <column name="instr_id" remarks="主键" type="BIGINT(20)" incrementBy="1" startWith="1" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="product" type="varchar(64)" remarks="设备产品类型" />
+            <column name="command" type="varchar(64)" remarks="命令" />
+            <column name="content" type="varchar(255)" remarks="命令报文正文" />
+            <column name="create_by" defaultValue="" remarks="创建者" type="VARCHAR(64)" />
+            <column name="create_time" remarks="创建时间" type="datetime(6)" />
+            <column name="update_by" defaultValue="" remarks="更新者" type="VARCHAR(64)" />
+            <column name="update_time" remarks="更新时间" type="datetime(6)" />
+            <column name="remark" remarks="备注" type="VARCHAR(500)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="wangchao" id="btp_instr_device::create">
+        <createTable tableName="btp_instr_device" remarks="场站信息表">
+            <column name="instr_device_id" remarks="主键" type="BIGINT(20)" incrementBy="1" startWith="1"
+                    autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="device_id" type="BIGINT(20)" remarks="设备id" />
+            <column name="instr_id" type="BIGINT(20)" remarks="命令id" />
+            <column name="create_by" defaultValue="" remarks="创建者" type="VARCHAR(64)" />
+            <column name="create_time" remarks="创建时间" type="datetime(6)" />
+            <column name="update_by" defaultValue="" remarks="更新者" type="VARCHAR(64)" />
+            <column name="update_time" remarks="更新时间" type="datetime(6)" />
+            <column name="remark" remarks="备注" type="VARCHAR(500)" />
+        </createTable>
+        <createIndex tableName="btp_instr_device" indexName="instr_device_idx">
+            <column name="device_id" />
+            <column name="instr_id" />
+        </createIndex>
+    </changeSet>
+
+
+</databaseChangeLog>

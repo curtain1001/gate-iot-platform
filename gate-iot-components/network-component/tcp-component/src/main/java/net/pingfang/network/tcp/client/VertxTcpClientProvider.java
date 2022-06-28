@@ -60,6 +60,9 @@ public class VertxTcpClientProvider implements NetworkProvider<TcpClientProperti
 	}
 
 	public void initClient(VertxTcpClient client, TcpClientProperties properties) {
+		NetClientOptions options = properties.getOptions();
+		options.setReconnectAttempts(10);
+		options.setReconnectInterval(500);
 		NetClient netClient = vertx.createNetClient(properties.getOptions());
 		client.setClient(netClient);
 		client.setKeepAliveTimeoutMs(properties.getLong("keepAliveTimeout").orElse(Duration.ofMinutes(10).toMillis()));
