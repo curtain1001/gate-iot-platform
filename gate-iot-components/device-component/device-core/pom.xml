@@ -31,7 +31,11 @@
             <groupId>net.pingfang</groupId>
             <artifactId>common-component</artifactId>
             <version>1.0.0</version>
-            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.pingfang</groupId>
+            <artifactId>network-core</artifactId>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
 

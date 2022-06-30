@@ -4,13 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.netty.buffer.Unpooled;
-import net.pingfang.device.core.DeviceInfo;
+import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.plc.codec.PlcDeviceMessageCodec;
 import net.pingfang.iot.common.EncodedMessage;
-import net.pingfang.iot.common.SimpleEncodedMessage;
 import net.pingfang.iot.common.ValueObject;
-import net.pingfang.network.DefaultNetworkType;
-import net.pingfang.network.NetworkManager;
 import net.pingfang.network.tcp.TcpMessage;
 import net.pingfang.network.tcp.client.TcpClient;
 import reactor.core.publisher.Flux;
@@ -21,25 +18,23 @@ import reactor.core.publisher.Mono;
  * @description TODO
  * @date 2022-06-27 17:06
  */
-public class PLCDevice implements DeviceInfo, ValueObject {
-	final String deviceId;
+public class PLCDevice implements DeviceOperator, ValueObject {
+	final Long deviceId;
 	final String laneId;
 	final String deviceCode;
 	final String deviceName;
 	final HashMap<String, Object> properties;
-	final NetworkManager networkManager;
 	final TcpClient tcpClient;
 	final PlcDeviceMessageCodec messageCodec = new PlcDeviceMessageCodec();
 
-	public PLCDevice(String deviceId, String laneId, String deviceCode, String deviceName,
-			HashMap<String, Object> properties, NetworkManager networkManager) {
+	public PLCDevice(Long deviceId, String laneId, String deviceCode, String deviceName,
+			HashMap<String, Object> properties, TcpClient tcpClient) {
 		this.deviceId = deviceId;
 		this.laneId = laneId;
 		this.deviceCode = deviceCode;
 		this.deviceName = deviceName;
 		this.properties = properties;
-		this.networkManager = networkManager;
-		tcpClient = (TcpClient) networkManager.getNetwork(DefaultNetworkType.TCP_CLIENT, deviceId);
+		this.tcpClient = tcpClient;
 	}
 
 	@Override
@@ -48,7 +43,7 @@ public class PLCDevice implements DeviceInfo, ValueObject {
 	}
 
 	@Override
-	public String getDeviceId() {
+	public Long getDeviceId() {
 		return deviceId;
 	}
 
@@ -74,7 +69,7 @@ public class PLCDevice implements DeviceInfo, ValueObject {
 
 	@Override
 	public void disconnect() {
-
+		tcpClient.disconnect();
 	}
 
 	@Override
@@ -84,12 +79,13 @@ public class PLCDevice implements DeviceInfo, ValueObject {
 
 	@Override
 	public Mono<Boolean> send(EncodedMessage message) {
-		SimpleEncodedMessage encodedMessage = messageCodec.decode(message.getPayload());
-		return tcpClient.send(new TcpMessage(Unpooled.wrappedBuffer(encodedMessage.getPayload())));
+//		SimpleEncodedMessage encodedMessage = messageCodec.decode(message.getPayload());
+		return tcpClient.send(new TcpMessage(Unpooled.wrappedBuffer(message.getPayload())));
 	}
 
 	@Override
 	public Map<String, Object> values() {
 		return properties;
 	}
+
 }

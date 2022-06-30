@@ -1,77 +1,70 @@
 package net.pingfang.device.core;
 
+import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 
-import net.pingfang.iot.common.EncodedMessage;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
- * @author 王超
- * @description TODO
- * @date 2022-06-27 15:49
+ * @author zhouhao
+ * @since 1.0.0
  */
-
-public interface DeviceInfo {
-	/**
-	 * 设备号
-	 *
-	 * @return
-	 */
-	String getDeviceId();
-
-	/**
-	 * 车道主键
-	 *
-	 * @return 车道主键
-	 */
-	String getLaneId();
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class DeviceInfo implements Serializable {
+	private static final long serialVersionUID = -6849794470754667710L;
 
 	/**
-	 * 设备代码
-	 *
-	 * @return 设备代码
+	 * 设备ID
 	 */
-	String getDeviceCode();
+	private String id;
 
 	/**
-	 * 设备名称
-	 *
-	 * @return 设备名称
+	 * 产品ID
 	 */
-	String getDeviceName();
+	private String productId;
 
 	/**
-	 * 获取状态
-	 *
-	 * @return 状态
+	 * 产品版本
 	 */
-	String getStatus();
+	private String productVersion;
 
-	/**
-	 *
-	 * 断开连接
-	 */
-	void disconnect();
-
-	/**
-	 * 订阅TCP消息,此消息是已经处理过粘拆包的完整消息
-	 *
-	 * @return TCP消息
-	 */
-	Flux<EncodedMessage> subscribe();
-
-	/**
-	 * 向客户端发送数据
-	 *
-	 * @param message 数据对象
-	 * @return 发送结果
-	 */
-	Mono<Boolean> send(EncodedMessage message);
 
 	/**
 	 * 其他配置
 	 */
-	HashMap<String, Object> getProperties();
+	private Map<String, Object> configuration = new HashMap<>();
+
+	public DeviceInfo addConfig(String key, Object value) {
+		if (configuration == null) {
+			configuration = new HashMap<>();
+		}
+		configuration.put(key, value);
+		return this;
+	}
+
+	public DeviceInfo addConfigIfAbsent(String key, Object value) {
+		if (configuration == null) {
+			configuration = new HashMap<>();
+		}
+		configuration.putIfAbsent(key, value);
+		return this;
+	}
+
+	public DeviceInfo addConfigs(Map<String, ?> configs) {
+		if (configs == null) {
+			return this;
+		}
+		configs.forEach(this::addConfig);
+		return this;
+	}
 
 }
