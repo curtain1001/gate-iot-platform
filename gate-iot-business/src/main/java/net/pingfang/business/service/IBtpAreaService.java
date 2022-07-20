@@ -1,5 +1,7 @@
 package net.pingfang.business.service;
 
+import java.util.List;
+
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import net.pingfang.business.domain.BtpArea;
@@ -11,4 +13,10 @@ import net.pingfang.business.domain.BtpArea;
  */
 
 public interface IBtpAreaService extends IService<BtpArea> {
+	/**
+	 * 获取所有场站及场站的通道信息
+	 *
+	 * @return
+	 */
+	List<BtpArea> getAll();
 }

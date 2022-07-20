@@ -16,15 +16,22 @@
                 <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="product" type="varchar(64)" remarks="设备产品类型" />
-            <column name="command" type="varchar(64)" remarks="命令" />
-            <column name="content" type="varchar(255)" remarks="命令报文正文" />
+            <column name="command_name" type="varchar(64)" remarks="命令名称" />
+            <column name="command_value" type="varchar(64)" remarks="命令键值" />
+            <column name="type" type="VARCHAR(36)" remarks="类型" />
+            <column name="content" type="${clob.type}" remarks="命令报文正文" />
+            <column name="format" type="varchar(255)" remarks="格式化" />
             <column name="create_by" defaultValue="" remarks="创建者" type="VARCHAR(64)" />
             <column name="create_time" remarks="创建时间" type="datetime(6)" />
             <column name="update_by" defaultValue="" remarks="更新者" type="VARCHAR(64)" />
             <column name="update_time" remarks="更新时间" type="datetime(6)" />
             <column name="remark" remarks="备注" type="VARCHAR(500)" />
         </createTable>
+        <createIndex tableName="btp_instruction" indexName="inst_idx">
+            <column name="command_value" />
+        </createIndex>
     </changeSet>
+
 
     <changeSet author="wangchao" id="btp_instr_device::create">
         <createTable tableName="btp_instr_device" remarks="场站信息表">

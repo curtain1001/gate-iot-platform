@@ -29,11 +29,15 @@ import net.pingfang.network.NetworkType;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName("network_config")
+@TableName("btp_network_config")
 public class BtpNetworkConfig extends BaseEntity implements Serializable {
 
 	private static final long serialVersionUID = -2425794209203640447L;
 	@TableId(type = IdType.AUTO)
+	private Long id;
+	/**
+	 * 存在设备的情况 为设备id
+	 */
 	private String networkConfigId;
 
 	private String name;
@@ -43,7 +47,7 @@ public class BtpNetworkConfig extends BaseEntity implements Serializable {
 	@NotNull(message = "类型不能为空")
 	private String type;
 
-	private NetworkConfigState state;
+	private NetworkConfigState status;
 
 	private Map<String, Object> configuration;
 
@@ -54,8 +58,8 @@ public class BtpNetworkConfig extends BaseEntity implements Serializable {
 	public NetworkProperties toNetworkProperties() {
 		NetworkProperties properties = new NetworkProperties();
 		properties.setConfigurations(configuration);
-		properties.setEnabled(state == NetworkConfigState.enabled);
-		properties.setId(getNetworkConfigId());
+		properties.setEnabled(status == NetworkConfigState.enabled);
+		properties.setId(networkConfigId);
 		properties.setName(name);
 
 		return properties;

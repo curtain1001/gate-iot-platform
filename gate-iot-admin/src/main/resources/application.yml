@@ -31,7 +31,7 @@ server:
       # tomcat最大线程数，默认为200
       max: 800
       # Tomcat启动初始化的线程数，默认值10
-      min-spare: 100
+      min-spare: 10
 
 # 日志配置
 logging:
@@ -57,10 +57,10 @@ spring:
       # 设置总上传的文件大小
       max-request-size: 20MB
   # 服务模块
-  devtools:
-    restart:
-      # 热部署开关
-      enabled: true
+  #  devtools:
+  #    restart:
+  #      # 热部署开关
+  #      enabled: false
   # redis 配置
   redis:
     # 地址
@@ -132,6 +132,12 @@ xss:
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
 
+vertx:
+  max-event-loop-execute-time-unit: seconds
+  max-event-loop-execute-time: 30
+  max-worker-execute-time-unit: seconds
+  max-worker-execute-time: 30
+  prefer-native-transport: true
 
 liquibase:
   changelog:
@@ -139,3 +145,5 @@ liquibase:
     - /database/business/btpLane.xml
     - /database/business/btpNetworkConfig.xml
     - /database/business/btpCertificate.xml
+    - /database/business/btpDevice.xml
+    - /database/business/btpInstruction.xml

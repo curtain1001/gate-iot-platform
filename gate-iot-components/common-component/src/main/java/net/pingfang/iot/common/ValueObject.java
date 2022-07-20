@@ -34,7 +34,7 @@ public interface ValueObject {
 //	default Optional<Duration> getDuration(String name) {
 //		return getString(name).map(TimeUtils::parse);
 //	}
-
+//
 //	default Optional<Interval> getInterval(String name) {
 //		return getString(name).map(Interval::of);
 //	}
@@ -42,11 +42,11 @@ public interface ValueObject {
 //	default Interval getInterval(String name, Interval defaultValue) {
 //		return getString(name).map(Interval::of).orElse(defaultValue);
 //	}
-
+//
 //	default Duration getDuration(String name, Duration defaultValue) {
 //		return getDuration(name).orElse(defaultValue);
 //	}
-
+//
 //	default Optional<Date> getDate(String name) {
 //		return get(name).map(String::valueOf).map(TimeUtils::parseDate);
 //	}

@@ -6,8 +6,8 @@ import org.junit.platform.commons.logging.LoggerFactory;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import net.pingfang.business.component.customizedsetting.repos.CustomizedSettingRepository;
 import net.pingfang.common.utils.JsonUtils;
+import net.pingfang.iot.common.customizedsetting.repos.CustomizedSettingRepository;
 
 /**
  * @author 王超

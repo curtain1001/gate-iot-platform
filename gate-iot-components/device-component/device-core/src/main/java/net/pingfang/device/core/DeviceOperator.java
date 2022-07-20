@@ -1,10 +1,8 @@
 package net.pingfang.device.core;
 
-import java.util.HashMap;
-
-import net.pingfang.iot.common.EncodedMessage;
+import net.pingfang.iot.common.FunctionMessage;
+import net.pingfang.iot.common.product.Product;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * @author 王超
@@ -18,21 +16,14 @@ public interface DeviceOperator {
 	 *
 	 * @return
 	 */
-	Long getDeviceId();
+	String getDeviceId();
 
 	/**
 	 * 车道主键
 	 *
 	 * @return 车道主键
 	 */
-	String getLaneId();
-
-	/**
-	 * 设备代码
-	 *
-	 * @return 设备代码
-	 */
-	String getDeviceCode();
+	Long getLaneId();
 
 	/**
 	 * 设备名称
@@ -41,12 +32,22 @@ public interface DeviceOperator {
 	 */
 	String getDeviceName();
 
+	Product getProduct();
+
 	/**
 	 * 获取状态
 	 *
 	 * @return 状态
 	 */
-	String getStatus();
+	DeviceState getStatus();
+
+	/**
+	 * 设置状态
+	 *
+	 * @param state
+	 */
+
+	void setStatus(DeviceState state);
 
 	/**
 	 *
@@ -55,23 +56,24 @@ public interface DeviceOperator {
 	void disconnect();
 
 	/**
-	 * 订阅TCP消息,此消息是已经处理过粘拆包的完整消息
-	 *
-	 * @return TCP消息
+	 * 订阅消息
 	 */
-	Flux<EncodedMessage> subscribe();
+	Flux<FunctionMessage> subscribe();
+
+	boolean isAlive();
 
 	/**
-	 * 向客户端发送数据
+	 * 当{@link DeviceOperator#isAlive()}为false是,是否自动重新加载.
 	 *
-	 * @param message 数据对象
-	 * @return 发送结果
+	 * @return 是否重新加载
+	 * @see DeviceProvider#reload(DeviceOperator, Object)
 	 */
-	Mono<Boolean> send(EncodedMessage message);
+	boolean isAutoReload();
 
 	/**
-	 * 其他配置
+	 * 保活
 	 */
-	HashMap<String, Object> getProperties();
+
+	void keepAlive();
 
 }

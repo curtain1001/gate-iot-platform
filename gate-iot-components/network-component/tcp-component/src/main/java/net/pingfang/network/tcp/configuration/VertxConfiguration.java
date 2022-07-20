@@ -14,6 +14,7 @@ import io.vertx.core.VertxOptions;
  */
 @Configuration
 public class VertxConfiguration {
+
 	@Bean
 	@ConfigurationProperties(prefix = "vertx")
 	public VertxOptions vertxOptions() {
@@ -24,4 +25,9 @@ public class VertxConfiguration {
 	public Vertx vertx(VertxOptions vertxOptions) {
 		return Vertx.vertx(vertxOptions);
 	}
+
+//	@Bean
+//	public VertxTcpClientProvider VertxTcpClientProvider() {
+//		return new VertxTcpClientProvider(certificateManager, vertx, payloadParserBuilder);
+//	}
 }

@@ -1,5 +1,6 @@
 package net.pingfang.network.tcp.client;
 
+import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
 
 import javax.annotation.Nonnull;
@@ -10,7 +11,6 @@ import io.vertx.core.Vertx;
 import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetClientOptions;
 import lombok.extern.slf4j.Slf4j;
-import net.pingfang.common.utils.bean.BeanUtils;
 import net.pingfang.network.DefaultNetworkType;
 import net.pingfang.network.Network;
 import net.pingfang.network.NetworkProperties;
@@ -21,8 +21,8 @@ import net.pingfang.network.security.CertificateManager;
 import net.pingfang.network.security.VertxKeyCertTrustOptions;
 import net.pingfang.network.tcp.parser.PayloadParserBuilder;
 
-@Component
 @Slf4j
+@Component
 public class VertxTcpClientProvider implements NetworkProvider<TcpClientProperties> {
 
 	private final CertificateManager certificateManager;
@@ -47,10 +47,8 @@ public class VertxTcpClientProvider implements NetworkProvider<TcpClientProperti
 	@Nonnull
 	@Override
 	public VertxTcpClient createNetwork(@Nonnull TcpClientProperties properties) {
-		VertxTcpClient client = new VertxTcpClient(properties.getId(), false);
-
+		VertxTcpClient client = new VertxTcpClient(properties.getId(), true);
 		initClient(client, properties);
-
 		return client;
 	}
 
@@ -82,7 +80,12 @@ public class VertxTcpClientProvider implements NetworkProvider<TcpClientProperti
 	@Override
 	public TcpClientProperties createConfig(NetworkProperties properties) {
 		TcpClientProperties config = new TcpClientProperties();
-		BeanUtils.copyBeanProp(config, properties.getConfigurations());
+		try {
+			org.apache.commons.beanutils.BeanUtils.populate(config, properties.getConfigurations());
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			e.printStackTrace();
+		}
+		// BeanUtils.copyBeanProp(config, properties.getConfigurations());
 		config.setId(properties.getId());
 		if (config.getOptions() == null) {
 			config.setOptions(new NetClientOptions());

@@ -1,60 +1,42 @@
 package net.pingfang.device.plc;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import io.netty.buffer.Unpooled;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import net.pingfang.device.core.DeviceOperator;
-import net.pingfang.device.plc.codec.PlcDeviceMessageCodec;
-import net.pingfang.iot.common.EncodedMessage;
-import net.pingfang.iot.common.ValueObject;
+import net.pingfang.device.core.DeviceState;
+import net.pingfang.iot.common.FunctionMessage;
+import net.pingfang.iot.common.MessagePayloadType;
+import net.pingfang.iot.common.product.Product;
 import net.pingfang.network.tcp.TcpMessage;
 import net.pingfang.network.tcp.client.TcpClient;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * @author 王超
  * @description TODO
  * @date 2022-06-27 17:06
  */
-public class PLCDevice implements DeviceOperator, ValueObject {
-	final Long deviceId;
-	final String laneId;
-	final String deviceCode;
+public class PLCDevice implements DeviceOperator {
+	final String deviceId;
+	final Long laneId;
 	final String deviceName;
-	final HashMap<String, Object> properties;
-	final TcpClient tcpClient;
-	final PlcDeviceMessageCodec messageCodec = new PlcDeviceMessageCodec();
+	private TcpClient tcpClient;
 
-	public PLCDevice(Long deviceId, String laneId, String deviceCode, String deviceName,
-			HashMap<String, Object> properties, TcpClient tcpClient) {
+	public PLCDevice(Long laneId, String deviceId, String deviceName, TcpClient tcpClient) {
 		this.deviceId = deviceId;
 		this.laneId = laneId;
-		this.deviceCode = deviceCode;
 		this.deviceName = deviceName;
-		this.properties = properties;
 		this.tcpClient = tcpClient;
 	}
 
 	@Override
-	public HashMap<String, Object> getProperties() {
-		return properties;
-	}
-
-	@Override
-	public Long getDeviceId() {
+	public String getDeviceId() {
 		return deviceId;
 	}
 
 	@Override
-	public String getLaneId() {
+	public Long getLaneId() {
 		return laneId;
-	}
-
-	@Override
-	public String getDeviceCode() {
-		return deviceCode;
 	}
 
 	@Override
@@ -63,29 +45,67 @@ public class PLCDevice implements DeviceOperator, ValueObject {
 	}
 
 	@Override
-	public String getStatus() {
-		return null;
+	public Product getProduct() {
+		return PLCProduct.PLC;
+	}
+
+	@Override
+	public DeviceState getStatus() {
+		return checkStatus();
 	}
 
 	@Override
 	public void disconnect() {
-		tcpClient.disconnect();
+		if (tcpClient != null) {
+			tcpClient.disconnect();
+		}
+	}
+
+	public Flux<FunctionMessage> subscribe() {
+		return tcpClient.subscribe()
+				.map(x -> new FunctionMessage(laneId, deviceId, null, x, MessagePayloadType.BINARY));
+	}
+
+	public void send(TcpMessage message) {
+		tcpClient.send(message).block();
+	}
+
+	public DeviceState checkStatus() {
+		ByteBuf byteBuf = ByteBufAllocator.DEFAULT.ioBuffer();
+		byteBuf.writeBytes(new byte[] { (byte) 0xFE, (byte) 0xFF, (byte) 0xFF });
+		TcpMessage tcpMessage = new TcpMessage();
+		tcpMessage.setPayload(byteBuf);
+		Boolean bln = tcpClient.send(tcpMessage).block();
+		return bln != null && bln ? DeviceState.online : DeviceState.offline;
 	}
 
 	@Override
-	public Flux<EncodedMessage> subscribe() {
-		return null;
+	public void setStatus(DeviceState state) {
+
 	}
 
 	@Override
-	public Mono<Boolean> send(EncodedMessage message) {
-//		SimpleEncodedMessage encodedMessage = messageCodec.decode(message.getPayload());
-		return tcpClient.send(new TcpMessage(Unpooled.wrappedBuffer(message.getPayload())));
+	public boolean isAutoReload() {
+		return true;
 	}
 
 	@Override
-	public Map<String, Object> values() {
-		return properties;
+	public boolean isAlive() {
+		if (tcpClient != null) {
+			return tcpClient.isAlive();
+		}
+		return false;
+	}
+
+	@Override
+	public void keepAlive() {
+		if (tcpClient != null) {
+			ByteBuf byteBuf = ByteBufAllocator.DEFAULT.ioBuffer();
+			byteBuf.writeBytes(new byte[] { (byte) 0xFE, (byte) 0xFF, (byte) 0xFF });
+			TcpMessage tcpMessage = new TcpMessage();
+			tcpMessage.setPayload(byteBuf);
+			tcpClient.send(tcpMessage);
+		}
 	}
 
 }

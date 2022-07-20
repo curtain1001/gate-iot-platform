@@ -3,6 +3,7 @@ package net.pingfang.business.controller;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -23,6 +24,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
 import net.pingfang.business.domain.BtpArea;
 import net.pingfang.business.service.IBtpAreaService;
+import net.pingfang.business.values.LabelObject;
 import net.pingfang.common.annotation.Log;
 import net.pingfang.common.core.controller.BaseController;
 import net.pingfang.common.core.domain.AjaxResult;
@@ -152,6 +154,13 @@ public class BtpAreaController extends BaseController {
 	public AjaxResult remove(@PathVariable Long[] areaIds) {
 		areaService.removeByIds(Arrays.asList(areaIds));
 		return success();
+	}
+
+	@GetMapping("list/all")
+	public AjaxResult getList() {
+		List<BtpArea> btpAreas = areaService.getAll();
+		List<LabelObject> labelObjects = btpAreas.stream().map(BtpArea::toLabelObject).collect(Collectors.toList());
+		return AjaxResult.success(labelObjects);
 	}
 
 }

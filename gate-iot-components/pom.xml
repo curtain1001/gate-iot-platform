@@ -19,6 +19,7 @@
         <module>network-component</module>
         <module>common-component</module>
         <module>device-component</module>
+        <module>service-component</module>
     </modules>
 
 </project>

@@ -1,5 +1,9 @@
 package net.pingfang.business.service.impl;
 
+import java.util.List;
+
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -15,4 +19,11 @@ import net.pingfang.business.service.IBtpAreaService;
  */
 @Service
 public class BtpAreaServiceImpl extends ServiceImpl<BtpAreaMapper, BtpArea> implements IBtpAreaService {
+	@Resource
+	BtpAreaMapper btpAreaMapper;
+
+	@Override
+	public List<BtpArea> getAll() {
+		return btpAreaMapper.getAll();
+	}
 }

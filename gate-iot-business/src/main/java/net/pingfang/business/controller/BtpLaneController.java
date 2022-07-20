@@ -60,7 +60,7 @@ public class BtpLaneController extends BaseController {
 		LambdaQueryWrapper<BtpLane> queryWrapper = Wrappers.lambdaQuery();
 		queryWrapper.like(StringUtils.checkValNotNull(lane.getLaneNo()), BtpLane::getLaneNo, lane.getLaneNo());
 		queryWrapper.like(StringUtils.checkValNotNull(lane.getLaneName()), BtpLane::getLaneName, lane.getLaneName());
-		queryWrapper.like(StringUtils.checkValNotNull(lane.getAreaNo()), BtpLane::getAreaNo, lane.getAreaNo());
+		queryWrapper.like(StringUtils.checkValNotNull(lane.getAreaId()), BtpLane::getAreaId, lane.getAreaId());
 		queryWrapper.like(StringUtils.checkValNotNull(lane.getType()), BtpLane::getType, lane.getType());
 		queryWrapper.like(StringUtils.checkValNotNull(lane.getCustomsLaneNo()), BtpLane::getCustomsLaneNo,
 				lane.getCustomsLaneNo());
@@ -110,10 +110,10 @@ public class BtpLaneController extends BaseController {
 	/**
 	 * 根据场站号查询
 	 */
-	@GetMapping(value = "/lane/area/{areaNo}")
-	public AjaxResult selectByAreaNo(@PathVariable String areaNo) {
+	@GetMapping(value = "/lane/area/{areaId}")
+	public AjaxResult selectByAreaNo(@PathVariable String areaId) {
 		LambdaQueryWrapper<BtpLane> wrapper = Wrappers.lambdaQuery();
-		wrapper.eq(BtpLane::getAreaNo, areaNo);
+		wrapper.eq(BtpLane::getAreaId, areaId);
 		return AjaxResult.success(laneService.list(wrapper));
 	}
 
@@ -156,7 +156,7 @@ public class BtpLaneController extends BaseController {
 		wrapper.eq(BtpLane::getLaneNo, lane.getLaneNo());
 		btpLane = laneService.getOne(wrapper);
 		if (btpLane != null && !btpLane.getLaneId().equals(lane.getLaneId())) {
-			return AjaxResult.error("修改通道'" + lane.getAreaNo() + "'失败，通道号已存在");
+			return AjaxResult.error("修改通道'" + lane.getLaneNo() + "'失败，通道号已存在");
 		}
 		lane.setUpdateBy(getUsername());
 		lane.setUpdateTime(new Date());

@@ -17,11 +17,11 @@
     <dependencies>
 
         <!-- spring-boot-devtools -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <optional>true</optional> <!-- 表示依赖不会传递 -->
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework.boot</groupId>-->
+        <!--            <artifactId>spring-boot-devtools</artifactId>-->
+        <!--            <optional>true</optional> &lt;!&ndash; 表示依赖不会传递 &ndash;&gt;-->
+        <!--        </dependency>-->
 
         <!-- swagger3-->
         <dependency>
@@ -71,6 +71,18 @@
             <groupId>net.pingfang</groupId>
             <artifactId>gate-iot-business</artifactId>
         </dependency>
+        <dependency>
+            <groupId>net.pingfang</groupId>
+            <artifactId>device-component</artifactId>
+            <version>${gate-iot.version}</version>
+        </dependency>
+
+        <!-- 业务模块-->
+        <dependency>
+            <groupId>net.pingfang</groupId>
+            <artifactId>network-component</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
     </dependencies>
 
@@ -81,7 +93,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>2.1.1.RELEASE</version>
                 <configuration>
-                    <fork>true</fork> <!-- 如果没有该配置，devtools不会生效 -->
+                    <!--                    <fork>true</fork> &lt;!&ndash; 如果没有该配置，devtools不会生效 &ndash;&gt;-->
                 </configuration>
                 <executions>
                     <execution>

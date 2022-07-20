@@ -15,4 +15,5 @@ import net.pingfang.business.service.IBtpLaneService;
  */
 @Service
 public class BtpLaneServiceImpl extends ServiceImpl<BtpLaneMapper, BtpLane> implements IBtpLaneService {
+
 }

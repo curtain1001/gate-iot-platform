@@ -4,7 +4,10 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Many;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
@@ -105,5 +108,10 @@ public interface BtpAreaMapper extends BaseMapper<BtpArea> {
 			+ "</foreach>"//
 			+ "</script>") //
 	public int deleteAreaByIds(Long[] areaIds);
+
+	@Select("select * from btp_area")
+	@Results({
+			@Result(column = "area_id", property = "btpLanes", many = @Many(select = "net.pingfang.business.mapper.BtpLaneMapper.getLaneByAreaId")) })
+	public List<BtpArea> getAll();
 
 }

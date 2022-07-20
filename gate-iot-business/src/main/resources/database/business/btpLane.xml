@@ -17,7 +17,10 @@
             </column>
             <column name="lane_name" type="varchar(64)" remarks="车道名称" />
             <column name="lane_no" type="varchar(24)" remarks="车道号" />
-            <column name="area_no" type="varchar(24)" remarks="车道号" />
+            <column name="area_id" type="BIGINT(20)" remarks="场站id">
+                <constraints foreignKeyName="fk_area_id_btp_area_id" referencedColumnNames="area_id"
+                        referencedTableName="btp_area" />
+            </column>
             <column name="type" type="char(1)" remarks="进出道类型（0:进；1：出）" />
             <column name="customs_lane_no" type="varchar(24)" remarks="海关通道号" />
             <column name="create_by" defaultValue="" remarks="创建者" type="VARCHAR(64)" />
@@ -29,7 +32,7 @@
         <createIndex tableName="btp_lane" indexName="lane_idx">
             <column name="lane_no" />
             <column name="lane_name" />
-            <column name="area_no" />
+            <column name="area_id" />
             <column name="customs_lane_no" />
         </createIndex>
     </changeSet>

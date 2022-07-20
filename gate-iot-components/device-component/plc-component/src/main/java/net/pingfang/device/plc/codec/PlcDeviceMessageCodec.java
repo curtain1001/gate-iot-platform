@@ -1,5 +1,6 @@
 package net.pingfang.device.plc.codec;
 
+import io.netty.buffer.ByteBuf;
 import net.pingfang.device.core.codec.DeviceMessageCodec;
 import net.pingfang.iot.common.EncodedMessage;
 import net.pingfang.iot.common.SimpleEncodedMessage;
@@ -11,12 +12,12 @@ import net.pingfang.iot.common.SimpleEncodedMessage;
  */
 public class PlcDeviceMessageCodec implements DeviceMessageCodec {
 	@Override
-	public EncodedMessage encode(Object obj) {
+	public EncodedMessage encode(ByteBuf obj) {
 		return null;
 	}
 
 	@Override
-	public SimpleEncodedMessage decode(Object obj) {
+	public SimpleEncodedMessage decode(ByteBuf obj) {
 		return null;
 	}
 }

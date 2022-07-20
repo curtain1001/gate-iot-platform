@@ -21,9 +21,9 @@ public class TcpClientProperties implements ValueObject {
 
 	private String id;
 
-	private int port;
-
 	private String host;
+
+	private int port;
 
 	private String certId;
 

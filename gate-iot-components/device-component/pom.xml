@@ -18,6 +18,7 @@
     <modules>
         <module>device-core</module>
         <module>plc-component</module>
+        <module>licenseplate-component</module>
     </modules>
 
 </project>

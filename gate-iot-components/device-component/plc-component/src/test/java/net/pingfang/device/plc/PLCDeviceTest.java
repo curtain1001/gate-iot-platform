@@ -3,6 +3,8 @@ package net.pingfang.device.plc;
 import javax.annotation.Resource;
 
 import org.junit.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
 import net.pingfang.network.NetworkManager;
 
@@ -13,7 +15,7 @@ import net.pingfang.network.NetworkManager;
  */
 //@RunWith(SpringRunner.class)
 //@Slf4j
-//@SpringBootTest(classes = TestApplication.class)
+@SpringBootTest(classes = TestApplication.class, webEnvironment = WebEnvironment.NONE)
 public class PLCDeviceTest {
 
 	@Resource

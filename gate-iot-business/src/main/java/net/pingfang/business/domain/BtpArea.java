@@ -1,6 +1,8 @@
 package net.pingfang.business.domain;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -14,6 +16,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import net.pingfang.business.values.LabelObject;
 import net.pingfang.common.core.domain.BaseEntity;
 
 /**
@@ -44,6 +47,16 @@ public class BtpArea extends BaseEntity implements Serializable {
 	 */
 	@TableField(value = "area_no", condition = SqlCondition.LIKE)
 	private String areaNo;
+
+	private transient List<BtpLane> btpLanes;
+
+	public LabelObject toLabelObject() {
+		return LabelObject.builder() //
+				.label(areaName) //
+				.value(areaId)//
+				.children(btpLanes.stream().map(BtpLane::toLabelObject).collect(Collectors.toList())) //
+				.build(); //
+	}
 
 	public Long getAreaId() {
 		return areaId;

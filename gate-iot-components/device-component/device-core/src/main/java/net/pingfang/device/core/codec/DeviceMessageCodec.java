@@ -1,5 +1,6 @@
 package net.pingfang.device.core.codec;
 
+import io.netty.buffer.ByteBuf;
 import net.pingfang.iot.common.EncodedMessage;
 import net.pingfang.iot.common.SimpleEncodedMessage;
 
@@ -15,10 +16,10 @@ public interface DeviceMessageCodec {
 	 * @param obj
 	 * @return 编码报文
 	 */
-	EncodedMessage encode(Object obj);
+	EncodedMessage encode(ByteBuf obj);
 
 	/**
 	 * 解码器
 	 */
-	SimpleEncodedMessage decode(Object obj);
+	SimpleEncodedMessage decode(ByteBuf obj);
 }

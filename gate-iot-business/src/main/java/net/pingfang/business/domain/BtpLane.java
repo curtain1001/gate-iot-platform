@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import net.pingfang.business.values.LabelObject;
 import net.pingfang.common.core.domain.BaseEntity;
 
 /**
@@ -44,7 +45,7 @@ public class BtpLane extends BaseEntity implements Serializable {
 	/**
 	 * 场站号
 	 */
-	private String areaNo;
+	private String areaId;
 
 	/**
 	 * 海关通道号
@@ -55,6 +56,13 @@ public class BtpLane extends BaseEntity implements Serializable {
 	 * 进出类型（0:进；1：出）
 	 */
 	private String type;
+
+	public LabelObject toLabelObject() {
+		return LabelObject.builder() //
+				.label(laneName) //
+				.value(laneId)//
+				.build(); //
+	}
 
 	public String getLaneId() {
 		return laneId;
@@ -84,12 +92,12 @@ public class BtpLane extends BaseEntity implements Serializable {
 		this.laneNo = laneNo;
 	}
 
-	public String getAreaNo() {
-		return areaNo;
+	public String getAreaId() {
+		return areaId;
 	}
 
-	public void setAreaNo(String areaNo) {
-		this.areaNo = areaNo;
+	public void setAreaId(String areaId) {
+		this.areaId = areaId;
 	}
 
 	public String getCustomsLaneNo() {

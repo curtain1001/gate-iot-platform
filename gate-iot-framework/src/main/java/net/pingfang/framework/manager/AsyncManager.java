@@ -42,6 +42,10 @@ public class AsyncManager {
 		executor.schedule(task, OPERATE_DELAY_TIME, TimeUnit.MILLISECONDS);
 	}
 
+	public void execute(Runnable runnable) {
+		executor.execute(runnable);
+	}
+
 	/**
 	 * 停止任务线程池
 	 */

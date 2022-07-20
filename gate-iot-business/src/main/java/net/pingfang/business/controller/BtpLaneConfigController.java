@@ -22,7 +22,6 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
-import net.pingfang.business.component.customizedsetting.repos.CustomizedSettingRepository;
 import net.pingfang.business.domain.BtpLaneConfig;
 import net.pingfang.business.service.IBtpLaneConfigService;
 import net.pingfang.common.annotation.Log;
@@ -30,6 +29,7 @@ import net.pingfang.common.core.controller.BaseController;
 import net.pingfang.common.core.domain.AjaxResult;
 import net.pingfang.common.core.page.TableDataInfo;
 import net.pingfang.common.enums.BusinessType;
+import net.pingfang.iot.common.customizedsetting.repos.CustomizedSettingRepository;
 
 /**
  * @author 王超

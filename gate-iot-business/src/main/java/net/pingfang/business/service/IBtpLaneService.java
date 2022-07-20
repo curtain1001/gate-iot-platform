@@ -10,4 +10,5 @@ import net.pingfang.business.domain.BtpLane;
  * @date 2022-06-22 15:45
  */
 public interface IBtpLaneService extends IService<BtpLane> {
+
 }

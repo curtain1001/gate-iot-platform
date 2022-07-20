@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
@@ -46,7 +44,7 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor 
 		getNetwork(type, id);
 	}
 
-	@PostConstruct
+//	@PostConstruct
 	public void start() {
 		Flux.interval(Duration.ofSeconds(10)).subscribe(t -> this.checkNetwork());
 	}
@@ -89,6 +87,16 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor 
 		return network;
 	}
 
+	@Override
+	public <T extends Network> Network getNetwork(NetworkType type, NetworkProperties properties, String id) {
+		Map<String, Network> networkMap = getNetworkStore(type);
+		Network network = networkMap.get(id);
+		if (network == null || !network.isAlive()) {
+			network = createNetwork(type, properties, id);
+		}
+		return network;
+	}
+
 	/**
 	 * 如果store中不存在网络组件就创建，存在就重新加载
 	 *
@@ -107,6 +115,19 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor 
 			}
 			return network;
 		});
+	}
+
+	public Network createNetwork(NetworkType type, NetworkProperties properties, String id) {
+		NetworkProvider<Object> provider = providerSupport.get(type.getId());
+		if (provider == null) {
+			throw new UnsupportedOperationException("不支持的类型:" + type.getName());
+		} else {
+			if (properties == null) {
+				throw new UnsupportedOperationException("网络[" + type.getName() + "]配置[" + id + "]不存在");
+			}
+			Object config = provider.createConfig(properties);
+			return doCreate(provider, id, config);
+		}
 	}
 
 	public Network createNetwork(NetworkType type, String id) {
@@ -147,6 +168,7 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor 
 		Network network = getNetworkStore(type).get(id);
 		if (network != null) {
 			network.shutdown();
+
 		}
 	}
 

@@ -17,9 +17,6 @@
     </properties>
 
 
-    <dependencies></dependencies>
-
-
     <modules>
         <module>network-core</module>
         <module>tcp-component</module>

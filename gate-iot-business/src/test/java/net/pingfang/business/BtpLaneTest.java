@@ -10,8 +10,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.baomidou.mybatisplus.test.autoconfigure.MybatisPlusTest;
 
 import lombok.extern.slf4j.Slf4j;
-import net.pingfang.business.component.customizedsetting.repos.CustomizedSettingRepository;
 import net.pingfang.common.utils.JsonUtils;
+import net.pingfang.iot.common.customizedsetting.repos.CustomizedSettingRepository;
 
 /**
  * @author 王超
