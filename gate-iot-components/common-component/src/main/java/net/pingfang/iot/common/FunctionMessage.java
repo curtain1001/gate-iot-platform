@@ -3,6 +3,7 @@ package net.pingfang.iot.common;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import net.pingfang.iot.common.product.Product;
 
 /**
  * @author 王超
@@ -22,10 +23,7 @@ public class FunctionMessage {
 	 */
 	final String deviceId;
 
-	/**
-	 * 指令对象
-	 */
-	final String command;
+	final Product product;
 
 	/**
 	 * 执行结果

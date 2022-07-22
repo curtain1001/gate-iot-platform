@@ -26,8 +26,4 @@ public class VertxConfiguration {
 		return Vertx.vertx(vertxOptions);
 	}
 
-//	@Bean
-//	public VertxTcpClientProvider VertxTcpClientProvider() {
-//		return new VertxTcpClientProvider(certificateManager, vertx, payloadParserBuilder);
-//	}
 }

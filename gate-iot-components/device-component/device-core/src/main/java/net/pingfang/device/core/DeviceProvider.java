@@ -30,7 +30,7 @@ public interface DeviceProvider<P> {
 	 * @param operator   网络组件
 	 * @param properties 配置信息
 	 */
-	void reload(DeviceOperator operator, P properties);
+	DeviceOperator reload(DeviceOperator operator, P properties);
 
 	/**
 	 * 根据可序列化的配置信息创建网络组件配置

@@ -4,8 +4,10 @@ import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.instruction.DeviceInstruction;
 import net.pingfang.device.licenseplate.LicensePlateDevice;
 import net.pingfang.device.licenseplate.LicensePlateProduct;
+import net.pingfang.iot.common.instruction.InstructionResult;
 import net.pingfang.iot.common.instruction.InstructionType;
 import net.pingfang.iot.common.product.Product;
+import reactor.core.publisher.Mono;
 
 /**
  * @author 王超
@@ -34,8 +36,10 @@ public class ImageSnap implements DeviceInstruction {
 	}
 
 	@Override
-	public void execution(DeviceOperator deviceOperator) {
-		LicensePlateDevice device = (LicensePlateDevice) deviceOperator;
-		device.imageSnap();
+	public Mono<InstructionResult<Object, String>> execution(DeviceOperator deviceOperator) {
+		return Mono.fromCallable(() -> {
+			LicensePlateDevice device = (LicensePlateDevice) deviceOperator;
+			return device.imageSnap();
+		}).map(x -> InstructionResult.success(true, x));
 	}
 }

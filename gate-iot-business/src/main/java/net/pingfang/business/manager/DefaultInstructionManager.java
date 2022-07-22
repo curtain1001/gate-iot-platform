@@ -1,17 +1,20 @@
 package net.pingfang.business.manager;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
 
-import net.pingfang.device.core.manager.DefaultDeviceOperatorManager;
+import net.pingfang.device.core.instruction.DeviceInstruction;
 import net.pingfang.iot.common.instruction.Instruction;
 import net.pingfang.iot.common.instruction.InstructionProvider;
 import net.pingfang.iot.common.instruction.ObjectType;
+import net.pingfang.iot.common.product.Product;
 
 /**
  * @author 王超
@@ -20,22 +23,40 @@ import net.pingfang.iot.common.instruction.ObjectType;
  */
 @Component
 public class DefaultInstructionManager implements BeanPostProcessor {
-
-	private final Map<ObjectType, Map<String, Instruction>> objectTypeMap = new ConcurrentHashMap<>();
-	private final Map<String, Instruction> insMap = new ConcurrentHashMap<>();
-	private final DefaultDeviceOperatorManager operatorManager;
+	/**
+	 * 指令缓存 key:指令value
+	 */
+	private final Map<String, Instruction> instrStore = new ConcurrentHashMap<>();
 	/**
 	 * 指令代理
 	 */
 	private final Map<String, InstructionProvider> providerSupport = new ConcurrentHashMap<>();
 
+	private final DefaultDeviceOperatorManager operatorManager;
+
 	public DefaultInstructionManager(DefaultDeviceOperatorManager operatorManager) {
 		this.operatorManager = operatorManager;
 	}
 
+	public List<Instruction> getInstruction() {
+		return new ArrayList<>(instrStore.values());
+	}
+
+	public Instruction getInstruction(String value) {
+		return instrStore.get(value);
+	}
+
+	public List<Instruction> getInstruction(Product product) {
+		return instrStore.values().stream().filter(x -> {
+			if (ObjectType.device == x.getObjectType()) {
+				return ((DeviceInstruction) x).getProduct().isSupported(product.getValue());
+			}
+			return false;
+		}).collect(Collectors.toList());
+	}
+
 	public void register(Instruction instruction) {
-		insMap.put(instruction.getValue(), instruction);
-		objectTypeMap.put(instruction.getObjectType(), insMap);
+		instrStore.put(instruction.getValue(), instruction);
 	}
 
 	public void register(InstructionProvider provider) {
@@ -44,8 +65,7 @@ public class DefaultInstructionManager implements BeanPostProcessor {
 
 	public void register(List<Instruction> instruction) {
 		instruction.forEach(x -> {
-			insMap.put(x.getValue(), x);
-			objectTypeMap.put(x.getObjectType(), insMap);
+			instrStore.put(x.getValue(), x);
 		});
 	}
 
@@ -53,19 +73,12 @@ public class DefaultInstructionManager implements BeanPostProcessor {
 		providerSupport.values().forEach(x -> register(x.getCommand()));
 	}
 
-	public void deploy(String laneId, String value) {
-//		operatorManager.getDevice()
-
-		Instruction instruction = insMap.get(value);
+	public void execute(String laneId, String value) {
 
 	}
 
-	public Instruction getIns(ObjectType type, String ins) {
-		return objectTypeMap.get(type).get(ins);
-	}
+	public void deviceExecute(String deviceId, String value) {
 
-	public Map<String, Instruction> getIns(ObjectType type) {
-		return objectTypeMap.get(type);
 	}
 
 	@Override

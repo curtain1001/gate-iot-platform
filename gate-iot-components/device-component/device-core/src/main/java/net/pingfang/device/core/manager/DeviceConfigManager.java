@@ -3,7 +3,6 @@ package net.pingfang.device.core.manager;
 import java.util.List;
 
 import net.pingfang.device.core.DeviceProperties;
-import net.pingfang.iot.common.product.Product;
 
 /**
  * 网络组件配置管理器
@@ -12,7 +11,7 @@ import net.pingfang.iot.common.product.Product;
  */
 public interface DeviceConfigManager {
 
-	DeviceProperties getProperties(Product product, String id);
+	DeviceProperties getProperties(String id);
 
 	List<DeviceProperties> getProperties();
 

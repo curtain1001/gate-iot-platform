@@ -10,6 +10,7 @@ import net.pingfang.iot.common.product.Product;
 import net.pingfang.network.tcp.TcpMessage;
 import net.pingfang.network.tcp.client.TcpClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * @author 王超
@@ -55,19 +56,20 @@ public class PLCDevice implements DeviceOperator {
 	}
 
 	@Override
-	public void disconnect() {
+	public void shutdown() {
 		if (tcpClient != null) {
-			tcpClient.disconnect();
+			tcpClient.shutdown();
 		}
 	}
 
+	@Override
 	public Flux<FunctionMessage> subscribe() {
 		return tcpClient.subscribe()
-				.map(x -> new FunctionMessage(laneId, deviceId, null, x, MessagePayloadType.BINARY));
+				.map(x -> new FunctionMessage(laneId, deviceId, PLCProduct.PLC, x, MessagePayloadType.BINARY));
 	}
 
-	public void send(TcpMessage message) {
-		tcpClient.send(message).block();
+	public Mono<Boolean> send(TcpMessage message) {
+		return tcpClient.send(message);
 	}
 
 	public DeviceState checkStatus() {

@@ -1,10 +1,7 @@
 package net.pingfang.device.licenseplate;
 
-import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.function.Function;
 
 import com.sun.jna.Pointer;
@@ -16,7 +13,6 @@ import net.pingfang.device.core.DeviceState;
 import net.pingfang.device.licenseplate.values.ImageRecvInfo;
 import net.pingfang.device.licenseplate.values.ResultCode;
 import net.pingfang.device.licenseplate.values.StatusCode;
-import net.pingfang.framework.manager.AsyncManager;
 import net.pingfang.iot.common.FunctionMessage;
 import net.pingfang.iot.common.MessagePayloadType;
 import net.pingfang.iot.common.product.Product;
@@ -106,7 +102,7 @@ public class LicensePlateDevice implements DeviceOperator {
 	}
 
 	@Override
-	public void disconnect() {
+	public void shutdown() {
 		try {
 			int dcc = net.Net_DisConnCamera(handle);
 			if (dcc != 0) {
@@ -118,6 +114,7 @@ public class LicensePlateDevice implements DeviceOperator {
 			}
 		} finally {
 			handle = -1;
+			processor.onComplete();
 		}
 	}
 
@@ -152,35 +149,20 @@ public class LicensePlateDevice implements DeviceOperator {
 		return true;
 	}
 
-	public void saveImageToJpeg(String url) {
-		// 异步处理 根据sdkdemo而来 同步情况下无法得到抓拍的图片
-		AsyncManager.me().execute(new Runnable() {
-			@Override
-			public void run() {
-				File file = new File(url);
-				if (!file.exists()) {
-					file.mkdir();
-				}
-				StringBuilder sbf = new StringBuilder(url);
-				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-				String dateName = dateFormat.format(new Date());
-				sbf.append("capture_");
-				sbf.append(dateName);
-				sbf.append(".jpeg");
-				int sitp = net.Net_SaveImageToJpeg(getHandle(), sbf.toString());
-				log.info(StatusCode.getStatusCode(sitp, "Net_SaveImageToJpeg") + "\n图像保存路径：" + sbf.toString());
-			}
-		});
+	public String saveImageToJpeg(String url) {
+		int sitp = net.Net_SaveImageToJpeg(getHandle(), url);
+		return StatusCode.getStatusCode(sitp, "Net_SaveImageToJpeg");
 
 	}
 
-	public void imageSnap() {
+	public String imageSnap() {
 		T_DCImageSnap.ByReference ptImageSnap = new T_DCImageSnap.ByReference();
 		int is = net.Net_ImageSnap(getHandle(), ptImageSnap);
 		log.info(StatusCode.getStatusCode(is, "Net_ImageSnap"));
 		if (is == 0) {
 			log.info("等待回调输出：");
 		}
+		return StatusCode.getStatusCode(is, "Net_ImageSnap");
 	}
 
 	/**
@@ -261,13 +243,11 @@ public class LicensePlateDevice implements DeviceOperator {
 							.build();
 					// 车牌
 					FunctionMessage functionMessage = FunctionMessage.builder() //
-							.command("RECV_REPORT")//
 							.deviceId(deviceId)//
 							.laneId(laneId)//
 							.Payload(recvInfo)//
 							.type(MessagePayloadType.JSON)//
 							.build();//
-					String result = new String(ptImageInfo.szLprResult, "GBK");
 
 					Mono.just(functionMessage).subscribe(x -> received(x));
 				} catch (UnsupportedEncodingException e) {

@@ -26,7 +26,7 @@ public class ProductSupports {
 		return supports.stream().filter(x -> x.isSupported(value)).findFirst().orElse(null);
 	}
 
-	public static List<Value> getSupports() {
+	public static List<Value> getDeviceSupports() {
 		return supports.stream().filter(x -> ObjectType.device.equals(x.getType()))
 				.map(x -> Value.builder().value(x.toString()).name(x.getName()).build()).collect(Collectors.toList());
 	}

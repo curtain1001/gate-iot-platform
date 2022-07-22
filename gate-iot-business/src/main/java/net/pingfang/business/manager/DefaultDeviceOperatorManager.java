@@ -1,23 +1,28 @@
-package net.pingfang.device.core.manager;
+package net.pingfang.business.manager;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
 
-import org.apache.commons.compress.utils.Lists;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
+
+import com.google.common.eventbus.EventBus;
 
 import lombok.extern.slf4j.Slf4j;
 import net.pingfang.common.utils.JsonUtils;
@@ -25,6 +30,10 @@ import net.pingfang.device.core.DeviceManager;
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.DeviceProperties;
 import net.pingfang.device.core.DeviceProvider;
+import net.pingfang.device.core.event.MessageUpEvent;
+import net.pingfang.device.core.manager.DeviceConfigManager;
+import net.pingfang.iot.common.instruction.Instruction;
+import net.pingfang.iot.common.instruction.InstructionType;
 import net.pingfang.iot.common.product.Product;
 import reactor.core.publisher.Flux;
 
@@ -37,15 +46,11 @@ import reactor.core.publisher.Flux;
 @Slf4j
 public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProcessor, ApplicationRunner {
 
-	/**
-	 * 设备操作对象缓存
-	 */
-	private final Map<String, Map<String, DeviceOperator>> store = new ConcurrentHashMap<>();
+	@Resource
+	EventBus eventBus;
 
-	/**
-	 * 设备操作对象缓存
-	 */
-	private final Map<String, DeviceOperator> deviceOperatorStore = new ConcurrentHashMap<>();
+	@Resource
+	DefaultInstructionManager instructionManager;
 
 	/**
 	 * 设备代理
@@ -54,7 +59,8 @@ public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProc
 	/**
 	 * 车道设备对象缓存
 	 */
-	private final Map<Long, Map<String, DeviceOperator>> laneStore = new ConcurrentHashMap<>();
+	private final Map<Long, Map<String, DeviceOperator>> store = new ConcurrentHashMap<>();
+
 	/**
 	 * 设备配置管理器
 	 */
@@ -63,6 +69,7 @@ public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProc
 	public DefaultDeviceOperatorManager(DeviceConfigManager deviceConfigManager,
 			ScheduledExecutorService executorService) {
 		this.deviceConfigManager = deviceConfigManager;
+
 		executorService.scheduleWithFixedDelay(() -> {
 			Flux.fromStream(store.values().stream()).subscribe(d -> d.values().forEach(o -> {
 				log.info("执行心跳：{}", JsonUtils.toJsonString(o));
@@ -78,45 +85,28 @@ public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProc
 	}
 
 	public List<DeviceOperator> getDevice() {
-		List<DeviceOperator> deviceOperators = Lists.newArrayList();
-		store.values().forEach(x -> deviceOperators.addAll(x.values()));
-		return deviceOperators;
+		return store.values().stream().flatMap(f -> f.values().stream()).collect(Collectors.toList());
 	}
 
-	private Map<String, DeviceOperator> getDeviceStore(String productName) {
-		return store.computeIfAbsent(productName, _id -> new ConcurrentHashMap<>());
-	}
-
-	private Map<String, DeviceOperator> getLaneDevice(Long laneId) {
-		return laneStore.computeIfAbsent(laneId, (x) -> new ConcurrentHashMap<>());
-	}
-
-	private Map<String, DeviceOperator> getDeviceStore(Product type) {
-		return getDeviceStore(type.getName());
+	private Map<String, DeviceOperator> getDeviceStore(Long laneId) {
+		return store.computeIfAbsent(laneId, _id -> new ConcurrentHashMap<>());
 	}
 
 	@Override
-	public <T extends DeviceOperator> DeviceOperator create(Product type, String deviceId) {
-		return getDevice(type, deviceId);
-	}
-
-	public <T extends DeviceOperator> DeviceOperator getDevice(Product type, String id, Boolean create) {
-		Map<String, DeviceOperator> operatorMap = getDeviceStore(type);
-		DeviceOperator deviceOperator = operatorMap.get(id);
-		if (create && (deviceOperator == null || !deviceOperator.isAlive())) {
-			deviceOperator = createDeviceOperator(type, id);
-		}
-		return deviceOperator;
-	}
-
-	@Override
-	public <T extends DeviceOperator> DeviceOperator getDevice(Product type, String id) {
-		Map<String, DeviceOperator> operatorMap = getDeviceStore(type);
-		DeviceOperator deviceOperator = operatorMap.get(id);
+	public <T extends DeviceOperator> DeviceOperator create(Long laneId, String deviceId, Product type) {
+		Map<String, DeviceOperator> operatorMap = getDeviceStore(laneId);
+		DeviceOperator deviceOperator = operatorMap.get(deviceId);
 		if (deviceOperator == null || !deviceOperator.isAlive()) {
-			deviceOperator = createDeviceOperator(type, id);
+			deviceOperator = createDeviceOperator(type, deviceId);
 		}
 		return deviceOperator;
+
+	}
+
+	@Override
+	public <T extends DeviceOperator> DeviceOperator getDevice(Long laneId, String deviceId) {
+		Map<String, DeviceOperator> operatorMap = getDeviceStore(laneId);
+		return operatorMap.get(deviceId);
 	}
 
 	public DeviceOperator createDeviceOperator(Product type, String id) {
@@ -124,36 +114,61 @@ public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProc
 		if (provider == null) {
 			throw new UnsupportedOperationException("不支持的类型:" + type.getName());
 		} else {
-			DeviceProperties properties = deviceConfigManager.getProperties(type, id);
+			DeviceProperties properties = deviceConfigManager.getProperties(id);
 			if (properties == null) {
 				throw new UnsupportedOperationException("网络[" + type.getName() + "]配置[" + id + "]不存在");
 			} else if (!properties.isEnabled()) {
 				throw new UnsupportedOperationException("网络[" + type.getName() + "]配置[" + id + "]已禁用");
 			}
 			Object config = provider.createConfig(properties);
-			return doCreate(provider, id, config);
+			return doCreate(provider, properties.getLaneId(), id, config);
 		}
 	}
 
 	/**
-	 * 如果store中不存在网络组件就创建，存在就重新加载
+	 * 如果store中不存在设备就创建，存在就重新加载
 	 *
-	 * @param provider   网络组件支持提供商
-	 * @param id         网络组件唯一标识
-	 * @param properties 网络组件配置
+	 * @param provider   设备类型支持提供商
+	 * @param laneId     车道
+	 * @param deviceId   设备唯一标识
+	 * @param properties 设备配置
 	 * @return 网络组件
 	 */
-	public DeviceOperator doCreate(DeviceProvider<Object> provider, String id, Object properties) {
-		return getDeviceStore(provider.getType()).compute(id, (s, operator) -> {
+	public DeviceOperator doCreate(DeviceProvider<Object> provider, Long laneId, String deviceId, Object properties) {
+		return getDeviceStore(laneId).compute(deviceId, (s, operator) -> {
 			if (operator == null) {
 				operator = provider.createDevice(properties);
-				operator.subscribe()
-						.subscribe(x -> log.info("command" + JsonUtils.toJsonNode(x).get("command").asText()));
 				log.info("设备启动成功：deviceId:{},deviceName:{}", operator.getDeviceId(), operator.getDeviceName());
 			} else {
 				// 单例，已经存在则重新加载
-				provider.reload(operator, properties);
+				operator = provider.reload(operator, properties);
+				log.info("设备重启成功：deviceId:{},deviceName:{}", operator.getDeviceId(), operator.getDeviceName());
 			}
+			// 发布事件
+			operator.subscribe().subscribe(x -> {
+				List<Instruction> instructions = instructionManager.getInstruction(x.getProduct());
+				if (CollectionUtils.isNotEmpty(instructions)) {
+					Optional<Instruction> optional = instructions.stream()
+							.filter(i -> i.getInsType() == InstructionType.up && i.isSupport(x.getPayload()))
+							.findFirst();
+					optional.ifPresent(instruction -> eventBus.post(MessageUpEvent.builder() //
+							.laneId(x.getLaneId()) //
+							.product(x.getProduct())//
+							.deviceId(x.getDeviceId()) //
+							.instruction(instruction)//
+							.message(x.getPayload()) //
+							.type(x.getType().name())//
+							.build()));
+				} else {
+					eventBus.post(MessageUpEvent.builder() //
+							.laneId(x.getLaneId()) //
+							.product(x.getProduct())//
+							.deviceId(x.getDeviceId()) //
+							.message(x.getPayload()) //
+							.type(x.getType().name())//
+							.build());
+				}
+			});
 			return operator;
 		});
 	}
@@ -164,25 +179,25 @@ public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProc
 	}
 
 	@Override
-	public void reload(Product type, String id) {
-		getDeviceStore(type).compute(id, (s, operator) -> {
-			if (operator != null) {
-				operator.disconnect();
-			}
-			return null;
+	public void reload(Long laneId, String deviceId) {
+		getDeviceStore(laneId).computeIfPresent(deviceId, (s, operator) -> {
+			DeviceProvider<Object> provider = providerSupport.get(operator.getProduct().getName());
+			DeviceProperties properties = deviceConfigManager.getProperties(deviceId);
+			Object config = provider.createConfig(properties);
+			DeviceOperator deviceOperator = provider.reload(operator, config);
+			log.info("设备重新启动成功：deviceId:{},deviceName:{}", deviceOperator.getDeviceId(),
+					deviceOperator.getDeviceName());
+			return deviceOperator;
 		});
-		getDevice(type, id);
 	}
 
 	@Override
-	public void shutdown(Product type, String deviceId) {
-		getDeviceStore(type).computeIfPresent(deviceId, (s, operator) -> {
-			operator.disconnect();
-			getLaneDevice(operator.getLaneId()).computeIfPresent(deviceId, (l, ld) -> null);
-			getLaneDevice(operator.getLaneId()).remove(deviceId);
+	public void shutdown(Long laneId, String deviceId) {
+		getDeviceStore(laneId).computeIfPresent(deviceId, (s, operator) -> {
+			operator.shutdown();
 			return null;
 		});
-		getDeviceStore(type).remove(deviceId);
+		getDeviceStore(laneId).remove(deviceId);
 	}
 
 	public void register(DeviceProvider<Object> provider) {
@@ -223,18 +238,17 @@ public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProc
 			if (provider == null || !operator.isAutoReload()) {
 				return;
 			}
-			DeviceProperties properties = deviceConfigManager.getProperties(operator.getProduct(),
-					operator.getDeviceId());
+			DeviceProperties properties = deviceConfigManager.getProperties(operator.getDeviceId());
 			if (properties != null && properties.isEnabled()) {
 				Object o = provider.createConfig(properties);
-				this.doCreate(provider, operator.getDeviceId(), o);
+				this.doCreate(provider, properties.getLaneId(), operator.getDeviceId(), o);
 			}
 		});
 	}
 
 	@PreDestroy
 	public void destroy() {
-		this.store.values().forEach(x -> x.values().forEach(DeviceOperator::disconnect));
+		this.store.values().forEach(x -> x.values().forEach(DeviceOperator::shutdown));
 	}
 
 	@Override
@@ -248,7 +262,7 @@ public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProc
 			DeviceProvider<Object> provider = providerSupport.get(pro.getProduct().getName());
 			if (pro.isEnabled()) {
 				Object o = provider.createConfig(pro);
-				this.doCreate(provider, pro.getDeviceId(), o);
+				this.doCreate(provider, pro.getLaneId(), pro.getDeviceId(), o);
 			}
 		});
 	}

@@ -1,7 +1,6 @@
 package net.pingfang.network;
 
 import java.io.Serializable;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -17,7 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * 默认网络管理器
@@ -40,14 +39,17 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor 
 
 	@Override
 	public void reload(NetworkType type, String id) {
-		getNetworkStore(type).get(id).shutdown();
-		getNetwork(type, id);
+		Mono.justOrEmpty(getNetworkStore(type) //
+				.get(id)) //
+				.doOnNext(Network::shutdown) //
+				.then(Mono.just(getNetwork(type, id))) //
+				.subscribe();
 	}
 
 //	@PostConstruct
-	public void start() {
-		Flux.interval(Duration.ofSeconds(10)).subscribe(t -> this.checkNetwork());
-	}
+//	public void start() {
+//		Flux.interval(Duration.ofSeconds(10)).subscribe(t -> this.checkNetwork());
+//	}
 
 	/**
 	 * 检查网络 把需要加载的网络组件启动起来

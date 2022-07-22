@@ -2,6 +2,7 @@ package net.pingfang.dockservice.customs.instruction;
 
 import lombok.extern.slf4j.Slf4j;
 import net.pingfang.dockservice.core.BusinessInstruction;
+import net.pingfang.iot.common.instruction.InstructionResult;
 import net.pingfang.iot.common.instruction.InstructionType;
 
 /**
@@ -29,8 +30,9 @@ public enum CustomsInstruction implements BusinessInstruction {
 	}
 
 	@Override
-	public void execution() {
+	public InstructionResult<String, String> execution() {
 		log.info("对接海关");
+		return InstructionResult.success(null, "执行成功");
 	}
 
 }

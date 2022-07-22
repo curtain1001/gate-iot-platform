@@ -1,6 +1,7 @@
 package net.pingfang.dockservice.core;
 
 import net.pingfang.iot.common.instruction.Instruction;
+import net.pingfang.iot.common.instruction.InstructionResult;
 import net.pingfang.iot.common.instruction.ObjectType;
 
 /**
@@ -10,7 +11,7 @@ import net.pingfang.iot.common.instruction.ObjectType;
  */
 public interface BusinessInstruction extends Instruction {
 
-	public abstract void execution();
+	public abstract InstructionResult execution();
 
 	@Override
 	default ObjectType getObjectType() {

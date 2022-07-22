@@ -24,6 +24,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
 import net.pingfang.business.domain.BtpDevice;
 import net.pingfang.business.domain.BtpInstruction;
+import net.pingfang.business.manager.DefaultDeviceOperatorManager;
 import net.pingfang.business.manager.DefaultInstructionManager;
 import net.pingfang.business.service.IBtpDeviceService;
 import net.pingfang.business.service.IBtpInstrDeviceService;
@@ -35,10 +36,7 @@ import net.pingfang.common.core.page.TableDataInfo;
 import net.pingfang.common.enums.BusinessType;
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.instruction.DeviceInstruction;
-import net.pingfang.device.core.manager.DefaultDeviceOperatorManager;
 import net.pingfang.framework.manager.AsyncManager;
-import net.pingfang.iot.common.instruction.ObjectType;
-import net.pingfang.iot.common.product.ProductSupports;
 
 /**
  * @author 王超
@@ -92,25 +90,15 @@ public class BtpInstructionController extends BaseController {
 	@GetMapping("{id}/run/{product}/{instruction}")
 	public AjaxResult run(@Validated @PathVariable Long id, @PathVariable String product,
 			@Validated @PathVariable String instruction) {
-		DeviceInstruction i = (DeviceInstruction) instructionManager.getIns(ObjectType.device, instruction);
+		DeviceInstruction i = (DeviceInstruction) instructionManager.getInstruction(instruction);
 		BtpDevice device = deviceService.getById(id);
-		DeviceOperator operator = operatorManager.getDevice(ProductSupports.getSupport(product), device.getDeviceId());
+		if (device == null) {
+			AjaxResult.success("设备不存在");
+		}
+		DeviceOperator operator = operatorManager.getDevice(device.getLaneId(), device.getDeviceId());
 		i.execution(operator);
 		return AjaxResult.success("指令执行成功");
 	}
-
-//	/**
-//	 * 获取所有场站信息
-//	 *
-//	 * @return 所有场站信息
-//	 */
-//	@GetMapping("/all/{deviceId}")
-//	public AjaxResult getInstructionLists(@PathVariable String deviceId) {
-//		LambdaQueryWrapper<BtpInstrDevice> queryWrapper = Wrappers.lambdaQuery();
-//		queryWrapper.like(StringUtils.checkValNotNull(instruction.getCommandName()), BtpInstruction::getCommandName,
-//				instruction.getCommandName());
-//		return AjaxResult.success(list);
-//	}
 
 	/**
 	 * 根据参数编号获取详细信息
@@ -130,16 +118,6 @@ public class BtpInstructionController extends BaseController {
 		wrapper.eq(BtpInstruction::getCommandValue, commandValue);
 		return AjaxResult.success(instructionService.getOne(wrapper));
 	}
-
-//	/**
-//	 * 根据参数键名查询参数值
-//	 */
-//	@GetMapping(value = "/instruction/{instructionNo}")
-//	public AjaxResult getInstructionNo(@PathVariable String instructionNo) {
-//		LambdaQueryWrapper<BtpInstruction> wrapper = Wrappers.lambdaQuery();
-//		wrapper.eq(BtpInstruction::getinstructionNo, instructionNo);
-//		return AjaxResult.success(instructionService.getOne(wrapper));
-//	}
 
 	/**
 	 * 新增场站信息

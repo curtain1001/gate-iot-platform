@@ -15,7 +15,6 @@ import net.pingfang.business.domain.BtpDevice;
 import net.pingfang.business.service.IBtpDeviceService;
 import net.pingfang.device.core.DeviceProperties;
 import net.pingfang.device.core.manager.DeviceConfigManager;
-import net.pingfang.iot.common.product.Product;
 
 /**
  * @author 王超
@@ -28,10 +27,9 @@ public class DefaultDeviceConfigManager implements DeviceConfigManager {
 	private IBtpDeviceService deviceService;
 
 	@Override
-	public DeviceProperties getProperties(Product product, String id) {
+	public DeviceProperties getProperties(String deviceId) {
 		LambdaQueryWrapper<BtpDevice> queryWrapper = Wrappers.lambdaQuery();
-		queryWrapper.eq(BtpDevice::getDeviceId, id);
-		queryWrapper.eq(BtpDevice::getProduct, product);
+		queryWrapper.eq(BtpDevice::getDeviceId, deviceId);
 		BtpDevice device = deviceService.getOne(queryWrapper);
 		if (device != null) {
 			return device.toProperties();

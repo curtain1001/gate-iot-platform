@@ -2,6 +2,7 @@ package net.pingfang.device.core.event;
 
 import lombok.Builder;
 import lombok.Data;
+import net.pingfang.iot.common.instruction.Instruction;
 import net.pingfang.iot.common.product.Product;
 
 /**
@@ -24,6 +25,10 @@ public class MessageUpEvent {
 	 * 设备产品类型
 	 */
 	private final Product product;
+	/**
+	 * 指令
+	 */
+	private final Instruction instruction;
 	/**
 	 *
 	 */

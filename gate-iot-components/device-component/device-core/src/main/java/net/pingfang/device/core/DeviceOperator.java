@@ -53,7 +53,7 @@ public interface DeviceOperator {
 	 *
 	 * 断开连接
 	 */
-	void disconnect();
+	void shutdown();
 
 	/**
 	 * 订阅消息

@@ -304,6 +304,7 @@
         <module>gate-iot-common</module>
         <module>gate-iot-business</module>
         <module>gate-iot-components</module>
+        <module>gate-iot-manger</module>
     </modules>
     <packaging>pom</packaging>
 

@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
 import net.pingfang.business.domain.BtpDevice;
+import net.pingfang.business.manager.DefaultDeviceOperatorManager;
 import net.pingfang.business.manager.DefaultInstructionManager;
 import net.pingfang.business.service.IBtpDeviceService;
 import net.pingfang.business.service.IBtpInstrDeviceService;
@@ -32,7 +33,6 @@ import net.pingfang.common.core.domain.AjaxResult;
 import net.pingfang.common.core.page.TableDataInfo;
 import net.pingfang.common.enums.BusinessType;
 import net.pingfang.device.core.DeviceOperator;
-import net.pingfang.device.core.manager.DefaultDeviceOperatorManager;
 import net.pingfang.iot.common.product.ProductSupports;
 
 /**
@@ -55,7 +55,7 @@ public class BtpDeviceController extends BaseController {
 
 	@GetMapping("/product/list")
 	public AjaxResult getDeviceProduct() {
-		return AjaxResult.success(ProductSupports.getSupports());
+		return AjaxResult.success(ProductSupports.getDeviceSupports());
 	}
 
 	/**
@@ -78,7 +78,8 @@ public class BtpDeviceController extends BaseController {
 		List<BtpDevice> list = btpDeviceService.list(queryWrapper);
 		TableDataInfo info = getDataTable(list);
 		info.setRows(info.getRows().stream().peek(x -> {
-			((BtpDevice) x).setInstructions(instrDeviceService.getInstructions(((BtpDevice) x).getDeviceId()));
+			((BtpDevice) x).setInstructions(
+					instrDeviceService.getInstructions(ProductSupports.getSupport(((BtpDevice) x).getProduct())));
 		}).collect(Collectors.toList()));
 		return info;
 	}
@@ -191,24 +192,23 @@ public class BtpDeviceController extends BaseController {
 	@PutMapping("{id}/{status:(?:on|off)}")
 	public AjaxResult openDevice(@Validated @PathVariable Long id, @Validated @PathVariable String status) {
 		BtpDevice device = btpDeviceService.getById(id);
+		if (device == null) {
+			return AjaxResult.error("设备不存在！");
+		}
 		if ("on".equals(status)) {
 			device.setEnabled(0);
 			btpDeviceService.updateById(device);
-			DeviceOperator deviceOperator = operatorManager.create(ProductSupports.getSupport(device.getProduct()),
-					device.getDeviceId());
+			DeviceOperator deviceOperator = operatorManager.create(device.getLaneId(), device.getDeviceId(),
+					ProductSupports.getSupport(device.getProduct()));
 			if (deviceOperator != null) {
 				return AjaxResult.success("开启设备成功");
 			}
 		}
 		if ("off".equals(status)) {
-			DeviceOperator deviceOperator = operatorManager.getDevice(ProductSupports.getSupport(device.getProduct()),
-					device.getDeviceId(), false);
-			if (deviceOperator != null) {
-				operatorManager.shutdown(ProductSupports.getSupport(device.getProduct()), device.getDeviceId());
-				device.setEnabled(1);
-				btpDeviceService.updateById(device);
-				return AjaxResult.success("关闭设备成功");
-			}
+			operatorManager.shutdown(device.getLaneId(), device.getDeviceId());
+			device.setEnabled(1);
+			btpDeviceService.updateById(device);
+			return AjaxResult.success("关闭设备成功");
 		}
 		return AjaxResult.error("on".equals(status) ? "开启设备失败" : "关闭设备失败");
 	}

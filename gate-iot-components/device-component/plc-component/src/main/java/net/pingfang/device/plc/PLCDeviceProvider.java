@@ -48,7 +48,7 @@ public class PLCDeviceProvider implements DeviceProvider<PLCDeviceProperties> {
 		Map tcpProperties = JsonUtils.toObject(JsonUtils.toJsonString(properties), Map.class);
 		// 粘黏包处理设置
 		tcpProperties.put("parserType", PayloadParserType.FIXED_LENGTH);
-		tcpProperties.put("parserConfiguration", Collections.singletonMap("size", 3));
+		tcpProperties.put("parserConfiguration", Collections.singletonMap("size", 4));
 
 		NetworkProperties networkProperties = new NetworkProperties();
 		networkProperties.setId(properties.getId());
@@ -62,11 +62,11 @@ public class PLCDeviceProvider implements DeviceProvider<PLCDeviceProperties> {
 	}
 
 	@Override
-	public void reload(DeviceOperator operator, PLCDeviceProperties properties) {
+	public DeviceOperator reload(DeviceOperator operator, PLCDeviceProperties properties) {
 //		TcpClient tcpClient = (TcpClient) networkManager.getNetwork(DefaultNetworkType.TCP_CLIENT,
 //				operator.getDeviceId());
-		operator.disconnect();
-		operator = init(properties);
+		operator.shutdown();
+		return init(properties);
 	}
 
 	@Override

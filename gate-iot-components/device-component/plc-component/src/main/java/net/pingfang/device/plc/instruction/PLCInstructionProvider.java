@@ -1,5 +1,6 @@
 package net.pingfang.device.plc.instruction;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,9 +19,11 @@ import net.pingfang.device.plc.PLCProduct;
 import net.pingfang.iot.common.instruction.InsEntity;
 import net.pingfang.iot.common.instruction.Instruction;
 import net.pingfang.iot.common.instruction.InstructionProvider;
+import net.pingfang.iot.common.instruction.InstructionResult;
 import net.pingfang.iot.common.instruction.InstructionType;
 import net.pingfang.iot.common.product.Product;
 import net.pingfang.network.tcp.TcpMessage;
+import reactor.core.publisher.Mono;
 
 /**
  * @author 王超
@@ -67,22 +70,28 @@ public class PLCInstructionProvider implements InstructionProvider {
 			}
 
 			@Override
-			public void execution(DeviceOperator deviceOperator) {
+			public Mono<InstructionResult<Object, String>> execution(DeviceOperator deviceOperator) {
 				PLCDevice device = (PLCDevice) deviceOperator;
 				byte[] bytes = ByteUtils.convertHexStrToByteArray(x.getContent().toString());
 				ByteBuf byteBuf = ByteBufAllocator.DEFAULT.ioBuffer();
 				byteBuf.writeBytes(bytes);
 				TcpMessage tcpMessage = new TcpMessage(byteBuf);
-				device.send(tcpMessage);
+				return device.send(tcpMessage).map(y -> {
+					if (y != null && y) {
+						return InstructionResult.success(true, "指令下发成功");
+					}
+					return InstructionResult.fail(null, "指令下发失败");
+				});
 			}
 
 			@Override
 			public boolean isSupport(Object object) {
-				byte[] bytes = ByteUtils.convertHexStrToByteArray(x.getContent().toString());
-				ByteBuf target = ByteBufAllocator.DEFAULT.ioBuffer();
-				target.writeBytes(bytes);
-				ByteBuf byteBuf = (ByteBuf) object;
-				return target.equals(byteBuf);
+				if (object instanceof TcpMessage) {
+					byte[] bytes = ((TcpMessage) object).payloadAsBytes();
+					byte[] target = ByteUtils.convertHexStrToByteArray(x.getContent().toString());
+					return Arrays.equals(bytes, target);
+				}
+				return false;
 			}
 		}).collect(Collectors.toList());
 	}

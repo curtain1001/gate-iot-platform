@@ -17,20 +17,21 @@ public interface DeviceManager {
 	/**
 	 * 根据ID获取设备
 	 *
-	 * @param id  网络组件id
-	 * @param <T> NetWork子类泛型
+	 * @param laneId   车道id
+	 * @param deviceId 设备id
 	 * @return 网络组件
 	 */
-	<T extends DeviceOperator> DeviceOperator getDevice(Product type, String id);
+	<T extends DeviceOperator> DeviceOperator getDevice(Long laneId, String deviceId);
 
 	/**
 	 * 创建设备
 	 *
-	 * @param id  网络组件id
-	 * @param <T> NetWork子类泛型
+	 * @param laneId   车道id
+	 * @param deviceId 设备id
+	 * @param type     设备类型
 	 * @return 网络组件
 	 */
-	<T extends DeviceOperator> DeviceOperator create(Product type, String id);
+	<T extends DeviceOperator> DeviceOperator create(Long laneId, String deviceId, Product type);
 
 	/**
 	 * 获取所有的网络组件支持提供商
@@ -42,18 +43,18 @@ public interface DeviceManager {
 	/**
 	 * 重新加载网络组件
 	 *
-	 * @param type 网络类型
-	 * @param id   网络组件ID
+	 * @param laneId   车道id
+	 * @param deviceId 设备id
 	 * @return void
 	 */
-	void reload(Product type, String id);
+	void reload(Long laneId, String deviceId);
 
 	/**
 	 * 停止网络组件
 	 *
-	 * @param type 网络类型
-	 * @param id   网络组件ID
+	 * @param laneId   车道id
+	 * @param deviceId 设备id
 	 * @return void
 	 */
-	void shutdown(Product type, String id);
+	void shutdown(Long laneId, String deviceId);
 }
