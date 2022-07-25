@@ -269,7 +269,7 @@
 
             <dependency>
                 <groupId>net.pingfang</groupId>
-                <artifactId>gate-iot-flow</artifactId>
+                <artifactId>gate-iot-flowable</artifactId>
                 <version>${gate-iot.version}</version>
             </dependency>
 
@@ -325,7 +325,7 @@
         <module>gate-iot-business</module>
         <module>gate-iot-components</module>
         <module>gate-iot-manger</module>
-        <module>gate-iot-flow</module>
+        <module>gate-iot-flowable</module>
     </modules>
     <packaging>pom</packaging>
 
