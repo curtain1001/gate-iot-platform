@@ -142,12 +142,12 @@ public class BtpDeviceController extends BaseController {
 		if (btpDeviceService.count(wrapper) > 0) {
 			return AjaxResult.error("新增设备'" + device.getDeviceName() + "'失败，设备名称已存在");
 		}
-		wrapper = Wrappers.lambdaQuery();
-		wrapper.eq(BtpDevice::getLaneId, device.getLaneId());
-		wrapper.eq(BtpDevice::getProduct, device.getProduct());
-		if (btpDeviceService.count(wrapper) > 0) {
-			return AjaxResult.error("新增设备'" + device.getProduct() + "'失败，通道内设备产品唯一");
-		}
+//		wrapper = Wrappers.lambdaQuery();
+//		wrapper.eq(BtpDevice::getLaneId, device.getLaneId());
+//		wrapper.eq(BtpDevice::getProduct, device.getProduct());
+//		if (btpDeviceService.count(wrapper) > 0) {
+//			return AjaxResult.error("新增设备'" + device.getProduct() + "'失败，通道内设备产品唯一");
+//		}
 
 		device.setCreateBy(getUsername());
 		device.setCreateTime(new Date());

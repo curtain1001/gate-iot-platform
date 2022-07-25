@@ -57,7 +57,10 @@ public class LicensePlateDevice implements DeviceOperator {
 	public void init(String ip, short port, short timeout) {
 		// 添加相机
 		handle = net.Net_AddCamera(ip);
-		net.Net_ConnCamera(handle, port, timeout);
+		int conn = net.Net_ConnCamera(handle, port, timeout);
+		if (conn != 0) {
+			log.error("相机连接：" + ResultCode.getMsg(conn));
+		}
 		int rem = net.Net_RegReportMessEx(handle, reportCBEx(), Pointer.NULL);
 		if (rem != 0) {
 			throw new RuntimeException("车牌识别结果获取回调函数注册完毕：" + ResultCode.getMsg(rem));
@@ -246,6 +249,7 @@ public class LicensePlateDevice implements DeviceOperator {
 							.deviceId(deviceId)//
 							.laneId(laneId)//
 							.Payload(recvInfo)//
+							.product(LicensePlateProduct.OCR_License_Plate)//
 							.type(MessagePayloadType.JSON)//
 							.build();//
 

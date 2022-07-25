@@ -13,7 +13,9 @@ public enum PayloadParserType {
 
 	DELIMITED("分隔符"),
 
-	SCRIPT("自定义脚本");
+	SCRIPT("自定义脚本"), //
+
+	PLC("自定义PLC设备");
 
 	private final String text;
 

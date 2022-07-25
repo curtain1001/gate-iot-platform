@@ -93,9 +93,12 @@ public class BtpInstructionController extends BaseController {
 		DeviceInstruction i = (DeviceInstruction) instructionManager.getInstruction(instruction);
 		BtpDevice device = deviceService.getById(id);
 		if (device == null) {
-			AjaxResult.success("设备不存在");
+			return AjaxResult.error("设备不存在");
 		}
 		DeviceOperator operator = operatorManager.getDevice(device.getLaneId(), device.getDeviceId());
+		if (operator == null) {
+			return AjaxResult.error("设备未启动");
+		}
 		i.execution(operator);
 		return AjaxResult.success("指令执行成功");
 	}

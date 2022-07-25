@@ -145,28 +145,32 @@ public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProc
 				log.info("设备重启成功：deviceId:{},deviceName:{}", operator.getDeviceId(), operator.getDeviceName());
 			}
 			// 发布事件
-			operator.subscribe().subscribe(x -> {
-				List<Instruction> instructions = instructionManager.getInstruction(x.getProduct());
-				if (CollectionUtils.isNotEmpty(instructions)) {
-					Optional<Instruction> optional = instructions.stream()
-							.filter(i -> i.getInsType() == InstructionType.up && i.isSupport(x.getPayload()))
-							.findFirst();
-					optional.ifPresent(instruction -> eventBus.post(MessageUpEvent.builder() //
-							.laneId(x.getLaneId()) //
-							.product(x.getProduct())//
-							.deviceId(x.getDeviceId()) //
-							.instruction(instruction)//
-							.message(x.getPayload()) //
-							.type(x.getType().name())//
-							.build()));
-				} else {
-					eventBus.post(MessageUpEvent.builder() //
-							.laneId(x.getLaneId()) //
-							.product(x.getProduct())//
-							.deviceId(x.getDeviceId()) //
-							.message(x.getPayload()) //
-							.type(x.getType().name())//
-							.build());
+			operator.subscribe().doOnError(x -> log.error("订阅设备消息异常：" + x.getMessage())).subscribe(x -> {
+				try {
+					List<Instruction> instructions = instructionManager.getInstruction(x.getProduct());
+					if (CollectionUtils.isNotEmpty(instructions)) {
+						Optional<Instruction> optional = instructions.stream()
+								.filter(i -> i.getInsType() == InstructionType.up && i.isSupport(x.getPayload()))
+								.findFirst();
+						optional.ifPresent(instruction -> eventBus.post(MessageUpEvent.builder() //
+								.laneId(x.getLaneId()) //
+								.product(x.getProduct())//
+								.deviceId(x.getDeviceId()) //
+								.instruction(instruction)//
+								.message(x.getPayload()) //
+								.type(x.getType().name())//
+								.build()));
+					} else {
+						eventBus.post(MessageUpEvent.builder() //
+								.laneId(x.getLaneId()) //
+								.product(x.getProduct())//
+								.deviceId(x.getDeviceId()) //
+								.message(x.getPayload()) //
+								.type(x.getType().name())//
+								.build());
+					}
+				} catch (Exception e) {
+					log.error("消费车道设备消息异常：", e);
 				}
 			});
 			return operator;
