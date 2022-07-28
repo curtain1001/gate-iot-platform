@@ -1,6 +1,7 @@
 package net.pingfang.flow.core;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,9 @@ public class FlowEngine {
 	 */
 	Instruction currentInstruction;
 
-	Map<Long, Process> processStore;
+	final Map<Long, Process> processStore = new ConcurrentHashMap<>();
+
+	final
 
 	public Map<Long, Process> deploy(Long laneId, Process process) {
 		this.processStore.put(laneId, process);

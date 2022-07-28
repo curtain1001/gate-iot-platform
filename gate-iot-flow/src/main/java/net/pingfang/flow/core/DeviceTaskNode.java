@@ -3,7 +3,6 @@ package net.pingfang.flow.core;
 import net.pingfang.device.core.DeviceManager;
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.instruction.DeviceInstruction;
-import net.pingfang.iot.common.instruction.Instruction;
 import net.pingfang.iot.common.instruction.InstructionResult;
 
 /**
@@ -14,7 +13,8 @@ import net.pingfang.iot.common.instruction.InstructionResult;
  * @author 王超
  * @since 2022-07-28 17:37
  */
-public class DeviceTaskNode implements TaskNode<DeviceInstruction> {
+public class DeviceTaskNode implements TaskNode {
+
 	private Long laneId;
 	/**
 	 * 节点代码
@@ -48,22 +48,21 @@ public class DeviceTaskNode implements TaskNode<DeviceInstruction> {
 
 	@Override
 	public String getNodeName() {
-		return null;
+		return this.nodeName;
 	}
 
 	@Override
-	public Instruction getInstruction() {
-		return null;
+	public DeviceInstruction getInstruction() {
+		return this.instruction;
 	}
 
 	@Override
 	public String getConditionScript() {
-		return null;
+		return this.conditionScript;
 	}
 
-	@Override
 	public String getDeviceId() {
-		return null;
+		return this.deviceId;
 	}
 
 	public InstructionResult device(DeviceManager deviceManager) {

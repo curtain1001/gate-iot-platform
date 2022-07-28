@@ -1,7 +1,10 @@
 package net.pingfang.flow.core;
 
+import java.util.List;
+
 import lombok.Builder;
 import lombok.Data;
+import net.pingfang.flow.domain.FlowDefinitionNode;
 
 /**
  * @author 王超
@@ -22,7 +25,10 @@ public class Process {
 	 * 流程定义名称
 	 */
 	private String definitionName;
-
+	/**
+	 * 所有流程节点
+	 */
+	List<FlowDefinitionNode> taskNodeList;
 	/**
 	 * 版本号
 	 */

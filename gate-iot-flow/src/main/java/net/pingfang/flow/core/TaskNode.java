@@ -5,10 +5,9 @@ import net.pingfang.iot.common.instruction.InstructionType;
 
 /**
  * @author 王超
- * @description TODO
- * @date 2022-07-26 16:43
+ * @since 2022-07-28 17:37
  */
-public interface TaskNode<T> {
+public interface TaskNode {
 
 	Long getLaneId();
 
@@ -32,7 +31,6 @@ public interface TaskNode<T> {
 	 */
 	String getConditionScript();
 
-	String getDeviceId();
 
 	/**
 	 * 流转判断
