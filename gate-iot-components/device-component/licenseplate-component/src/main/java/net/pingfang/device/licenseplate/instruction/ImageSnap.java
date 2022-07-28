@@ -4,10 +4,10 @@ import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.instruction.DeviceInstruction;
 import net.pingfang.device.licenseplate.LicensePlateDevice;
 import net.pingfang.device.licenseplate.LicensePlateProduct;
+import net.pingfang.device.licenseplate.values.StatusCode;
 import net.pingfang.iot.common.instruction.InstructionResult;
 import net.pingfang.iot.common.instruction.InstructionType;
 import net.pingfang.iot.common.product.Product;
-import reactor.core.publisher.Mono;
 
 /**
  * @author 王超
@@ -36,10 +36,14 @@ public class ImageSnap implements DeviceInstruction {
 	}
 
 	@Override
-	public Mono<InstructionResult<Object, String>> execution(DeviceOperator deviceOperator) {
-		return Mono.fromCallable(() -> {
-			LicensePlateDevice device = (LicensePlateDevice) deviceOperator;
-			return device.imageSnap();
-		}).map(x -> InstructionResult.success(true, x));
+	public InstructionResult<Object, String> execution(DeviceOperator deviceOperator) {
+		LicensePlateDevice device = (LicensePlateDevice) deviceOperator;
+		int is = device.imageSnap();
+		String message = StatusCode.getStatusCode(is, "Net_ImageSnap");
+		if (is == 0) {
+			return InstructionResult.success(null, message);
+		} else {
+			return InstructionResult.fail(null, message);
+		}
 	}
 }

@@ -11,12 +11,12 @@ import net.pingfang.device.core.instruction.DeviceInstruction;
 import net.pingfang.device.core.manager.LaneConfigManager;
 import net.pingfang.device.licenseplate.LicensePlateDevice;
 import net.pingfang.device.licenseplate.LicensePlateProduct;
+import net.pingfang.device.licenseplate.values.StatusCode;
 import net.pingfang.iot.common.customizedsetting.values.DefaultCustomized;
 import net.pingfang.iot.common.instruction.InstructionResult;
 import net.pingfang.iot.common.instruction.InstructionType;
 import net.pingfang.iot.common.instruction.ObjectType;
 import net.pingfang.iot.common.product.Product;
-import reactor.core.publisher.Mono;
 
 /**
  * @author 王超
@@ -51,25 +51,26 @@ public class SaveImageToJpeg implements DeviceInstruction {
 	}
 
 	@Override
-	public Mono<InstructionResult<Object, String>> execution(DeviceOperator deviceOperator) {
-		return Mono.fromCallable(() -> {
-
-			LicensePlateDevice device = (LicensePlateDevice) deviceOperator;
-			String url = Injection.manager.getConfig(DefaultCustomized.PICTURE_STORE_DIRECTORY,
-					deviceOperator.getLaneId());
-			File file = new File(url);
-			if (!file.exists()) {
-				file.mkdir();
-			}
-			StringBuilder sbf = new StringBuilder(url);
-			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-			String dateName = dateFormat.format(new Date());
-			sbf.append("capture_");
-			sbf.append(dateName);
-			sbf.append(".jpeg");
-			return device.saveImageToJpeg(sbf.toString());
-		}).map(x -> InstructionResult.success(x, x + ";图片保存地址为：" + x));
-
+	public InstructionResult<Object, String> execution(DeviceOperator deviceOperator) {
+		LicensePlateDevice device = (LicensePlateDevice) deviceOperator;
+		String url = Injection.manager.getConfig(DefaultCustomized.PICTURE_STORE_DIRECTORY, deviceOperator.getLaneId());
+		File file = new File(url);
+		if (!file.exists()) {
+			file.mkdir();
+		}
+		StringBuilder sbf = new StringBuilder(url);
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+		String dateName = dateFormat.format(new Date());
+		sbf.append("capture_");
+		sbf.append(dateName);
+		sbf.append(".jpeg");
+		int is = device.saveImageToJpeg(sbf.toString());
+		if (is == 0) {
+			return InstructionResult.success(sbf.toString(), "执行成功，文件路径为：" + sbf.toString());
+		} else {
+			return InstructionResult.success(sbf.toString(),
+					"执行失败：" + StatusCode.getStatusCode(is, "Net_SaveImageToJpeg"));
+		}
 	}
 
 	@Component

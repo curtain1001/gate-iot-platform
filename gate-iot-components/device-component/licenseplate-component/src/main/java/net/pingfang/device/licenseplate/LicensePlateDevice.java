@@ -152,20 +152,22 @@ public class LicensePlateDevice implements DeviceOperator {
 		return true;
 	}
 
-	public String saveImageToJpeg(String url) {
+	public int saveImageToJpeg(String url) {
 		int sitp = net.Net_SaveImageToJpeg(getHandle(), url);
-		return StatusCode.getStatusCode(sitp, "Net_SaveImageToJpeg");
+		log.info(StatusCode.getStatusCode(sitp, "Net_SaveImageToJpeg"));
+		return sitp;
 
 	}
 
-	public String imageSnap() {
+	public int imageSnap() {
 		T_DCImageSnap.ByReference ptImageSnap = new T_DCImageSnap.ByReference();
 		int is = net.Net_ImageSnap(getHandle(), ptImageSnap);
 		log.info(StatusCode.getStatusCode(is, "Net_ImageSnap"));
 		if (is == 0) {
 			log.info("等待回调输出：");
 		}
-		return StatusCode.getStatusCode(is, "Net_ImageSnap");
+		return is;
+
 	}
 
 	/**

@@ -32,12 +32,6 @@ public class DefaultInstructionManager implements BeanPostProcessor {
 	 */
 	private final Map<String, InstructionProvider> providerSupport = new ConcurrentHashMap<>();
 
-	private final DefaultDeviceOperatorManager operatorManager;
-
-	public DefaultInstructionManager(DefaultDeviceOperatorManager operatorManager) {
-		this.operatorManager = operatorManager;
-	}
-
 	public List<Instruction> getInstruction() {
 		return new ArrayList<>(instrStore.values());
 	}

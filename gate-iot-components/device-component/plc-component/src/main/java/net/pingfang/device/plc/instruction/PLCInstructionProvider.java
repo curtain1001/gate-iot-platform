@@ -23,7 +23,6 @@ import net.pingfang.iot.common.instruction.InstructionResult;
 import net.pingfang.iot.common.instruction.InstructionType;
 import net.pingfang.iot.common.product.Product;
 import net.pingfang.network.tcp.TcpMessage;
-import reactor.core.publisher.Mono;
 
 /**
  * @author 王超
@@ -70,18 +69,19 @@ public class PLCInstructionProvider implements InstructionProvider {
 			}
 
 			@Override
-			public Mono<InstructionResult<Object, String>> execution(DeviceOperator deviceOperator) {
+			public InstructionResult<Object, String> execution(DeviceOperator deviceOperator) {
 				PLCDevice device = (PLCDevice) deviceOperator;
 				byte[] bytes = ByteUtils.convertHexStrToByteArray(x.getContent().toString());
 				ByteBuf byteBuf = ByteBufAllocator.DEFAULT.ioBuffer();
 				byteBuf.writeBytes(bytes);
 				TcpMessage tcpMessage = new TcpMessage(byteBuf);
-				return device.send(tcpMessage).map(y -> {
-					if (y != null && y) {
-						return InstructionResult.success(true, "指令下发成功");
-					}
-					return InstructionResult.fail(null, "指令下发失败");
-				});
+//				return device.send(tcpMessage).map(y -> {
+//					if (y != null && y) {
+//						return InstructionResult.success(true, "指令下发成功");
+//					}
+//					return InstructionResult.fail(null, "指令下发失败");
+//				}).block();
+				return null;
 			}
 
 			@Override

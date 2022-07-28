@@ -32,6 +32,11 @@ public interface DeviceOperator {
 	 */
 	String getDeviceName();
 
+	/**
+	 * 设备产品类型
+	 *
+	 * @return 类型实例
+	 */
 	Product getProduct();
 
 	/**
@@ -44,7 +49,7 @@ public interface DeviceOperator {
 	/**
 	 * 设置状态
 	 *
-	 * @param state
+	 * @param state 状态
 	 */
 
 	void setStatus(DeviceState state);
@@ -60,6 +65,11 @@ public interface DeviceOperator {
 	 */
 	Flux<FunctionMessage> subscribe();
 
+	/**
+	 * 是否存活
+	 *
+	 * @return 是否存活
+	 */
 	boolean isAlive();
 
 	/**
@@ -71,9 +81,8 @@ public interface DeviceOperator {
 	boolean isAutoReload();
 
 	/**
-	 * 保活
+	 * 心跳
 	 */
-
 	void keepAlive();
 
 }

@@ -1,7 +1,5 @@
 package net.pingfang.flow.core;
 
-import java.util.List;
-
 import lombok.Builder;
 import lombok.Data;
 
@@ -14,16 +12,20 @@ import lombok.Data;
 @Builder
 public class Process {
 
-	final String processId;
+	private String processId;
+	/**
+	 * 定义代码
+	 */
+	private String definitionCode;
 
-	final Long laneId;
+	/**
+	 * 流程定义名称
+	 */
+	private String definitionName;
 
-	TaskNode<?> taskNode;
-
-	List<TaskNode<?>> startNode;
-
-	List<TaskNode<?>> currentNode;
-
-	List<TaskNode<?>> endNode;
+	/**
+	 * 版本号
+	 */
+	private String version;
 
 }

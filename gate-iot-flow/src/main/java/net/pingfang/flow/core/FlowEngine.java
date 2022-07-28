@@ -2,6 +2,8 @@ package net.pingfang.flow.core;
 
 import java.util.Map;
 
+import org.springframework.stereotype.Component;
+
 import com.google.common.eventbus.Subscribe;
 
 import lombok.AllArgsConstructor;
@@ -16,6 +18,7 @@ import net.pingfang.iot.common.instruction.Instruction;
  */
 @AllArgsConstructor
 @Slf4j
+@Component
 public class FlowEngine {
 	/**
 	 * 当前状态
@@ -28,7 +31,7 @@ public class FlowEngine {
 
 	Map<Long, Process> processStore;
 
-	public Map<Long, Process> register(Long laneId, Process process) {
+	public Map<Long, Process> deploy(Long laneId, Process process) {
 		this.processStore.put(laneId, process);
 		return processStore;
 	}
@@ -40,7 +43,27 @@ public class FlowEngine {
 	@Subscribe
 	public void on(MessageUpEvent event) {
 		log.info("设备：{}；指令：{}；", event.getDeviceId(), event.getInstruction().getValue());
-		Process p = processStore.get(event.getLaneId());
-		event.getInstruction().getValue().equals(p.get)
+
+	}
+
+	/**
+	 * 流程开始
+	 */
+	public void start() {
+
+	}
+
+	/**
+	 * 流程驱动
+	 */
+	public void device() {
+
+	}
+
+	/**
+	 * 结束流程
+	 */
+	public void end() {
+
 	}
 }

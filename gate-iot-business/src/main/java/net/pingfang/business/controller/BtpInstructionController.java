@@ -37,6 +37,7 @@ import net.pingfang.common.enums.BusinessType;
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.instruction.DeviceInstruction;
 import net.pingfang.framework.manager.AsyncManager;
+import net.pingfang.iot.common.instruction.InstructionResult;
 
 /**
  * @author 王超
@@ -99,8 +100,15 @@ public class BtpInstructionController extends BaseController {
 		if (operator == null) {
 			return AjaxResult.error("设备未启动");
 		}
-		i.execution(operator);
-		return AjaxResult.success("指令执行成功");
+		InstructionResult<Object, String> resultMono = i.execution(operator).block();
+		if (resultMono == null) {
+			return AjaxResult.error("指令执行失败");
+		}
+		if (resultMono.isSuccess()) {
+			return AjaxResult.success("指令执行成功:" + resultMono.getMessage());
+		} else {
+			return AjaxResult.error("指令执行失败:" + resultMono.getMessage());
+		}
 	}
 
 	/**
