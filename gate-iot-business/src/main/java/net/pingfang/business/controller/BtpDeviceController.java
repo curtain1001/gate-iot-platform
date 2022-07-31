@@ -85,6 +85,21 @@ public class BtpDeviceController extends BaseController {
 	}
 
 	/**
+	 * 分页列表
+	 *
+	 * @return 所有设备
+	 */
+	@GetMapping("/all")
+	public AjaxResult getDevices() {
+		List<BtpDevice> list = btpDeviceService.list();
+		list = list.stream().peek(x -> {
+			x.setInstructions(
+					instrDeviceService.getInstructions(ProductSupports.getSupport(((BtpDevice) x).getProduct())));
+		}).collect(Collectors.toList());
+		return AjaxResult.success(list);
+	}
+
+	/**
 	 * 根据id查询
 	 */
 	@PreAuthorize("@ss.hasPermi('business:device:query')")

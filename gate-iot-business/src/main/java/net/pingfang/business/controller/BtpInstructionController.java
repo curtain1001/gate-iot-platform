@@ -100,7 +100,7 @@ public class BtpInstructionController extends BaseController {
 		if (operator == null) {
 			return AjaxResult.error("设备未启动");
 		}
-		InstructionResult<Object, String> resultMono = i.execution(operator).block();
+		InstructionResult<Object, String> resultMono = i.execution(operator);
 		if (resultMono == null) {
 			return AjaxResult.error("指令执行失败");
 		}
