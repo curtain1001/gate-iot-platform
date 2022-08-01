@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <property name="blob.type" dbms="mssql" value="varbinary(max)" />
+    <property name="blob.type" dbms="mysql" value="longblob" />
+    <property name="blob.type" dbms="h2" value="blob" />
+
+    <property name="clob.type" dbms="mssql" value="varchar(max)" />
+    <property name="clob.type" dbms="mysql" value="longtext" />
+    <property name="clob.type" dbms="h2" value="longtext" />
+    <property name="autoIncrement" value="true" dbms="h2" />
+
+    <changeSet author="wangchao" id="btp_flow::create">
+        <createTable tableName="btp_flow" remarks="流程管理表">
+            <column name="flow_id" remarks="主键" type="BIGINT(20)" incrementBy="1" startWith="1" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="lane_id" type="bigint(20)" remarks="车道id" />
+            <column name="flow_name" type="varchar(64)" remarks="流程名称" />
+            <column name="content" type="${clob.type}" remarks="流程内容" />
+            <column name="create_by" defaultValue="" remarks="创建者" type="VARCHAR(64)" />
+            <column name="create_time" remarks="创建时间" type="datetime(6)" />
+            <column name="update_by" defaultValue="" remarks="更新者" type="VARCHAR(64)" />
+            <column name="update_time" remarks="更新时间" type="datetime(6)" />
+            <column name="remark" remarks="备注" type="VARCHAR(500)" />
+        </createTable>
+        <createIndex tableName="btp_flow" indexName="btpFlow_idx">
+            <column name="lane_id" />
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

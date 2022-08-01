@@ -147,3 +147,4 @@ liquibase:
     - /database/business/btpCertificate.xml
     - /database/business/btpDevice.xml
     - /database/business/btpInstruction.xml
+    - /database/business/btpFlow.xml

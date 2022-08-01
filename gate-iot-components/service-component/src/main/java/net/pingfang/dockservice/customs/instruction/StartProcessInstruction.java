@@ -11,21 +11,21 @@ import net.pingfang.iot.common.instruction.InstructionType;
  * @date 2022-07-15 10:31
  */
 @Slf4j
-public class CustomsInstruction implements BusinessInstruction {
+public class StartProcessInstruction implements BusinessInstruction {
 
 	@Override
 	public String getName() {
-		return "对接海关";
+		return "开始流程";
 	}
 
 	@Override
 	public String getValue() {
-		return "DOCK_CUSTOMS";
+		return "START_PROCESS";
 	}
 
 	@Override
 	public InstructionType getInsType() {
-		return InstructionType.down;
+		return InstructionType.up;
 	}
 
 	@Override

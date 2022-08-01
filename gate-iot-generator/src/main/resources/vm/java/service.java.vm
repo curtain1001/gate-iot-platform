@@ -1,23 +1,27 @@
-package ${packageName}import java.util.List; ${packageName}.domain.${ClassName};
+package ${packageName}.service;
+
+import java.util.List;
+import ${packageName}.domain.${ClassName};
 
 /**
  * ${functionName}Service接口
- *
+ * 
  * @author ${author}
  * @date ${datetime}
  */
-public interface I${ClassName}Service {
+public interface I${ClassName}Service 
+{
     /**
      * 查询${functionName}
-     *
-     * @param ${pkColumn.javaField} ${functionName}主键
+     * 
+     * @param ${pkColumn.javaField} ${functionName}ID
      * @return ${functionName}
      */
-    public ${ClassName} select${ClassName}By${pkColumn.capJavaField}(${pkColumn.javaType} ${pkColumn.javaField});
+    public ${ClassName} select${ClassName}ById(${pkColumn.javaType} ${pkColumn.javaField});
 
     /**
      * 查询${functionName}列表
-     *
+     * 
      * @param ${className} ${functionName}
      * @return ${functionName}集合
      */
@@ -25,7 +29,7 @@ public interface I${ClassName}Service {
 
     /**
      * 新增${functionName}
-     *
+     * 
      * @param ${className} ${functionName}
      * @return 结果
      */
@@ -33,7 +37,7 @@ public interface I${ClassName}Service {
 
     /**
      * 修改${functionName}
-     *
+     * 
      * @param ${className} ${functionName}
      * @return 结果
      */
@@ -41,17 +45,17 @@ public interface I${ClassName}Service {
 
     /**
      * 批量删除${functionName}
-     *
-     * @param ${pkColumn.javaField}s 需要删除的${functionName}主键集合
+     * 
+     * @param ${pkColumn.javaField}s 需要删除的${functionName}ID
      * @return 结果
      */
-    public int delete${ClassName}By${pkColumn.capJavaField}s(${pkColumn.javaType}[] ${pkColumn.javaField}s);
+    public int delete${ClassName}ByIds(${pkColumn.javaType}[] ${pkColumn.javaField}s);
 
     /**
      * 删除${functionName}信息
-     *
-     * @param ${pkColumn.javaField} ${functionName}主键
+     * 
+     * @param ${pkColumn.javaField} ${functionName}ID
      * @return 结果
      */
-    public int delete${ClassName}By${pkColumn.capJavaField}(${pkColumn.javaType} ${pkColumn.javaField});
+    public int delete${ClassName}ById(${pkColumn.javaType} ${pkColumn.javaField});
 }

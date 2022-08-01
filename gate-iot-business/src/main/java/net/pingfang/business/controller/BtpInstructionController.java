@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -38,6 +39,7 @@ import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.instruction.DeviceInstruction;
 import net.pingfang.framework.manager.AsyncManager;
 import net.pingfang.iot.common.instruction.InstructionResult;
+import net.pingfang.iot.common.instruction.ObjectType;
 
 /**
  * @author 王超
@@ -109,6 +111,15 @@ public class BtpInstructionController extends BaseController {
 		} else {
 			return AjaxResult.error("指令执行失败:" + resultMono.getMessage());
 		}
+	}
+
+	/**
+	 * 获取服务列表
+	 */
+	@GetMapping("list/{objetType}")
+	public AjaxResult getInstructions(@Validated @PathVariable("objetType") String objetType) {
+		return AjaxResult.success(instructionManager.getInstruction().stream()
+				.filter(x -> ObjectType.valueOf(objetType) == x.getObjectType()).collect(Collectors.toList()));
 	}
 
 	/**
