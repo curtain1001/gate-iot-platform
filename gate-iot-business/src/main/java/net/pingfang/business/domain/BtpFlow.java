@@ -1,8 +1,12 @@
 package net.pingfang.business.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.Version;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -41,5 +45,9 @@ public class BtpFlow extends BaseEntity {
 	/**
 	 * 流程前端数据
 	 */
-	private String content;
+	@TableField(typeHandler = JacksonTypeHandler.class)
+	private JsonNode content;
+
+	@Version
+	private Integer version;
 }

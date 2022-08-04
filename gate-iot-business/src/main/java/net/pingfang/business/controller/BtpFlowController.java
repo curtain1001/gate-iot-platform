@@ -117,7 +117,7 @@ public class BtpFlowController extends BaseController {
 	 */
 	@PreAuthorize("@ss.hasPermi('business:flow:edit')")
 	@Log(title = "流程管理", businessType = BusinessType.UPDATE)
-	@PutMapping
+	@PutMapping()
 	public AjaxResult edit(@Validated @RequestBody BtpFlow flow) {
 		LambdaQueryWrapper<BtpFlow> wrapper = Wrappers.lambdaQuery();
 		wrapper.eq(BtpFlow::getFlowName, flow.getFlowName());
@@ -129,6 +129,18 @@ public class BtpFlowController extends BaseController {
 		flow.setUpdateBy(getUsername());
 		flow.setUpdateTime(new Date());
 		return toAjax(flowService.updateById(flow));
+	}
+
+	/**
+	 * 部署流程
+	 */
+	@PreAuthorize("@ss.hasPermi('business:flow:edit')")
+	@Log(title = "流程管理", businessType = BusinessType.GRANT)
+	@PutMapping("/deploy/{flowId}/{version}")
+	public AjaxResult deploy(@PathVariable("flowId") @Validated Long flowId, @PathVariable("version") Integer version) {
+		// TODO: 2022/8/4
+		// 流程部署
+		return AjaxResult.success("部署成功");
 	}
 
 	/**

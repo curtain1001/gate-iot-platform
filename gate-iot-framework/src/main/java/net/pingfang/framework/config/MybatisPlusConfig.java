@@ -32,6 +32,21 @@ public class MybatisPlusConfig {
 		return interceptor;
 	}
 
+//	/**
+//	 * 下划线转驼峰
+//	 *
+//	 * @return
+//	 */
+//	@Bean
+//	public ConfigurationCustomizer mybatisConfigurationCustomizer() {
+//		return new ConfigurationCustomizer() {
+//			@Override
+//			public void customize(MybatisConfiguration configuration) {
+//				configuration.setObjectWrapperFactory(new MybatisMapWrapperFactory());
+//			}
+//		};
+//	}
+
 //	@Bean
 //	public PageInterceptor pageInterceptor() {
 //		PageInterceptor pageInterceptor = new PageInterceptor();

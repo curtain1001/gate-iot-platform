@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import org.apache.commons.compress.utils.Lists;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.SqlCondition;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -40,12 +42,12 @@ public class BtpArea extends BaseEntity implements Serializable {
 	/**
 	 * 场站名
 	 */
-	@TableField(value = "area_name", condition = SqlCondition.LIKE)
+	@TableField(condition = SqlCondition.LIKE)
 	private String areaName;
 	/**
 	 * 场站号
 	 */
-	@TableField(value = "area_no", condition = SqlCondition.LIKE)
+	@TableField(condition = SqlCondition.LIKE)
 	private String areaNo;
 
 	private transient List<BtpLane> btpLanes;
@@ -54,7 +56,8 @@ public class BtpArea extends BaseEntity implements Serializable {
 		return LabelObject.builder() //
 				.label(areaName) //
 				.value(areaId)//
-				.children(btpLanes.stream().map(BtpLane::toLabelObject).collect(Collectors.toList())) //
+				.children(btpLanes != null ? btpLanes.stream().map(BtpLane::toLabelObject).collect(Collectors.toList())
+						: Lists.newArrayList()) //
 				.build(); //
 	}
 

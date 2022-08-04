@@ -30,4 +30,10 @@
         </createIndex>
     </changeSet>
 
+    <changeSet id="btp_flow::addColumn::version" author="wangchao">
+        <addColumn tableName="btp_flow">
+            <column name="version" type="int" remarks="版本号" defaultValue="1" />
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

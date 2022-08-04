@@ -18,7 +18,7 @@ import net.pingfang.common.core.domain.BaseEntity;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("flow_definition_node")
+@TableName("btp_flow_runtime")
 public class FlowDefinitionNode extends BaseEntity {
 
 	private static final long serialVersionUID = 1L;
@@ -29,7 +29,7 @@ public class FlowDefinitionNode extends BaseEntity {
 	/**
 	 * 定义代码
 	 */
-	private String definitionCode;
+	private String flowId;
 
 	/**
 	 * 父节点代码
