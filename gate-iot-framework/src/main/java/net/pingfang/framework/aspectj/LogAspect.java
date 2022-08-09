@@ -18,11 +18,15 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.HandlerMapping;
 
 import com.alibaba.fastjson2.JSON;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import net.pingfang.common.annotation.Log;
 import net.pingfang.common.core.domain.model.LoginUser;
 import net.pingfang.common.enums.BusinessStatus;
 import net.pingfang.common.enums.HttpMethod;
+import net.pingfang.common.utils.JsonUtils;
 import net.pingfang.common.utils.SecurityUtils;
 import net.pingfang.common.utils.ServletUtils;
 import net.pingfang.common.utils.StringUtils;
@@ -134,33 +138,37 @@ public class LogAspect {
 	 */
 	private void setRequestValue(JoinPoint joinPoint, SysOperLog operLog) throws Exception {
 		String requestMethod = operLog.getRequestMethod();
+		ObjectMapper objectMapper = JsonUtils.createObjectMapper();
+		ObjectNode objectNode = objectMapper.createObjectNode();
 		if (HttpMethod.PUT.name().equals(requestMethod) || HttpMethod.POST.name().equals(requestMethod)) {
-			String params = argsArrayToString(joinPoint.getArgs());
-			operLog.setOperParam(StringUtils.substring(params, 0, 2000));
+			argsArrayToString(objectNode, joinPoint.getArgs());
 		} else {
 			Map<?, ?> paramsMap = (Map<?, ?>) ServletUtils.getRequest()
 					.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-			operLog.setOperParam(StringUtils.substring(paramsMap.toString(), 0, 2000));
+			if (!paramsMap.isEmpty()) {
+				paramsMap.forEach((key, value) -> objectNode.replace(key.toString(), JsonUtils.toJsonNode(value)));
+			}
 		}
+		operLog.setOperParam(objectNode);
 	}
 
 	/**
 	 * 参数拼装
 	 */
-	private String argsArrayToString(Object[] paramsArray) {
-		String params = "";
+	private JsonNode argsArrayToString(ObjectNode objectNode, Object[] paramsArray) {
 		if (paramsArray != null && paramsArray.length > 0) {
+			int i = 0;
 			for (Object o : paramsArray) {
 				if (StringUtils.isNotNull(o) && !isFilterObject(o)) {
 					try {
-						Object jsonObj = JSON.toJSON(o);
-						params += jsonObj.toString() + " ";
+						objectNode.replace("param_" + i, JsonUtils.toJsonNode(o));
+						i++;
 					} catch (Exception e) {
 					}
 				}
 			}
 		}
-		return params.trim();
+		return objectNode;
 	}
 
 	/**

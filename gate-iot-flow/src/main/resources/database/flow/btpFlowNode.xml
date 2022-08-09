@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <property name="blob.type" dbms="mssql" value="varbinary(max)" />
+    <property name="blob.type" dbms="mysql" value="longblob" />
+    <property name="blob.type" dbms="h2" value="blob" />
+
+    <property name="clob.type" dbms="mssql" value="varchar(max)" />
+    <property name="clob.type" dbms="mysql" value="longtext" />
+    <property name="clob.type" dbms="h2" value="longtext" />
+    <property name="autoIncrement" value="true" dbms="h2" />
+
+    <changeSet author="wangchao" id="btp_flow_node::create">
+        <createTable tableName="btp_flow_node" remarks="流程图节点信息表">
+            <column name="node_id" type="varchar(36)" remarks="连线主键id" />
+            <column name="deploy_id" type="bigint(36)" remarks="部署流程主键" />
+            <column name="type" type="varchar(36)" remarks="类型" />
+            <column name="content" type="${clob.type}" remarks="完整报文" />
+            <column name="properties" type="${clob.type}" remarks="配置信息" />
+            <column name="seq" type="int" remarks="序号" />
+        </createTable>
+        <createIndex tableName="btp_flow_node" indexName="flowEdge_idx">
+            <column name="deploy_id" />
+            <column name="node_id" />
+        </createIndex>
+    </changeSet>
+
+
+</databaseChangeLog>

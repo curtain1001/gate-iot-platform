@@ -4,7 +4,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-import net.pingfang.flow.domain.FlowInstance;
+import net.pingfang.flow.domain.FlowProcessInstance;
 
 /**
  * <p>
@@ -15,5 +15,5 @@ import net.pingfang.flow.domain.FlowInstance;
  * @since 2022-07-26
  */
 @Mapper
-public interface FlowInstanceMapper extends BaseMapper<FlowInstance> {
+public interface FlowProcessInstanceMapper extends BaseMapper<FlowProcessInstance> {
 }

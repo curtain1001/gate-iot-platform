@@ -22,7 +22,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
 import net.pingfang.business.domain.BtpFlow;
-import net.pingfang.business.service.impl.BtpFlowService;
+import net.pingfang.business.service.impl.BtpFlowServiceImpl;
 import net.pingfang.common.annotation.Log;
 import net.pingfang.common.core.controller.BaseController;
 import net.pingfang.common.core.domain.AjaxResult;
@@ -42,7 +42,7 @@ import net.pingfang.common.enums.BusinessType;
 public class BtpFlowController extends BaseController {
 
 	@Resource
-	private BtpFlowService flowService;
+	private BtpFlowServiceImpl flowService;
 
 	/**
 	 * 分页列表
@@ -136,11 +136,11 @@ public class BtpFlowController extends BaseController {
 	 */
 	@PreAuthorize("@ss.hasPermi('business:flow:edit')")
 	@Log(title = "流程管理", businessType = BusinessType.GRANT)
-	@PutMapping("/deploy/{flowId}/{version}")
-	public AjaxResult deploy(@PathVariable("flowId") @Validated Long flowId, @PathVariable("version") Integer version) {
-		// TODO: 2022/8/4
+	@PutMapping("/deploy/{laneId}/{flowId}/{version}")
+	public AjaxResult deploy(@PathVariable("laneId") Long laneId, @PathVariable("flowId") @Validated Long flowId,
+			@PathVariable("version") Integer version) {
 		// 流程部署
-		return AjaxResult.success("部署成功");
+		return toAjax(flowService.deploy(laneId, flowId, version));
 	}
 
 	/**

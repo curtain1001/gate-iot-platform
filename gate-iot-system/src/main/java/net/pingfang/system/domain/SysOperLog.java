@@ -3,6 +3,7 @@ package net.pingfang.system.domain;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import net.pingfang.common.annotation.Excel;
 import net.pingfang.common.annotation.Excel.ColumnType;
@@ -65,7 +66,8 @@ public class SysOperLog extends BaseEntity {
 
 	/** 请求参数 */
 	@Excel(name = "请求参数")
-	private String operParam;
+//	@TableField(typeHandler = JacksonTypeHandler.class)
+	private JsonNode operParam;
 
 	/** 返回参数 */
 	@Excel(name = "返回参数")
@@ -180,11 +182,11 @@ public class SysOperLog extends BaseEntity {
 		this.operLocation = operLocation;
 	}
 
-	public String getOperParam() {
+	public JsonNode getOperParam() {
 		return operParam;
 	}
 
-	public void setOperParam(String operParam) {
+	public void setOperParam(JsonNode operParam) {
 		this.operParam = operParam;
 	}
 

@@ -73,14 +73,14 @@
         </dependency>
         <dependency>
             <groupId>net.pingfang</groupId>
-            <artifactId>device-component</artifactId>
+            <artifactId>device-core</artifactId>
             <version>${gate-iot.version}</version>
         </dependency>
 
         <!-- 业务模块-->
         <dependency>
             <groupId>net.pingfang</groupId>
-            <artifactId>network-component</artifactId>
+            <artifactId>network-core</artifactId>
             <version>${project.version}</version>
         </dependency>
 

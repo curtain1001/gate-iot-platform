@@ -25,6 +25,20 @@ public class JsonUtils {
 		return objectMapper;
 	}
 
+	/**
+	 * 判断是否为json类型
+	 *
+	 */
+	public static boolean isJSONValid(Object jsonInString) {
+		try {
+			final ObjectMapper mapper = new ObjectMapper();
+			mapper.readTree(jsonInString.toString());
+			return true;
+		} catch (IOException e) {
+			return false;
+		}
+	}
+
 	public static String toJsonString(Object value) {
 		if (value == null) {
 			return null;

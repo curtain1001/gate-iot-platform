@@ -2,11 +2,10 @@ package net.pingfang.flow.service.impl;
 
 import org.springframework.stereotype.Service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
-import net.pingfang.flow.domain.FlowDefinition;
-import net.pingfang.flow.mapper.FlowDefinitionMapper;
-import net.pingfang.flow.service.IFlowDefinitionService;
+import net.pingfang.flow.domain.FlowDeployment;
 
 /**
  * <p>
@@ -17,7 +16,7 @@ import net.pingfang.flow.service.IFlowDefinitionService;
  * @since 2022-07-26
  */
 @Service
-public class FlowDefinitionServiceImpl extends ServiceImpl<FlowDefinitionMapper, FlowDefinition>
-		implements IFlowDefinitionService {
+public class FlowDefinitionServiceImpl extends ServiceImpl<FlowDefinitionMapper, FlowDeployment>
+		implements IService<FlowDeployment> {
 
 }

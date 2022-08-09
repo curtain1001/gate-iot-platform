@@ -5,15 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.compress.utils.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -25,6 +24,7 @@ import com.github.pagehelper.PageInfo;
 import net.pingfang.business.domain.BtpArea;
 import net.pingfang.business.mapper.BtpAreaMapper;
 import net.pingfang.business.service.IBtpAreaService;
+import net.pingfang.business.service.impl.BtpAreaServiceImpl;
 
 /**
  * @author 王超
@@ -33,12 +33,12 @@ import net.pingfang.business.service.IBtpAreaService;
  */
 @RunWith(SpringRunner.class)
 @MapperScan("net.pingfang.**.mapper")
-@ComponentScan(basePackageClasses = { IBtpAreaService.class })
-@MybatisPlusTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION))
+@MybatisPlusTest(includeFilters = @ComponentScan.Filter(value = { BtpAreaServiceImpl.class, BtpAreaMapper.class }))
+@ContextConfiguration(classes = { BtpAreaServiceImpl.class, BtpAreaMapper.class })
 public class BtpAreaTest {
-	@Resource
+	@Autowired
 	private BtpAreaMapper btpAreaMapper;
-	@Resource
+	@Autowired
 	private IBtpAreaService btpAreaService;
 
 //	@Test

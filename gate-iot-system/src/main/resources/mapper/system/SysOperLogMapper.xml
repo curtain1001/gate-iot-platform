@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="net.pingfang.system.mapper.SysOperLogMapper">
 
-    <resultMap id="SysOperLogResult" type="SysOperLog">
+    <resultMap id="SysOperLogResult" type="net.pingfang.system.domain.SysOperLog">
         <id column="oper_id" property="operId" />
         <result column="title" property="title" />
         <result column="business_type" property="businessType" />
@@ -15,7 +15,8 @@
         <result column="oper_url" property="operUrl" />
         <result column="oper_ip" property="operIp" />
         <result column="oper_location" property="operLocation" />
-        <result column="oper_param" property="operParam" />
+        <result column="oper_param" property="operParam" javaType="com.fasterxml.jackson.databind.JsonNode"
+                jdbcType="VARCHAR" typeHandler="net.pingfang.framework.config.JsonTypeHandler" />
         <result column="json_result" property="jsonResult" />
         <result column="status" property="status" />
         <result column="error_msg" property="errorMsg" />
@@ -47,7 +48,9 @@
                                  oper_url, oper_ip, oper_location, oper_param, json_result, status, error_msg,
                                  oper_time)
         values (#{title}, #{businessType}, #{method}, #{requestMethod}, #{operatorType}, #{operName}, #{deptName},
-                #{operUrl}, #{operIp}, #{operLocation}, #{operParam}, #{jsonResult}, #{status}, #{errorMsg}, sysdate())
+                #{operUrl}, #{operIp}, #{operLocation},
+                #{operParam, typeHandler=net.pingfang.framework.config.JsonTypeHandler}, #{jsonResult}, #{status},
+                #{errorMsg}, sysdate())
     </insert>
 
     <select id="selectOperLogList" parameterType="SysOperLog" resultMap="SysOperLogResult">
@@ -70,6 +73,9 @@
             </if>
             <if test="operName != null and operName != ''">
                 AND oper_name like concat('%', #{operName}, '%')
+            </if>
+            <if test="operUrl != null and operUrl != ''">
+                AND oper_url like concat('%', #{operUrl}, '%')
             </if>
             <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
                 and date_format(oper_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')

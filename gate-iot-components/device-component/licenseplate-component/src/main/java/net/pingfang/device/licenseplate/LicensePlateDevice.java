@@ -226,9 +226,9 @@ public class LicensePlateDevice implements DeviceOperator {
 							.acSnapTime(new String(ptImageInfo.acSnapTime))//
 							.ucDirection(String.valueOf(ptImageInfo.ucDirection))//
 							.ucHaveVehicle("")//
-							.ucLaneNo(new String(String.valueOf(ptImageInfo.ucLaneNo)))//
+							.ucLaneNo(String.valueOf(ptImageInfo.ucLaneNo))//
 							.szLprResult(new String(ptImageInfo.szLprResult, "GBK").trim())//
-							.ucLprType(new String(String.valueOf(ptImageInfo.ucLprType)))//
+							.ucLprType(String.valueOf(ptImageInfo.ucLprType))//
 							.ucPlateColor(String.valueOf(ptImageInfo.ucPlateColor))//
 							.ucScore(String.valueOf(ptImageInfo.ucScore))//
 							.ucSnapshotIndex(String.valueOf(ptImageInfo.ucSnapshotIndex))//

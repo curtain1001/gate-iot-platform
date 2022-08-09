@@ -105,6 +105,10 @@
             <version>1.0.0</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>net.pingfang</groupId>
+            <artifactId>gate-iot-flow</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
