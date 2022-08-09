@@ -13,6 +13,9 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.extern.slf4j.Slf4j;
+import net.pingfang.device.core.DeviceManager;
+import net.pingfang.device.core.DeviceOperator;
+import net.pingfang.device.core.instruction.DeviceInstruction;
 import net.pingfang.flow.domain.FlowDeployment;
 import net.pingfang.flow.domain.FlowEdge;
 import net.pingfang.flow.domain.FlowNode;
@@ -21,8 +24,9 @@ import net.pingfang.flow.enums.InstanceStatus;
 import net.pingfang.flow.service.IFlowDeploymentService;
 import net.pingfang.flow.service.IFlowProcessInstanceService;
 import net.pingfang.flow.utils.FlowUtils;
+import net.pingfang.flow.values.NodeProperties;
 import net.pingfang.flow.values.ProcessMessage;
-import net.pingfang.iot.common.instruction.Instruction;
+import net.pingfang.iot.common.instruction.InstructionResult;
 import net.pingfang.iot.common.instruction.ObjectType;
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.FluxSink;
@@ -39,6 +43,7 @@ import reactor.core.publisher.FluxSink;
 public class ProcessTask {
 	private IFlowDeploymentService deploymentService;
 	private IFlowProcessInstanceService processInstanceService;
+	private DeviceManager deviceManager;
 
 	private final EmitterProcessor<ProcessMessage> processor = EmitterProcessor.create(false);
 	private final FluxSink<ProcessMessage> sink = processor.sink(FluxSink.OverflowStrategy.BUFFER);
@@ -57,6 +62,8 @@ public class ProcessTask {
 	private FlowNode currentNode;
 
 	private List<FlowNode> startNode;
+
+	private JsonNode result;
 
 	public ProcessTask(Long laneId) {
 		this.laneId = laneId;
@@ -88,8 +95,13 @@ public class ProcessTask {
 		});
 	}
 
-	public void run(Instruction instruction) {
-//		if ()
+	public void run(NodeProperties node) {
+		if (node.getInstruction() instanceof DeviceInstruction) {
+			DeviceInstruction deviceInstruction = (DeviceInstruction) node.getInstruction();
+			DeviceOperator deviceOperator = deviceManager.getDevice(laneId, node.getDeviceId());
+			InstructionResult<Object, String> instructionResult = deviceInstruction.execution(deviceOperator);
+			// todo 执行 服务指令 区分上线下行指令
+		}
 	}
 
 	public void checkProcessInstance() {
