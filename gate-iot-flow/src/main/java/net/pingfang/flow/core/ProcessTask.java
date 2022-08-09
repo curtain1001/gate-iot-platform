@@ -112,12 +112,13 @@ public class ProcessTask {
 	}
 
 	public List<FlowNode> getStartNode(FlowDeployment deployment) {
+		List<FlowNode> startNodes = Lists.newArrayList();
 		if (deployment != null && deployment.getContent() != null) {
 			JsonNode jsonNode = deployment.getContent();
 			// 节点
 			JsonNode nodes = jsonNode.get("nodes");
 			if (nodes != null && nodes.isArray()) {
-				List<FlowNode> startNodes = Lists.newArrayList();
+
 				nodes.elements().forEachRemaining(x -> {
 					if (x.hasNonNull("type") && "start".equals(x.get("type").asText())) {
 						FlowNode flowNode = FlowUtils.nodeConvert(x);
@@ -125,12 +126,13 @@ public class ProcessTask {
 							flowNode = flowNode.toBuilder() //
 									.deployId(deployment.getDeployId())//
 									.build();
-							flowNodes.add(flowNode);
+							startNodes.add(flowNode);
 						}
 					}
 				});
 			}
 		}
+		return startNodes;
 	}
 
 	private void setFlow(FlowDeployment deployment) {
