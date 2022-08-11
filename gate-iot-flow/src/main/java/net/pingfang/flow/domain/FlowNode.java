@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import net.pingfang.common.utils.JsonUtils;
+import net.pingfang.flow.enums.NodeType;
 import net.pingfang.flow.values.NodeProperties;
 
 /**
@@ -30,6 +30,10 @@ public class FlowNode {
 	private static final long serialVersionUID = 1L;
 	@TableId(type = IdType.INPUT)
 	private String nodeId;
+	/**
+	 * 节点名称 text=>value
+	 */
+	private String nodeName;
 
 	/**
 	 * 部署流程id
@@ -39,7 +43,7 @@ public class FlowNode {
 	/**
 	 * 节点类型
 	 */
-	private String type;
+	private NodeType type;
 	/**
 	 * 节点配置信息
 	 */
@@ -55,10 +59,5 @@ public class FlowNode {
 	 * 序号
 	 */
 	private int seq;
-
-	public FlowNode setProperties(JsonNode jsonNode) {
-		this.properties = JsonUtils.nodeToObject(jsonNode, NodeProperties.class);
-		return this;
-	}
 
 }

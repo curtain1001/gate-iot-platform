@@ -38,9 +38,9 @@ public class LicensePlateDeviceProvider implements DeviceProvider<LicensePlateDe
 	}
 
 	@Override
-	public DeviceOperator reload(DeviceOperator operator, LicensePlateDeviceProperties properties) {
-		operator.shutdown();
-		return init(properties);
+	public void reload(DeviceOperator operator, LicensePlateDeviceProperties properties) {
+		LicensePlateDevice device = (LicensePlateDevice) operator;
+		device.reload(properties.getHost(), (short) properties.getPort(), (short) properties.getTimeout());
 	}
 
 	@Override

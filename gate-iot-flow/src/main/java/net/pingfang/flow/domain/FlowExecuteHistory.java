@@ -6,9 +6,11 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import net.pingfang.iot.common.instruction.Instruction;
+import lombok.NoArgsConstructor;
+import net.pingfang.flow.enums.ProcessStatus;
 
 /**
  * <p>
@@ -20,12 +22,14 @@ import net.pingfang.iot.common.instruction.Instruction;
  */
 @Data
 @Builder
-@TableName("btp_flow_execute_history")
+@TableName(value = "btp_flow_execute_history", autoResultMap = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class FlowExecuteHistory {
 	private static final long serialVersionUID = 1L;
 
 	@TableId(type = IdType.AUTO)
-	private Long id;
+	private Long historyId;
 	/**
 	 * 流程实例id
 	 */
@@ -34,7 +38,7 @@ public class FlowExecuteHistory {
 	/**
 	 * 节点id
 	 */
-	private Integer nodeId;
+	private String nodeId;
 	/**
 	 * 节点名称
 	 */
@@ -42,11 +46,11 @@ public class FlowExecuteHistory {
 	/**
 	 * 执行指令
 	 */
-	private Instruction instruction;
+	private String instruction;
 	/**
 	 * 状态：0待处理，1成功，2失败
 	 */
-	private Integer actionStatus;
+	private ProcessStatus status;
 	/**
 	 * 执行时间
 	 */

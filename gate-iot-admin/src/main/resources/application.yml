@@ -156,3 +156,5 @@ liquibase:
     - /database/flow/btpFlowEdge.xml
     - /database/flow/btpFlowNode.xml
     - /database/flow/btpFlowDeployment.xml
+    - /database/flow/btpFlowExecuteHistory.xml
+    - /database/flow/btpFlowProcessInstance.xml

@@ -1,5 +1,7 @@
 package net.pingfang.dockservice.customs.instruction;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import lombok.extern.slf4j.Slf4j;
 import net.pingfang.dockservice.core.BusinessInstruction;
 import net.pingfang.iot.common.instruction.InstructionResult;
@@ -29,7 +31,7 @@ public class StartProcessInstruction implements BusinessInstruction {
 	}
 
 	@Override
-	public InstructionResult<String, String> execution() {
+	public InstructionResult<String, String> execution(JsonNode jsonNode) {
 		log.info("对接海关");
 		return InstructionResult.success(null, "执行成功");
 	}

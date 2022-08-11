@@ -1,5 +1,7 @@
 package net.pingfang.dockservice.core;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import net.pingfang.iot.common.instruction.Instruction;
 import net.pingfang.iot.common.instruction.InstructionResult;
 import net.pingfang.iot.common.instruction.ObjectType;
@@ -10,8 +12,12 @@ import net.pingfang.iot.common.instruction.ObjectType;
  * @date 2022-07-15 10:59
  */
 public interface BusinessInstruction extends Instruction {
-
-	public abstract InstructionResult execution();
+	/**
+	 *
+	 * @param jsonNode fieldName 节点名称；fieldValue: 节点执行报文
+	 * @return
+	 */
+	public abstract InstructionResult execution(JsonNode jsonNode);
 
 	@Override
 	default ObjectType getObjectType() {

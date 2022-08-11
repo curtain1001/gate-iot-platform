@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import net.pingfang.device.core.instruction.DeviceInstruction;
 import net.pingfang.iot.common.instruction.Instruction;
+import net.pingfang.iot.common.instruction.InstructionManager;
 import net.pingfang.iot.common.instruction.InstructionProvider;
 import net.pingfang.iot.common.instruction.ObjectType;
 import net.pingfang.iot.common.product.Product;
@@ -22,7 +23,7 @@ import net.pingfang.iot.common.product.Product;
  * @date 2022-07-06 15:55
  */
 @Component
-public class DefaultInstructionManager implements BeanPostProcessor {
+public class DefaultInstructionManager implements InstructionManager, BeanPostProcessor {
 	/**
 	 * 指令缓存 key:指令value
 	 */

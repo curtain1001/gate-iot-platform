@@ -209,6 +209,10 @@ public class JsonUtils {
 		}
 	}
 
+	public static String getFieldValue(JsonNode jsonNode, String fieldName) {
+		return jsonNode.hasNonNull(fieldName) ? jsonNode.get(fieldName).asText() : null;
+	}
+
 	/**
 	 * 先从对象变成JsonNode，在通过函数处理，然后转成原来的对象类型
 	 *

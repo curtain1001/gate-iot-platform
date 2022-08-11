@@ -47,7 +47,7 @@ public interface NetworkManager {
 	 * @param id   网络组件ID
 	 * @return void
 	 */
-	void reload(NetworkType type, String id);
+	void reload(NetworkType type, NetworkProperties properties, String id);
 
 	/**
 	 * 停止网络组件

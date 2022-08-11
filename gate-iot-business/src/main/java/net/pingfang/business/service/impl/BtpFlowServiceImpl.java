@@ -1,12 +1,9 @@
 package net.pingfang.business.service.impl;
 
 import java.util.Date;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.compress.utils.Lists;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,11 +18,10 @@ import net.pingfang.business.service.IBtpFlowService;
 import net.pingfang.common.exception.ServiceException;
 import net.pingfang.common.utils.SecurityUtils;
 import net.pingfang.flow.domain.FlowDeployment;
-import net.pingfang.flow.domain.FlowEdge;
-import net.pingfang.flow.domain.FlowNode;
 import net.pingfang.flow.service.IFlowDeploymentService;
 import net.pingfang.flow.service.IFlowEdgeService;
 import net.pingfang.flow.service.IFlowNodeService;
+import net.pingfang.iot.common.instruction.InstructionManager;
 
 /**
  * <p>
@@ -46,6 +42,8 @@ public class BtpFlowServiceImpl extends ServiceImpl<BtpFlowMapper, BtpFlow> impl
 	public IFlowEdgeService edgeService;
 	@Resource
 	public IFlowDeploymentService deploymentService;
+	@Resource
+	public InstructionManager instructionManager;
 
 	@Transactional(rollbackFor = { Exception.class })
 	public boolean deploy(Long laneId, Long flowId, int version) {
@@ -80,68 +78,7 @@ public class BtpFlowServiceImpl extends ServiceImpl<BtpFlowMapper, BtpFlow> impl
 				.createBy(SecurityUtils.getLoginUser().getUsername())//
 				.createTime(new Date())//
 				.build();
-		deploymentService.save(deployment);
-
-		List<FlowNode> flowNodeList = Lists.newArrayList();
-		if (nodes != null && nodes.isArray()) {
-			AtomicInteger i = new AtomicInteger(0);
-			nodes.elements().forEachRemaining(x -> {
-				i.getAndIncrement();
-				FlowNode flowNode = nodeConvert(x);
-				if (flowNode != null) {
-					flowNode = flowNode.toBuilder() //
-							.deployId(deployment.getDeployId())//
-							.seq(i.get()) //
-							.build();
-					flowNodeList.add(flowNode);
-				}
-			});
-		}
-
-		List<FlowEdge> flowEdgeList = Lists.newArrayList();
-		JsonNode edges = jsonNode.get("edges");
-		if (edges != null && edges.isArray()) {
-			AtomicInteger i = new AtomicInteger(0);
-			edges.elements().forEachRemaining(x -> {
-				i.getAndIncrement();
-				FlowEdge flowEdge = edgeConvert(x);
-				if (flowEdge != null) {
-					flowEdge = flowEdge.toBuilder() //
-							.deployId(deployment.getDeployId())//
-							.seq(i.get()) //
-							.build();
-					flowEdgeList.add(flowEdge);
-				}
-
-			});
-		}
-		return nodeService.saveBatch(flowNodeList) && edgeService.saveBatch(flowEdgeList);
-	}
-
-	public FlowNode nodeConvert(JsonNode jsonNode) {
-		JsonNode properties = jsonNode.get("properties");
-		FlowNode flowNode = FlowNode.builder() //
-//				.deployId()
-				.nodeId(jsonNode.get("id").asText())//
-				.type(jsonNode.get("type").asText())//
-				.content(jsonNode)//
-				.build();
-		flowNode = flowNode.setProperties(properties);
-		return flowNode;
-	}
-
-	public FlowEdge edgeConvert(JsonNode edge) {
-		JsonNode properties = edge.get("properties");
-		FlowEdge flowEdge = FlowEdge.builder() //
-				// .deployId()
-				.edgeId(edge.get("id").asText())//
-				.type(edge.get("type").asText())//
-				.sourceNodeId(edge.get("sourceNodeId").asText())//
-				.targetNodeId(edge.get("targetNodeId").asText())//
-				.content(edge)//
-				.build();
-		flowEdge = flowEdge.setProperties(properties);
-		return flowEdge;
+		return deploymentService.save(deployment);
 	}
 
 	public String getFieldValue(JsonNode jsonNode, String fieldName) {

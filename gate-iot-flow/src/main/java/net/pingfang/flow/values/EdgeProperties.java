@@ -17,4 +17,5 @@ import lombok.Data;
 @Builder(toBuilder = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EdgeProperties {
+	String condition;
 }

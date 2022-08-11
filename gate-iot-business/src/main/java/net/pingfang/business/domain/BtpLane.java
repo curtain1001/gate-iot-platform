@@ -31,7 +31,7 @@ public class BtpLane extends BaseEntity implements Serializable {
 	 * 车道id
 	 */
 	@TableId(type = IdType.AUTO)
-	private String laneId;
+	private Long laneId;
 	/**
 	 * 车道名称
 	 */
@@ -45,7 +45,7 @@ public class BtpLane extends BaseEntity implements Serializable {
 	/**
 	 * 场站号
 	 */
-	private String areaId;
+	private Long areaId;
 
 	/**
 	 * 海关通道号
@@ -64,12 +64,20 @@ public class BtpLane extends BaseEntity implements Serializable {
 				.build(); //
 	}
 
-	public String getLaneId() {
+	public Long getLaneId() {
 		return laneId;
 	}
 
-	public void setLaneId(String laneId) {
+	public void setLaneId(Long laneId) {
 		this.laneId = laneId;
+	}
+
+	public void setAreaId(Long areaId) {
+		this.areaId = areaId;
+	}
+
+	public Long getAreaId() {
+		return areaId;
 	}
 
 	@NotBlank(message = "通道名称不能为空")
@@ -90,14 +98,6 @@ public class BtpLane extends BaseEntity implements Serializable {
 
 	public void setLaneNo(String laneNo) {
 		this.laneNo = laneNo;
-	}
-
-	public String getAreaId() {
-		return areaId;
-	}
-
-	public void setAreaId(String areaId) {
-		this.areaId = areaId;
 	}
 
 	public String getCustomsLaneNo() {

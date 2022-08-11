@@ -36,7 +36,7 @@ public class ImageSnap implements DeviceInstruction {
 	}
 
 	@Override
-	public InstructionResult<Object, String> execution(DeviceOperator deviceOperator) {
+	public InstructionResult<String, String> execution(DeviceOperator deviceOperator) {
 		LicensePlateDevice device = (LicensePlateDevice) deviceOperator;
 		int is = device.imageSnap();
 		String message = StatusCode.getStatusCode(is, "Net_ImageSnap");

@@ -1,5 +1,8 @@
 package net.pingfang.device.plc;
 
+import java.util.Collections;
+import java.util.Map;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import net.pingfang.device.core.DeviceOperator;
@@ -7,8 +10,12 @@ import net.pingfang.device.core.DeviceState;
 import net.pingfang.iot.common.FunctionMessage;
 import net.pingfang.iot.common.MessagePayloadType;
 import net.pingfang.iot.common.product.Product;
+import net.pingfang.network.DefaultNetworkType;
+import net.pingfang.network.NetworkManager;
+import net.pingfang.network.NetworkProperties;
 import net.pingfang.network.tcp.TcpMessage;
 import net.pingfang.network.tcp.client.TcpClient;
+import net.pingfang.network.tcp.parser.PayloadParserType;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -22,12 +29,13 @@ public class PLCDevice implements DeviceOperator {
 	final Long laneId;
 	final String deviceName;
 	private TcpClient tcpClient;
+	final NetworkManager networkManager;
 
-	public PLCDevice(Long laneId, String deviceId, String deviceName, TcpClient tcpClient) {
+	public PLCDevice(Long laneId, String deviceId, String deviceName, NetworkManager networkManager) {
 		this.deviceId = deviceId;
 		this.laneId = laneId;
 		this.deviceName = deviceName;
-		this.tcpClient = tcpClient;
+		this.networkManager = networkManager;
 	}
 
 	@Override
@@ -57,9 +65,8 @@ public class PLCDevice implements DeviceOperator {
 
 	@Override
 	public void shutdown() {
-		if (tcpClient != null) {
-			tcpClient.shutdown();
-		}
+		networkManager.shutdown(DefaultNetworkType.TCP_CLIENT, deviceId);
+		this.tcpClient = null;
 	}
 
 	@Override
@@ -73,12 +80,17 @@ public class PLCDevice implements DeviceOperator {
 	}
 
 	public DeviceState checkStatus() {
-		ByteBuf byteBuf = ByteBufAllocator.DEFAULT.ioBuffer();
-		byteBuf.writeBytes(new byte[] { (byte) 0xFE, (byte) 0xFF, (byte) 0xFF });
-		TcpMessage tcpMessage = new TcpMessage();
-		tcpMessage.setPayload(byteBuf);
-		Boolean bln = tcpClient.send(tcpMessage).block();
-		return bln != null && bln ? DeviceState.online : DeviceState.offline;
+		if (isAlive()) {
+			ByteBuf byteBuf = ByteBufAllocator.DEFAULT.ioBuffer();
+			byteBuf.writeBytes(new byte[] { (byte) 0xFE, (byte) 0xFF, (byte) 0xFF });
+			TcpMessage tcpMessage = new TcpMessage();
+			tcpMessage.setPayload(byteBuf);
+			Boolean bln = tcpClient.send(tcpMessage).block();
+			return bln != null && bln ? DeviceState.online : DeviceState.offline;
+		} else {
+			return DeviceState.offline;
+		}
+
 	}
 
 	@Override
@@ -101,13 +113,27 @@ public class PLCDevice implements DeviceOperator {
 
 	@Override
 	public void keepAlive() {
-		if (tcpClient != null) {
+		if (isAlive()) {
 			ByteBuf byteBuf = ByteBufAllocator.DEFAULT.ioBuffer();
 			byteBuf.writeBytes(new byte[] { (byte) 0xFE, (byte) 0xFF, (byte) 0xFF });
 			TcpMessage tcpMessage = new TcpMessage();
 			tcpMessage.setPayload(byteBuf);
 			tcpClient.send(tcpMessage);
 		}
+	}
+
+	public void setTcpClient(Map<String, Object> properties) {
+		// 粘黏包处理设置
+		properties.put("parserType", PayloadParserType.FIXED_LENGTH);
+		properties.put("parserConfiguration", Collections.singletonMap("size", 4));
+
+		NetworkProperties networkProperties = new NetworkProperties();
+		networkProperties.setId(deviceId);
+		networkProperties.setName("PLC::TCP::CLIENT::" + deviceId);
+		networkProperties.setEnabled(true);
+		networkProperties.setConfigurations(properties);
+		this.tcpClient = (TcpClient) networkManager.getNetwork(DefaultNetworkType.TCP_CLIENT, networkProperties,
+				deviceId);
 	}
 
 }

@@ -44,7 +44,7 @@ public class LicensePlateDevice implements DeviceOperator {
 	final String deviceId;
 	final Long laneId;
 	final String deviceName;
-	private final EmitterProcessor<FunctionMessage> processor = EmitterProcessor.create(false);
+	private final EmitterProcessor<FunctionMessage> processor = EmitterProcessor.create(true);
 	private final FluxSink<FunctionMessage> sink = processor.sink(FluxSink.OverflowStrategy.BUFFER);
 
 	public LicensePlateDevice(Long laneId, String deviceId, String deviceName, NET net) {
@@ -133,7 +133,8 @@ public class LicensePlateDevice implements DeviceOperator {
 
 	@Override
 	public void keepAlive() {
-		if (net.Net_QueryConnState(handle) == -1) {
+		if (isAlive()) {
+			// todo 保持连接
 		}
 	}
 
@@ -150,6 +151,24 @@ public class LicensePlateDevice implements DeviceOperator {
 	@Override
 	public boolean isAutoReload() {
 		return true;
+	}
+
+	public void reload(String ip, short port, short timeout) {
+		if (!isAlive()) {
+			handle = net.Net_AddCamera(ip);
+			int conn = net.Net_ConnCamera(handle, port, timeout);
+			if (conn != 0) {
+				log.error("相机连接：" + ResultCode.getMsg(conn));
+			}
+			int rem = net.Net_RegReportMessEx(handle, reportCBEx(), Pointer.NULL);
+			if (rem != 0) {
+				throw new RuntimeException("车牌识别结果获取回调函数注册完毕：" + ResultCode.getMsg(rem));
+			}
+			int rev = net.Net_RegImageRecvEx(handle, imageCBEx(), Pointer.createConstant(port));
+			if (rev != 0) {
+				throw new RuntimeException("车牌识别结果获取回调函数注册完毕：" + ResultCode.getMsg(rev));
+			}
+		}
 	}
 
 	public int saveImageToJpeg(String url) {

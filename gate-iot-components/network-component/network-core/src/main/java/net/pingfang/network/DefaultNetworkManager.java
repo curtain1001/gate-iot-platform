@@ -38,11 +38,11 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor 
 	}
 
 	@Override
-	public void reload(NetworkType type, String id) {
+	public void reload(NetworkType type, NetworkProperties properties, String id) {
 		Mono.justOrEmpty(getNetworkStore(type) //
 				.get(id)) //
 				.doOnNext(Network::shutdown) //
-				.then(Mono.just(getNetwork(type, id))) //
+				.then(Mono.just(getNetwork(type, properties, id))) //
 				.subscribe();
 	}
 
@@ -170,7 +170,7 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor 
 		Network network = getNetworkStore(type).get(id);
 		if (network != null) {
 			network.shutdown();
-
+			getNetworkStore(type).remove(id);
 		}
 	}
 

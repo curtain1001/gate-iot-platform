@@ -19,7 +19,7 @@ public interface DeviceInstruction extends Instruction {
 
 	public abstract Product getProduct();
 
-	default InstructionResult<Object, String> execution(DeviceOperator deviceOperator) {
+	default InstructionResult execution(DeviceOperator deviceOperator) {
 		throw new RuntimeException("暂未实现");
 	}
 

@@ -2,9 +2,12 @@ package net.pingfang.flow.values;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import net.pingfang.iot.common.instruction.Instruction;
+import net.pingfang.iot.common.instruction.InstructionType;
 import net.pingfang.iot.common.instruction.ObjectType;
 
 /**
@@ -18,6 +21,8 @@ import net.pingfang.iot.common.instruction.ObjectType;
 @Data
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class NodeProperties {
 	/**
 	 * 对象类型
@@ -26,7 +31,7 @@ public class NodeProperties {
 	/**
 	 * 指令类型
 	 */
-	private String insType;
+	private InstructionType insType;
 	/**
 	 * 指令
 	 */

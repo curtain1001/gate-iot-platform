@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <property name="blob.type" dbms="mssql" value="varbinary(max)" />
+    <property name="blob.type" dbms="mysql" value="longblob" />
+    <property name="blob.type" dbms="h2" value="blob" />
+
+    <property name="clob.type" dbms="mssql" value="varchar(max)" />
+    <property name="clob.type" dbms="mysql" value="longtext" />
+    <property name="clob.type" dbms="h2" value="longtext" />
+    <property name="autoIncrement" value="true" dbms="h2" />
+
+    <changeSet author="wangchao" id="btp_flow_execute_history::create">
+        <createTable tableName="btp_flow_execute_history" remarks="流程执行节点记录">
+            <column name="history_id" type="bigint(20)" autoIncrement="true" remarks="主键">
+                <constraints primaryKey="true" nullable="true" />
+            </column>
+            <column name="instance_id" type="bigint(20)" remarks="流程实例主键" />
+            <column name="node_id" type="varchar(36)" remarks="流程逻辑节点id" />
+            <column name="node_name" type="varchar(36)" remarks="流程逻辑节点名称" />
+            <column name="node_type" type="varchar(36)" remarks="流程逻辑节点名称" />
+            <column name="instruction" type="varchar(36)" remarks="执行指令命令" />
+            <column name="status" type="varchar(36)" remarks="执行状态" />
+            <column name="action_time" type="VARCHAR(64)" remarks="执行时间" />
+            <column name="result" type="${clob.type}" remarks="执行结果" />
+        </createTable>
+        <createIndex tableName="btp_flow_execute_history" indexName="history_idx">
+            <column name="history_id" />
+            <column name="instance_id" />
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

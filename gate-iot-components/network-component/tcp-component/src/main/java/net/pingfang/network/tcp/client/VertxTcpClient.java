@@ -33,7 +33,7 @@ public class VertxTcpClient implements TcpClient {
 	@Getter
 	private final String id;
 	private final List<Runnable> disconnectListener = new CopyOnWriteArrayList<>();
-	private final EmitterProcessor<TcpMessage> processor = EmitterProcessor.create(false);
+	private final EmitterProcessor<TcpMessage> processor = EmitterProcessor.create(true);
 	private final FluxSink<TcpMessage> sink = processor.sink(FluxSink.OverflowStrategy.BUFFER);
 	private final boolean serverClient;
 	public volatile NetClient client;
@@ -172,9 +172,6 @@ public class VertxTcpClient implements TcpClient {
 			execute(runnable);
 		}
 		disconnectListener.clear();
-		if (serverClient) {
-			processor.onComplete();
-		}
 	}
 
 	public void setClient(NetClient client) {

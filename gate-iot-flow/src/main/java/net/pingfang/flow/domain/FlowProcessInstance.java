@@ -7,11 +7,9 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-import net.pingfang.common.core.domain.BaseEntity;
 import net.pingfang.flow.enums.InstanceStatus;
 
 /**
@@ -23,12 +21,11 @@ import net.pingfang.flow.enums.InstanceStatus;
  * @since 2022-07-26
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-@TableName("flow_process_instance")
-@SuperBuilder
+@TableName("btp_flow_process_instance")
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class FlowProcessInstance extends BaseEntity {
+public class FlowProcessInstance {
 
 	private static final long serialVersionUID = 1L;
 
