@@ -21,7 +21,7 @@ import net.pingfang.flow.enums.ProcessStatus;
  * @since 2022-08-09 10:57
  */
 @Data
-@Builder
+@Builder(toBuilder = true)
 @TableName(value = "btp_flow_execute_history", autoResultMap = true)
 @AllArgsConstructor
 @NoArgsConstructor
@@ -51,12 +51,15 @@ public class FlowExecuteHistory {
 	 * 状态：0待处理，1成功，2失败
 	 */
 	private ProcessStatus status;
-	/**
-	 * 执行时间
-	 */
-	private Date actionTime;
+
 	/**
 	 * 执行结果
 	 */
 	private Object result;
+
+	/** 创建时间 */
+	private Date createTime;
+
+	/** 更新时间 */
+	private Date updateTime;
 }

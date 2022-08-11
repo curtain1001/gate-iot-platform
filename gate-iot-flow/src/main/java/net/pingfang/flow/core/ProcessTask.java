@@ -313,6 +313,8 @@ public class ProcessTask {
 					if (properties != null && StringUtils.isNotEmpty(properties.getCondition())) {
 						Object o = FlowUtils.execJs(properties.getCondition(), result);
 						return (Boolean) o;
+					} else {
+						return true;
 					}
 				} catch (Exception e) {
 					log.error("JS Engine exec error:", e);
@@ -336,7 +338,7 @@ public class ProcessTask {
 				.nodeId(currentNode.getNodeId()) //
 				.nodeName(currentNode.getNodeName())//
 				.status(ProcessStatus.WAIT)//
-				.actionTime(new Date())//
+				.createTime(new Date())//
 				.build();
 		historyService.save(executeHistory);
 		this.currentNodes.add(currentNode);
@@ -349,17 +351,17 @@ public class ProcessTask {
 	 * @param instructionResult 当前节点指令完成结果
 	 */
 	public void finishNode(FlowNode node, InstructionResult instructionResult) {
-		FlowExecuteHistory executeHistory = FlowExecuteHistory.builder() //
-				.instruction(node.getProperties().getInstruction().getValue())//
-				.instanceId(instanceId) //
-				.nodeId(node.getNodeId()) //
-				.nodeName(node.getNodeName())//
+		LambdaQueryWrapper<FlowExecuteHistory> queryWrapper = Wrappers.lambdaQuery();
+		queryWrapper.eq(FlowExecuteHistory::getInstanceId, this.instanceId);
+		queryWrapper.eq(FlowExecuteHistory::getNodeId, node.getNodeId());
+		FlowExecuteHistory executeHistory = historyService.getOne(queryWrapper);
+		executeHistory = executeHistory.toBuilder()//
 				.status(instructionResult.isSuccess() ? ProcessStatus.SUCCESS : ProcessStatus.FAIL)//
-				.actionTime(new Date())//
+				.updateTime(new Date())//
 				.result(JsonUtils.toJsonString(instructionResult)) //
 				.build();
 		assemble(node.getNodeName(), JsonUtils.toJsonNode(instructionResult.getResult()));
-		historyService.save(executeHistory);
+		historyService.updateById(executeHistory);
 		this.currentNodes.remove(node);
 	}
 
