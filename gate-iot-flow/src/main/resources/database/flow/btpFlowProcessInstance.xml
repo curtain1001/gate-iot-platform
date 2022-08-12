@@ -16,7 +16,7 @@
             <column name="instance_id" type="bigint(20)" autoIncrement="true" remarks="实例主键">
                 <constraints primaryKey="true" nullable="true" />
             </column>
-            <column name="deploy_flow_id" type="bigint(20)" remarks="流程图主键" />
+            <column name="deploy_id" type="bigint(20)" remarks="流程图部署信息主键" />
             <column name="lane_id" type="bigint(20)" remarks="车道id" />
             <column name="status" type="varchar(20)" remarks="实例状态" />
             <column name="start_time" type="VARCHAR(64)" remarks="开始时间" />

@@ -5,6 +5,7 @@ import java.util.Date;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -57,9 +58,16 @@ public class FlowExecuteHistory {
 	 */
 	private Object result;
 
-	/** 创建时间 */
+	/**
+	 * 创建时间
+	 *
+	 */
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createTime;
 
-	/** 更新时间 */
+	/**
+	 * 更新时间
+	 */
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date updateTime;
 }

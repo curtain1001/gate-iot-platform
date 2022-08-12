@@ -21,6 +21,7 @@ import net.pingfang.flow.service.IFlowDeploymentService;
 import net.pingfang.flow.service.IFlowExecuteHistoryService;
 import net.pingfang.flow.service.IFlowProcessInstanceService;
 import net.pingfang.flow.values.ProcessMessage;
+import net.pingfang.framework.manager.AsyncManager;
 import net.pingfang.iot.common.instruction.InstructionManager;
 
 /**
@@ -47,23 +48,33 @@ public class FlowEngine implements ApplicationRunner {
 	final Map<Long, ProcessTask> processStore = new ConcurrentHashMap<>();
 
 	public void execute(Long laneId) {
-		ProcessTask task = new ProcessTask(deploymentService, processInstanceService, deviceManager, historyService,
-				instructionManager, laneId);
-		processStore.put(laneId, task);
+		AsyncManager.me().execute(() -> {
+			try {
+				ProcessTask task = new ProcessTask(deploymentService, processInstanceService, deviceManager,
+						historyService, instructionManager, laneId);
+				processStore.put(laneId, task);
+			} catch (Exception e) {
+				log.error("流程异常；", e);
+			}
+		});
 	}
 
 	@Subscribe
 	public void on(MessageUpEvent event) {
-		log.info("设备：{}；指令：{}；", event.getDeviceId(), event.getInstruction().getValue());
-		ProcessMessage message = ProcessMessage.builder() //
-				.message(event.getMessage())//
-				.laneId(event.getLaneId())//
-				.instruction(event.getInstruction())//
-				.deviceId(event.getDeviceId())//
-				.product(event.getProduct())//
-				.type(event.getType())//
-				.build();
-		processStore.get(event.getLaneId()).put(message);
+		if (event.getInstruction() != null) {
+			ProcessMessage message = ProcessMessage.builder() //
+					.message(event.getMessage())//
+					.laneId(event.getLaneId())//
+					.instruction(event.getInstruction())//
+					.deviceId(event.getDeviceId())//
+					.product(event.getProduct())//
+					.type(event.getType())//
+					.build();
+			ProcessTask task = processStore.get(event.getLaneId());
+			if (task != null) {
+				task.put(message);
+			}
+		}
 	}
 
 	@Override

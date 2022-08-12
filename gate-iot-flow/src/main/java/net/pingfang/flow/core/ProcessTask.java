@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 
 import lombok.extern.slf4j.Slf4j;
+import net.pingfang.common.exception.ServiceException;
 import net.pingfang.common.utils.JsonUtils;
 import net.pingfang.common.utils.StringUtils;
 import net.pingfang.device.core.DeviceManager;
@@ -88,6 +89,11 @@ public class ProcessTask {
 	 * 当前节点
 	 */
 	private final List<FlowNode> currentNodes = new CopyOnWriteArrayList<FlowNode>();
+
+	/**
+	 * 触发节点 用来对上行数据进行匹配
+	 */
+	private final List<FlowNode> triggerNodes = new CopyOnWriteArrayList<>();
 	/**
 	 * 开始节点
 	 */
@@ -97,6 +103,10 @@ public class ProcessTask {
 	 * 流程处理结果
 	 */
 	private ObjectNode result;
+	/**
+	 * 流程触发的报文
+	 */
+	private ProcessMessage message;
 
 	public void put(ProcessMessage message) {
 		sink.next(message);
@@ -119,19 +129,32 @@ public class ProcessTask {
 			this.instanceId = initInstance.getInstanceId();
 			LambdaQueryWrapper<FlowDeployment> queryWrapper = Wrappers.lambdaQuery();
 			queryWrapper.eq(FlowDeployment::getLaneId, this.laneId);
+			queryWrapper.eq(FlowDeployment::getDeployId, initInstance.getDeployId());
 			FlowDeployment deployment = this.deploymentService.getOne(queryWrapper);
 			setFlow(deployment);
 			LambdaQueryWrapper<FlowExecuteHistory> historyLambdaQueryWrapper = Wrappers.lambdaQuery();
 			historyLambdaQueryWrapper.eq(FlowExecuteHistory::getInstanceId, this.instanceId);
 			historyLambdaQueryWrapper.eq(FlowExecuteHistory::getStatus, ProcessStatus.WAIT.name());
 			List<FlowExecuteHistory> executeHistories = historyService.list(historyLambdaQueryWrapper);
-			List<String> currentNodeIds = executeHistories.stream().map(FlowExecuteHistory::getNodeId)
-					.collect(Collectors.toList());
-			this.currentNodes.addAll(flowNodes.stream().filter(x -> currentNodeIds.contains(x.getNodeId()))
-					.collect(Collectors.toList()));
+			if (executeHistories.isEmpty()) {
+				List<FlowNode> flowNodes = getStartNode(deployment);
+				if (CollectionUtils.isEmpty(flowNodes)) {
+					log.error("流程有误：不存在开始节点");
+					throw new ServiceException("流程有误：不存在开始节点");
+				} else {
+					this.currentNodes.addAll(flowNodes);
+					this.startNode.addAll(flowNodes);
+				}
+			} else {
+				List<String> currentNodeIds = executeHistories.stream().map(FlowExecuteHistory::getNodeId)
+						.collect(Collectors.toList());
+				this.currentNodes.addAll(flowNodes.stream().filter(x -> currentNodeIds.contains(x.getNodeId()))
+						.collect(Collectors.toList()));
+			}
 		}
 
 		processor.subscribe(x -> {
+			this.message = x;
 			try {
 				if (this.laneId != null) {
 					checkProcessInstance();
@@ -154,7 +177,7 @@ public class ProcessTask {
 					// 开始流程命中 流程开始
 					FlowProcessInstance instance = FlowProcessInstance.builder() //
 							.laneId(laneId)//
-							.deployFlowId(deployment.getFlowId())//
+							.deployId(deployment.getDeployId())//
 							.startTime(new Date())//
 							.status(InstanceStatus.IN_PROGRESS)//
 							.build();
@@ -166,6 +189,7 @@ public class ProcessTask {
 					initResult();
 					// 当前节点设置
 					checked.forEach(this::setCurrentNode);
+
 					// 赋值
 					if (x.getMessage() != null) {
 						assemble(this.currentNodes.get(0).getNodeName(), JsonUtils.toJsonNode(x.getMessage()));
@@ -202,16 +226,22 @@ public class ProcessTask {
 			FlowNode node = iterator.next();
 			if (types.contains(node.getType())) {
 				// 下行节点
+				InstructionResult instructionResult = InstructionResult.success(null, "上行节点");
+
 				if (node.getProperties().getInsType().equals(InstructionType.down)) {
-					InstructionResult instructionResult = exec(node);
-					// 结束当前节点
-					finishNode(node, instructionResult);
-					this.currentNodes.remove(node);
-					if (instructionResult.isSuccess()) {
-						List<FlowNode> nextNodes = getNextNode(node);
-						nextNodes.forEach(this::setCurrentNode);
-						transfer(nextNodes);
+					instructionResult = exec(node);
+				} else if (node.getProperties().getInsType().equals(InstructionType.up)) {
+					if (this.triggerNodes.contains(node)) {
+						instructionResult = InstructionResult.success(message, "上行触发节点");
 					}
+				}
+				// 结束当前节点
+				finishNode(node, instructionResult);
+				this.currentNodes.remove(node);
+				if (instructionResult.isSuccess()) {
+					List<FlowNode> nextNodes = getNextNode(node);
+					nextNodes.forEach(this::setCurrentNode);
+					transfer(nextNodes);
 				}
 			} else if (logicType.contains(node.getType())) {
 				// 节点逻辑处理
@@ -405,20 +435,25 @@ public class ProcessTask {
 	/**
 	 * 核验节点 判断节点与事件是否一致
 	 *
-	 * @param processMessage
-	 * @param flowNode
-	 * @return
+	 * @param processMessage 触发事件报文
+	 * @param flowNode       触发流程节点
+	 * @return 是否触发流程
 	 */
 	public boolean checkNode(ProcessMessage processMessage, FlowNode flowNode) {
+		boolean bln = false;
 		if (processMessage.getProduct().getType() == flowNode.getProperties().getObjectType()) {
 			if (processMessage.getProduct().getType() == ObjectType.device) {
-				return processMessage.getDeviceId().equals(flowNode.getProperties().getDeviceId())
+				bln = processMessage.getDeviceId().equals(flowNode.getProperties().getDeviceId())
 						&& processMessage.getInstruction() == flowNode.getProperties().getInstruction();
 			} else if (processMessage.getProduct().getType() == ObjectType.service) {
-				return processMessage.getInstruction() == flowNode.getProperties().getInstruction();
+				bln = processMessage.getInstruction() == flowNode.getProperties().getInstruction();
 			}
 		}
-		return false;
+		if (bln) {
+			// 流程触发时的节点
+			this.triggerNodes.add(flowNode);
+		}
+		return bln;
 	}
 
 	/**

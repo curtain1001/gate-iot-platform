@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import net.pingfang.business.domain.BtpFlow;
 import net.pingfang.business.mapper.BtpFlowMapper;
@@ -66,22 +65,16 @@ public class BtpFlowServiceImpl extends ServiceImpl<BtpFlowMapper, BtpFlow> impl
 			throw new ServiceException("清除原有部署信息失败");
 		}
 
-		JsonNode jsonNode = flow.getContent();
-		JsonNode nodes = jsonNode.get("nodes");
-
 		// 保存流程部署定义信息
 		FlowDeployment deployment = FlowDeployment.builder() //
-				.laneId(laneId)//
-				.flowId(flowId)//
+				.laneId(flow.getLaneId())//
+				.flowId(flow.getFlowId())//
 				.content(flow.getContent())//
-				.version(version)//
+				.version(flow.getVersion())//
 				.createBy(SecurityUtils.getLoginUser().getUsername())//
 				.createTime(new Date())//
 				.build();
 		return deploymentService.save(deployment);
 	}
 
-	public String getFieldValue(JsonNode jsonNode, String fieldName) {
-		return jsonNode.hasNonNull(fieldName) ? jsonNode.get(fieldName).asText() : null;
-	}
 }

@@ -75,23 +75,18 @@ public class PLCInstructionProvider implements InstructionProvider {
 				ByteBuf byteBuf = ByteBufAllocator.DEFAULT.ioBuffer();
 				byteBuf.writeBytes(bytes);
 				TcpMessage tcpMessage = new TcpMessage(byteBuf);
-//				return device.send(tcpMessage).map(y -> {
-//					if (y != null && y) {
-//						return InstructionResult.success(true, "指令下发成功");
-//					}
-//					return InstructionResult.fail(null, "指令下发失败");
-//				}).block();
-				return null;
+				Boolean bln = device.send(tcpMessage).block();
+				if (bln != null && bln) {
+					return InstructionResult.success(true, "指令下发成功");
+				} else {
+					return InstructionResult.fail(null, "指令下发失败");
+				}
 			}
 
 			@Override
 			public boolean isSupport(Object object) {
-				if (object instanceof TcpMessage) {
-					byte[] bytes = ((TcpMessage) object).payloadAsBytes();
-					byte[] target = ByteUtils.convertHexStrToByteArray(x.getContent().toString());
-					return Arrays.equals(bytes, target);
-				}
-				return false;
+				byte[] target = ByteUtils.convertHexStrToByteArray(x.getContent().toString());
+				return Arrays.equals((byte[]) object, target);
 			}
 		}).collect(Collectors.toList());
 	}

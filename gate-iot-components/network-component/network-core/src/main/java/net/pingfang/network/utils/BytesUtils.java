@@ -145,4 +145,16 @@ public class BytesUtils {
 		return toLowBytes(new byte[8], src, 0, 8);
 	}
 
+	public static String getBufHexStr(byte[] raw) {
+		String HEXES = "0123456789ABCDEF";
+		if (raw == null) {
+			return null;
+		}
+		final StringBuilder hex = new StringBuilder(2 * raw.length);
+		for (final byte b : raw) {
+			hex.append(HEXES.charAt((b & 0xF0) >> 4)).append(HEXES.charAt((b & 0x0F)));
+		}
+		return hex.toString();
+	}
+
 }

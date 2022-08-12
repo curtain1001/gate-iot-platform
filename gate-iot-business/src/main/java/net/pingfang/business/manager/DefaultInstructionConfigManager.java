@@ -30,6 +30,7 @@ public class DefaultInstructionConfigManager implements InstructionConfigManager
 	public List<InsEntity> getInstruction(Product product) {
 		LambdaQueryWrapper<BtpInstruction> queryWrapper = Wrappers.lambdaQuery();
 		queryWrapper.eq(BtpInstruction::getProduct, product.getValue());
+		queryWrapper.eq(BtpInstruction::getStatus, 0);
 		List<BtpInstruction> instructions = instructionService.list(queryWrapper);
 		return instructions.stream().map(instruction -> InsEntity.builder() //
 				.name(instruction.getCommandName())//

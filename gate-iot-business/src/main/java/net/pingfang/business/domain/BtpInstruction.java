@@ -56,4 +56,8 @@ public class BtpInstruction extends BaseEntity {
 	 * 报文格式类型（Json；）
 	 */
 	private String format;
+	/**
+	 * 状态
+	 */
+	private int status;
 }

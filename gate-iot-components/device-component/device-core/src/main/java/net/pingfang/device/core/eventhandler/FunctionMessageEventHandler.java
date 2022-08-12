@@ -18,7 +18,8 @@ public class FunctionMessageEventHandler {
 
 	@Subscribe
 	public void on(MessageUpEvent event) {
-		log.info("设备：{}；指令：{}；", event.getDeviceId(), event.getInstruction().getValue());
+		log.info("设备：{}；指令：{}；", event.getDeviceId(),
+				event.getInstruction() != null ? event.getInstruction().getValue() : "");
 	}
 
 }

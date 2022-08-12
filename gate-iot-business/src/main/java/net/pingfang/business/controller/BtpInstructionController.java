@@ -158,7 +158,7 @@ public class BtpInstructionController extends BaseController {
 		instruction.setCreateTime(new Date());
 		boolean bln = instructionService.save(instruction);
 		// 提交异步刷新指令任务
-		refreshIns();
+		refreshIns(instruction.getProduct());
 		return toAjax(bln);
 	}
 
@@ -166,7 +166,7 @@ public class BtpInstructionController extends BaseController {
 	 * 修改参数配置
 	 */
 	@PreAuthorize("@ss.hasPermi('business:instruction:edit')")
-	@Log(title = "场站管理", businessType = BusinessType.UPDATE)
+	@Log(title = "指令管理", businessType = BusinessType.UPDATE)
 	@PutMapping
 	public AjaxResult edit(@Validated @RequestBody BtpInstruction instruction) {
 		LambdaQueryWrapper<BtpInstruction> wrapper = Wrappers.lambdaQuery();
@@ -180,7 +180,7 @@ public class BtpInstructionController extends BaseController {
 		instruction.setUpdateTime(new Date());
 		boolean bln = instructionService.updateById(instruction);
 		// 提交异步刷新指令任务
-		refreshIns();
+		refreshIns(instruction.getProduct());
 		return toAjax(bln);
 	}
 
@@ -188,22 +188,41 @@ public class BtpInstructionController extends BaseController {
 	 * 删除参数配置
 	 */
 	@PreAuthorize("@ss.hasPermi('business:instruction:remove')")
-	@Log(title = "场站管理", businessType = BusinessType.DELETE)
+	@Log(title = "指令管理", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{instructionIds}")
 	public AjaxResult remove(@PathVariable Long[] instructionIds) {
 		instructionService.removeByIds(Arrays.asList(instructionIds));
-		refreshIns();
+		refreshIns("");
 		return success();
 	}
 
-	private void refreshIns() {
+	private void refreshIns(String product) {
 		// 提交异步刷新指令任务
 		AsyncManager.me().execute(new TimerTask() {
 			@Override
 			public void run() {
-				instructionManager.refresh();
+				instructionManager.refresh(product);
 			}
 		});
+	}
+
+	/**
+	 * 开启设备
+	 */
+	@PreAuthorize("@ss.hasPermi('business:instruction:open')")
+	@Log(title = "指令管理", businessType = BusinessType.UPDATE)
+	@PutMapping("{id}/{status:(?:on|off)}")
+	public AjaxResult openInstr(@Validated @PathVariable Long id, @Validated @PathVariable String status) {
+		BtpInstruction instruction = instructionService.getById(id);
+		if (instruction == null) {
+			return AjaxResult.error("指令不存在！");
+		}
+		instruction = instruction.toBuilder() //
+				.status("on".equals(status) ? 0 : 1) //
+				.build();
+		instructionService.updateById(instruction);
+		refreshIns(instruction.getProduct());
+		return success();
 	}
 
 }

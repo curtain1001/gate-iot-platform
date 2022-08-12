@@ -71,8 +71,8 @@ public class PLCDevice implements DeviceOperator {
 
 	@Override
 	public Flux<FunctionMessage> subscribe() {
-		return tcpClient.subscribe()
-				.map(x -> new FunctionMessage(laneId, deviceId, PLCProduct.PLC, x, MessagePayloadType.BINARY));
+		return tcpClient.subscribe().map(x -> new FunctionMessage(laneId, deviceId, PLCProduct.PLC, x.payloadAsBytes(),
+				MessagePayloadType.BINARY));
 	}
 
 	public Mono<Boolean> send(TcpMessage message) {

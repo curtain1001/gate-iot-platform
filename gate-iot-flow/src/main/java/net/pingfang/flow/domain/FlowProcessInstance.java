@@ -5,6 +5,7 @@ import java.util.Date;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,7 +36,7 @@ public class FlowProcessInstance {
 	/**
 	 * 部署中的流程主键
 	 */
-	private Long deployFlowId;
+	private Long deployId;
 
 	/**
 	 * 车道id
@@ -50,11 +51,13 @@ public class FlowProcessInstance {
 	/**
 	 * 流程开始时间
 	 */
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date startTime;
 
 	/**
 	 * 流程结束时间
 	 */
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date endTime;
 
 }
