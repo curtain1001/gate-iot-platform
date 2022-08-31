@@ -65,6 +65,7 @@ public class BtpFlowProcessController extends BaseController {
 				processInstance.getStatus());
 		queryWrapper.like(StringUtils.checkValNotNull(processInstance.getDeployId()), FlowProcessInstance::getDeployId,
 				processInstance.getDeployId());
+		queryWrapper.orderByDesc(FlowProcessInstance::getStartTime);
 		List<FlowProcessInstance> list = processInstanceService.list(queryWrapper);
 		return getDataTable(list);
 	}
@@ -109,6 +110,7 @@ public class BtpFlowProcessController extends BaseController {
 		}
 		LambdaQueryWrapper<FlowExecuteHistory> historyLambdaQueryWrapper = Wrappers.lambdaQuery();
 		historyLambdaQueryWrapper.eq(FlowExecuteHistory::getInstanceId, instance.getInstanceId());
+		historyLambdaQueryWrapper.orderByDesc(FlowExecuteHistory::getCreateTime);
 		List<FlowExecuteHistory> histories = executeHistoryService.list(historyLambdaQueryWrapper);
 		return AjaxResult.success(histories);
 	}

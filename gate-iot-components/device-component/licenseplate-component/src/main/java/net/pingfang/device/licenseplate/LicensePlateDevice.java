@@ -241,6 +241,7 @@ public class LicensePlateDevice implements DeviceOperator {
 			public int invoke(int tHandle, int uiImageId, ByReference ptImageInfo, T_PicInfo.ByReference picInfo,
 					Pointer pointer) {
 				try {
+					log.info("车牌上报：");
 					ImageRecvInfo recvInfo = ImageRecvInfo.builder() //
 							.acSnapTime(new String(ptImageInfo.acSnapTime))//
 							.ucDirection(String.valueOf(ptImageInfo.ucDirection))//

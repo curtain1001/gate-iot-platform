@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import net.pingfang.business.domain.BtpInstruction;
 import net.pingfang.business.service.IBtpInstructionService;
 import net.pingfang.device.core.manager.InstructionConfigManager;
+import net.pingfang.iot.common.instruction.FormatType;
 import net.pingfang.iot.common.instruction.InsEntity;
 import net.pingfang.iot.common.product.Product;
 
@@ -36,7 +37,7 @@ public class DefaultInstructionConfigManager implements InstructionConfigManager
 				.name(instruction.getCommandName())//
 				.value(instruction.getCommandValue())//
 				.content(instruction.getContent())//
-				.format(instruction.getFormat())//
+				.format(FormatType.of(instruction.getFormat()))//
 				.product(instruction.getProduct())//
 				.type(instruction.getType())//
 				.build()) //

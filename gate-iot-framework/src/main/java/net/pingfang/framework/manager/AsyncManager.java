@@ -1,6 +1,9 @@
 package net.pingfang.framework.manager;
 
 import java.util.TimerTask;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -44,6 +47,14 @@ public class AsyncManager {
 
 	public void execute(Runnable runnable) {
 		executor.execute(runnable);
+	}
+
+	public Future<?> execute(Callable<?> callable) {
+		return executor.submit(callable);
+	}
+
+	public void execute(FutureTask<?> task) {
+		executor.submit(task);
 	}
 
 	/**

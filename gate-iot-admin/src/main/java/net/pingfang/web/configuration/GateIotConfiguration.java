@@ -1,11 +1,13 @@
 package net.pingfang.web.configuration;
 
+import org.springframework.context.annotation.Configuration;
+
 /**
  * @author 王超
  * @description TODO
  * @date 2022-06-28 10:51
  */
-//@Configuration
+@Configuration
 public class GateIotConfiguration {
 
 //	@Bean
@@ -13,9 +15,5 @@ public class GateIotConfiguration {
 //	public VertxOptions vertxOptions() {
 //		return new VertxOptions();
 //	}
-//
-//	@Bean
-//	public Vertx vertx(VertxOptions vertxOptions) {
-//		return Vertx.vertx(vertxOptions);
-//	}
+
 }

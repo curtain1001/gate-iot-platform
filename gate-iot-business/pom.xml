@@ -95,13 +95,19 @@
         </dependency>
         <dependency>
             <groupId>net.pingfang</groupId>
+            <artifactId>novaled-component</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.pingfang</groupId>
             <artifactId>licenseplate-component</artifactId>
             <version>1.0.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.pingfang</groupId>
-            <artifactId>service-component</artifactId>
+            <artifactId>containerocr-component</artifactId>
             <version>1.0.0</version>
             <scope>compile</scope>
         </dependency>

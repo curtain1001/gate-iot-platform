@@ -1,6 +1,9 @@
 package net.pingfang.network;
 
 import java.util.List;
+import java.util.Map;
+
+import net.pingfang.iot.common.network.NetworkType;
 
 /**
  * 网络服务管理器
@@ -11,6 +14,14 @@ import java.util.List;
  * @since 1.0
  */
 public interface NetworkManager {
+
+	/**
+	 * 根据ID获取网络组件，否则根据type和id创建网络组件并返回
+	 *
+	 * @param type 网络类型
+	 * @return 网络组件
+	 */
+	Map<String, Network> getNetwork(NetworkType type);
 
 	/**
 	 * 根据ID获取网络组件，否则根据type和id创建网络组件并返回
@@ -48,6 +59,8 @@ public interface NetworkManager {
 	 * @return void
 	 */
 	void reload(NetworkType type, NetworkProperties properties, String id);
+
+	void reload(NetworkType type, String id);
 
 	/**
 	 * 停止网络组件

@@ -1,17 +1,22 @@
 package net.pingfang.common.utils.bean;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Bean 工具类
  *
  * @author ruoyi
  */
-public class BeanUtils extends org.springframework.beans.BeanUtils {
+@Slf4j
+public class BeanUtils extends org.apache.commons.beanutils.BeanUtils {
 	/** Bean方法名中属性名开始的下标 */
 	private static final int BEAN_METHOD_PROP_INDEX = 3;
 
@@ -27,12 +32,20 @@ public class BeanUtils extends org.springframework.beans.BeanUtils {
 	 * @param dest 目标对象
 	 * @param src  源对象
 	 */
-	public static void copyBeanProp(Object dest, Object src) {
-		try {
-			BeanUtils.copyProperties(src, dest);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public static void copyBeanProp(Object dest, Object src) throws InvocationTargetException, IllegalAccessException {
+		BeanUtils.copyProperties(dest, src);
+	}
+
+	/**
+	 * Bean属性复制工具方法。
+	 *
+	 * @param dest 目标对象
+	 * @param src  源对象
+	 */
+	public static void copyBean(Object dest, Map<String, ? extends Object> src)
+			throws InvocationTargetException, IllegalAccessException {
+		BeanUtils.populate(dest, src);
+
 	}
 
 	/**
@@ -95,4 +108,5 @@ public class BeanUtils extends org.springframework.beans.BeanUtils {
 	public static boolean isMethodPropEquals(String m1, String m2) {
 		return m1.substring(BEAN_METHOD_PROP_INDEX).equals(m2.substring(BEAN_METHOD_PROP_INDEX));
 	}
+
 }

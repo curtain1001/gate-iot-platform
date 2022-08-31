@@ -3,19 +3,25 @@ package net.pingfang.framework.websocket;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import javax.websocket.Session;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+import net.pingfang.common.utils.JsonUtils;
 
 /**
  * websocket 客户端用户集
  *
  * @author ruoyi
  */
+@Component
 public class WebSocketUsers {
 	/**
 	 * WebSocketUsers 日志控制器
@@ -88,12 +94,20 @@ public class WebSocketUsers {
 		return USERS;
 	}
 
+	public static Session getUser(String key) {
+		return USERS.get(key);
+	}
+
+	public static Set<Session> getUsers(Collection<String> key) {
+		return key.stream().map(WebSocketUsers::getUser).filter(Objects::nonNull).collect(Collectors.toSet());
+	}
+
 	/**
 	 * 群发消息文本消息
 	 *
 	 * @param message 消息内容
 	 */
-	public static void sendMessageToUsersByText(String message) {
+	public static void sendMessageToUsersByText(Message message) {
 		Collection<Session> values = USERS.values();
 		for (Session value : values) {
 			sendMessageToUserByText(value, message);
@@ -106,10 +120,10 @@ public class WebSocketUsers {
 	 * @param userName 自己的用户名
 	 * @param message  消息内容
 	 */
-	public static void sendMessageToUserByText(Session session, String message) {
+	public static void sendMessageToUserByText(Session session, Message message) {
 		if (session != null) {
 			try {
-				session.getBasicRemote().sendText(message);
+				session.getBasicRemote().sendText(JsonUtils.toJsonString(message));
 			} catch (IOException e) {
 				LOGGER.error("\n[发送消息异常]", e);
 			}

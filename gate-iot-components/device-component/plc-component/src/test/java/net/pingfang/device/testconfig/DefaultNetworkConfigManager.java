@@ -1,14 +1,15 @@
 package net.pingfang.device.testconfig;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Maps;
 
+import net.pingfang.iot.common.network.NetworkType;
 import net.pingfang.network.NetworkConfigManager;
 import net.pingfang.network.NetworkProperties;
-import net.pingfang.network.NetworkType;
 
 /**
  * @author 王超
@@ -33,5 +34,15 @@ public class DefaultNetworkConfigManager implements NetworkConfigManager {
 		properties.setId("TCP_CLIENT::001");
 		properties.setName("customs");
 		return properties;
+	}
+
+	@Override
+	public NetworkProperties getConfig(String configId) {
+		return null;
+	}
+
+	@Override
+	public List<NetworkProperties> getConfig() {
+		return null;
 	}
 }

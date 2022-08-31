@@ -19,6 +19,7 @@
         <module>device-core</module>
         <module>plc-component</module>
         <module>licenseplate-component</module>
+        <module>novaled-component</module>
     </modules>
 
 </project>

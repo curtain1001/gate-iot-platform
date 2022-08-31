@@ -1,5 +1,8 @@
 package net.pingfang.network.tcp.parser;
 
+import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.beanutils.Converter;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -15,8 +18,18 @@ public enum PayloadParserType {
 
 	SCRIPT("自定义脚本"), //
 
-	PLC("自定义PLC设备");
+	PLC("自定义PLC设备"), //
+
+	LED("诺瓦LED");
 
 	private final String text;
 
+	static {
+		ConvertUtils.register(new Converter() {
+			@Override
+			public Object convert(Class type, Object value) {
+				return PayloadParserType.valueOf(value.toString());
+			}
+		}, PayloadParserType.class);
+	}
 }

@@ -1,13 +1,23 @@
 package net.pingfang.business.manager;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.annotation.Resource;
 
+import org.apache.commons.compress.utils.Lists;
 import org.springframework.stereotype.Component;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+
+import net.pingfang.business.domain.BtpDevice;
+import net.pingfang.business.domain.BtpNetworkConfig;
+import net.pingfang.business.service.IBtpDeviceService;
 import net.pingfang.business.service.IBtpNetworkConfigService;
+import net.pingfang.iot.common.network.NetworkType;
 import net.pingfang.network.NetworkConfigManager;
 import net.pingfang.network.NetworkProperties;
-import net.pingfang.network.NetworkType;
 
 /**
  * @author 王超
@@ -19,8 +29,33 @@ public class DefaultNetworkConfigManager implements NetworkConfigManager {
 	@Resource
 	public IBtpNetworkConfigService networkConfigService;
 
+	@Resource
+	public IBtpDeviceService deviceService;
+
 	@Override
 	public NetworkProperties getConfig(NetworkType networkType, String id) {
-		return networkConfigService.getById(id).toNetworkProperties();
+		LambdaQueryWrapper<BtpDevice> lambdaQueryWrapper = Wrappers.lambdaQuery();
+		lambdaQueryWrapper.eq(BtpDevice::getDeviceId, id);
+		return deviceService.getOne(lambdaQueryWrapper).toNetworkProperties();
+	}
+
+	@Override
+	public NetworkProperties getConfig(String configId) {
+		LambdaQueryWrapper<BtpNetworkConfig> queryWrapper = Wrappers.lambdaQuery();
+		queryWrapper.eq(BtpNetworkConfig::getNetworkConfigId, configId);
+		BtpNetworkConfig config = networkConfigService.getOne(queryWrapper);
+		if (config != null) {
+			return config.toNetworkProperties();
+		}
+		return new NetworkProperties();
+	}
+
+	@Override
+	public List<NetworkProperties> getConfig() {
+		List<BtpNetworkConfig> configs = networkConfigService.list();
+		if (!configs.isEmpty()) {
+			return configs.stream().map(BtpNetworkConfig::toNetworkProperties).collect(Collectors.toList());
+		}
+		return Lists.newArrayList();
 	}
 }

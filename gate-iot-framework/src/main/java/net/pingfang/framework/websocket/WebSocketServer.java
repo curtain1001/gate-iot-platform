@@ -14,6 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+import net.pingfang.common.utils.JsonUtils;
+import net.pingfang.common.utils.spring.SpringUtils;
+
 /**
  * websocket 消息处理
  *
@@ -21,18 +25,21 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ServerEndpoint(value = "/websocket/message", configurator = GetHttpSessionConfigurator.class)
+@Slf4j
 public class WebSocketServer {
+
 	/**
 	 * WebSocketServer 日志控制器
 	 */
 	private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketServer.class);
-
 	/**
 	 * 默认最多允许同时在线人数100
 	 */
 	public static int socketMaxOnlineCount = 100;
 
 	private static Semaphore socketSemaphore = new Semaphore(socketMaxOnlineCount);
+
+	private final MessagingManager messagingManager = SpringUtils.getBean(MessagingManager.class);
 
 	/**
 	 * 连接建立成功调用的方法
@@ -45,14 +52,15 @@ public class WebSocketServer {
 		if (!semaphoreFlag) {
 			// 未获取到信号量
 			LOGGER.error("\n 当前在线人数超过限制数- {}", socketMaxOnlineCount);
-			WebSocketUsers.sendMessageToUserByText(session, "当前在线人数超过限制数：" + socketMaxOnlineCount);
+			WebSocketUsers.sendMessageToUserByText(session,
+					Message.error("", "", "当前在线人数超过限制数：" + socketMaxOnlineCount));
 			session.close();
 		} else {
 			// 添加用户
 			WebSocketUsers.put(((WsSession) session).getHttpSessionId(), session);
 			LOGGER.info("\n 建立连接 - {}", session);
 			LOGGER.info("\n 当前人数 - {}", WebSocketUsers.getUsers().size());
-			WebSocketUsers.sendMessageToUserByText(session, "连接成功");
+			WebSocketUsers.sendMessageToUserByText(session, Message.error("", "", "连接成功"));
 		}
 	}
 
@@ -91,7 +99,18 @@ public class WebSocketServer {
 	 */
 	@OnMessage
 	public void onMessage(String message, Session session) {
-		String msg = message.replace("你", "我").replace("吗", "");
-		WebSocketUsers.sendMessageToUserByText(session, msg);
+		if ("heartCheck".equals(message)) {
+			WebSocketUsers.sendMessageToUserByText(session, Message.success("", "", "heartCheck"));
+			return;
+		}
+		try {
+			SubscribeRequest request = JsonUtils.toObject(message, SubscribeRequest.class);
+			messagingManager.subscribe(request, session);
+		} catch (Exception e) {
+			log.error("websocket错误：", e);
+			WebSocketUsers.sendMessageToUserByText(session, Message.error("", "", "报文格式错误"));
+		}
+
 	}
+
 }

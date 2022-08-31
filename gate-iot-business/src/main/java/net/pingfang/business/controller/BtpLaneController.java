@@ -64,6 +64,7 @@ public class BtpLaneController extends BaseController {
 		queryWrapper.like(StringUtils.checkValNotNull(lane.getType()), BtpLane::getType, lane.getType());
 		queryWrapper.like(StringUtils.checkValNotNull(lane.getCustomsLaneNo()), BtpLane::getCustomsLaneNo,
 				lane.getCustomsLaneNo());
+		queryWrapper.orderByDesc(BtpLane::getCreateTime);
 		List<BtpLane> list = laneService.list(queryWrapper);
 		return getDataTable(list);
 	}

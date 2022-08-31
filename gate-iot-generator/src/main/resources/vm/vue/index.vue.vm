@@ -308,7 +308,7 @@
 </template>
 
 <script>
-import { list${BusinessName}, get${BusinessName}, del${BusinessName}, add${BusinessName}, update${BusinessName}, export${BusinessName} } from "@/api/${moduleName}/${businessName}";
+import api from "./api/index";
 #foreach($column in $columns)
 #if($column.insert && !$column.superColumn && !$column.pk && $column.htmlType == "imageUpload")
 import ImageUpload from '@/components/ImageUpload';
@@ -455,7 +455,7 @@ export default {
       }
 #end
 #end
-      list${BusinessName}(this.queryParams).then(response => {
+      api.list${BusinessName}(this.queryParams).then(response => {
         this.${businessName}List = response.rows;
         this.total = response.total;
         this.loading = false;
@@ -533,7 +533,7 @@ export default {
     handleUpdate(row) {
       this.reset();
       const ${pkColumn.javaField} = row.${pkColumn.javaField} || this.ids
-      get${BusinessName}(${pkColumn.javaField}).then(response => {
+      api.get${BusinessName}(${pkColumn.javaField}).then(response => {
         this.form = response.data;
 #foreach ($column in $columns)
 #if($column.htmlType == "checkbox")
@@ -560,13 +560,13 @@ export default {
           this.form.${subclassName}List = this.${subclassName}List;
 #end
           if (this.form.${pkColumn.javaField} != null) {
-            update${BusinessName}(this.form).then(response => {
+            api.update${BusinessName}(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
-            add${BusinessName}(this.form).then(response => {
+            api.add${BusinessName}(this.form).then(response => {
               this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
@@ -583,7 +583,7 @@ export default {
           cancelButtonText: "取消",
           type: "warning"
         }).then(function() {
-          return del${BusinessName}(${pkColumn.javaField}s);
+          return api.del${BusinessName}(${pkColumn.javaField}s);
         }).then(() => {
           this.getList();
           this.$modal.msgSuccess("删除成功");

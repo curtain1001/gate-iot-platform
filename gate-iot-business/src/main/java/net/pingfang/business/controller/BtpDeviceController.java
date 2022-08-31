@@ -75,6 +75,7 @@ public class BtpDeviceController extends BaseController {
 				device.getDeviceName());
 		queryWrapper.like(StringUtils.checkValNotNull(device.getLaneId()), BtpDevice::getLaneId, device.getLaneId());
 		queryWrapper.like(StringUtils.checkValNotNull(device.getProduct()), BtpDevice::getProduct, device.getProduct());
+		queryWrapper.orderByDesc(BtpDevice::getCreateTime);
 		List<BtpDevice> list = btpDeviceService.list(queryWrapper);
 		TableDataInfo info = getDataTable(list);
 		info.setRows(info.getRows().stream().peek(x -> {

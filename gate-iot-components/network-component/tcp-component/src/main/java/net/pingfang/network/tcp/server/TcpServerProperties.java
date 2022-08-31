@@ -31,8 +31,6 @@ public class TcpServerProperties implements ValueObject {
 
 	private NetServerOptions options;
 
-//	private PayloadType payloadType;
-
 	private PayloadParserType parserType;
 
 	private Map<String, Object> parserConfiguration = new HashMap<>();

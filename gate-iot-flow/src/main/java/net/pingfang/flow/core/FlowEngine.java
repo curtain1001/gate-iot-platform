@@ -14,6 +14,9 @@ import com.google.common.eventbus.Subscribe;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.pingfang.common.event.EventBusCenter;
+import net.pingfang.common.event.EventBusListener;
+import net.pingfang.common.event.EventBusListener.Type;
 import net.pingfang.device.core.DeviceManager;
 import net.pingfang.device.core.event.MessageUpEvent;
 import net.pingfang.flow.domain.FlowDeployment;
@@ -32,18 +35,21 @@ import net.pingfang.iot.common.instruction.InstructionManager;
 @AllArgsConstructor
 @Slf4j
 @Component
+@EventBusListener(type = Type.ASYNC)
 public class FlowEngine implements ApplicationRunner {
 
 	@Resource
 	private final IFlowDeploymentService deploymentService;
 	@Resource
-	private IFlowProcessInstanceService processInstanceService;
+	private final IFlowProcessInstanceService processInstanceService;
 	@Resource
-	private DeviceManager deviceManager;
+	private final DeviceManager deviceManager;
 	@Resource
-	private IFlowExecuteHistoryService historyService;
+	private final IFlowExecuteHistoryService historyService;
 	@Resource
-	private InstructionManager instructionManager;
+	private final InstructionManager instructionManager;
+	@Resource
+	private final EventBusCenter eventBusCenter;
 
 	final Map<Long, ProcessTask> processStore = new ConcurrentHashMap<>();
 
@@ -51,7 +57,7 @@ public class FlowEngine implements ApplicationRunner {
 		AsyncManager.me().execute(() -> {
 			try {
 				ProcessTask task = new ProcessTask(deploymentService, processInstanceService, deviceManager,
-						historyService, instructionManager, laneId);
+						historyService, instructionManager, eventBusCenter, laneId);
 				processStore.put(laneId, task);
 			} catch (Exception e) {
 				log.error("流程异常；", e);

@@ -13,6 +13,9 @@ import net.pingfang.iot.common.product.Product;
  * @since 2022-08-11 16:26
  */
 public interface InstructionManager {
+
+	public InstructionResult exec(InstructionParam param);
+
 	public Instruction getInstruction(String value);
 
 	public List<Instruction> getInstruction(Product product);

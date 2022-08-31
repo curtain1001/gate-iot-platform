@@ -2,6 +2,7 @@ package net.pingfang.network.tcp.client;
 
 import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -11,11 +12,14 @@ import io.vertx.core.Vertx;
 import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetClientOptions;
 import lombok.extern.slf4j.Slf4j;
+import net.pingfang.common.utils.bean.BeanUtils;
+import net.pingfang.iot.common.customizedsetting.repos.CustomizedSettingRepository;
+import net.pingfang.iot.common.customizedsetting.values.CustomizedSettingData;
+import net.pingfang.iot.common.network.NetworkType;
 import net.pingfang.network.DefaultNetworkType;
 import net.pingfang.network.Network;
 import net.pingfang.network.NetworkProperties;
 import net.pingfang.network.NetworkProvider;
-import net.pingfang.network.NetworkType;
 import net.pingfang.network.security.Certificate;
 import net.pingfang.network.security.CertificateManager;
 import net.pingfang.network.security.VertxKeyCertTrustOptions;
@@ -78,14 +82,11 @@ public class VertxTcpClientProvider implements NetworkProvider<TcpClientProperti
 	}
 
 	@Override
-	public TcpClientProperties createConfig(NetworkProperties properties) {
+	public TcpClientProperties createConfig(NetworkProperties properties)
+			throws InvocationTargetException, IllegalAccessException {
 		TcpClientProperties config = new TcpClientProperties();
-		try {
-			org.apache.commons.beanutils.BeanUtils.populate(config, properties.getConfigurations());
-		} catch (IllegalAccessException | InvocationTargetException e) {
-			e.printStackTrace();
-		}
-		// BeanUtils.copyBeanProp(config, properties.getConfigurations());
+		BeanUtils.copyBean(config, properties.getConfigurations());
+
 		config.setId(properties.getId());
 		if (config.getOptions() == null) {
 			config.setOptions(new NetClientOptions());
@@ -98,5 +99,10 @@ public class VertxTcpClientProvider implements NetworkProvider<TcpClientProperti
 			config.getOptions().setTrustOptions(vertxKeyCertTrustOptions);
 		}
 		return config;
+	}
+
+	@Override
+	public List<CustomizedSettingData> getBasicForm() {
+		return CustomizedSettingRepository.getValues(TcpClientBasicFormCustomized.values());
 	}
 }

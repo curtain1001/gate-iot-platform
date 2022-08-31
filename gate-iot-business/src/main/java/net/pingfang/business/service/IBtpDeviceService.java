@@ -10,4 +10,12 @@ import net.pingfang.business.domain.BtpDevice;
  * @date 2022-07-04 17:00
  */
 public interface IBtpDeviceService extends IService<BtpDevice> {
+
+//	boolean save(BtpDevice device);
+//
+//	boolean updateById(BtpDevice device);
+//
+//	boolean remove(Long deviceId);
+//
+//	boolean removeByIds(Long[] deviceIds);
 }

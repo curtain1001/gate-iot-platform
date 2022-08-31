@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import com.google.common.eventbus.Subscribe;
 
 import lombok.extern.slf4j.Slf4j;
+import net.pingfang.common.event.EventBusListener;
 import net.pingfang.device.core.event.MessageUpEvent;
 
 /**
@@ -14,6 +15,7 @@ import net.pingfang.device.core.event.MessageUpEvent;
  */
 @Component
 @Slf4j
+@EventBusListener
 public class FunctionMessageEventHandler {
 
 	@Subscribe

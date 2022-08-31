@@ -16,6 +16,7 @@ import net.pingfang.network.NetworkProperties;
 import net.pingfang.network.tcp.TcpMessage;
 import net.pingfang.network.tcp.client.TcpClient;
 import net.pingfang.network.tcp.parser.PayloadParserType;
+import net.pingfang.network.utils.BytesUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -71,8 +72,8 @@ public class PLCDevice implements DeviceOperator {
 
 	@Override
 	public Flux<FunctionMessage> subscribe() {
-		return tcpClient.subscribe().map(x -> new FunctionMessage(laneId, deviceId, PLCProduct.PLC, x.payloadAsBytes(),
-				MessagePayloadType.BINARY));
+		return tcpClient.subscribe().map(x -> new FunctionMessage(laneId, deviceId, PLCProduct.PLC,
+				BytesUtils.getBufHexStr(x.payloadAsBytes()), MessagePayloadType.STRING));
 	}
 
 	public Mono<Boolean> send(TcpMessage message) {
@@ -90,7 +91,6 @@ public class PLCDevice implements DeviceOperator {
 		} else {
 			return DeviceState.offline;
 		}
-
 	}
 
 	@Override

@@ -10,17 +10,18 @@
     <property name="clob.type" dbms="mysql" value="longtext" />
     <property name="clob.type" dbms="h2" value="longtext" />
 
-    <changeSet author="wangchao" id="network_config::create">
+    <changeSet author="wangchao" id="btp_network_config::create">
         <createTable tableName="btp_network_config" remarks="网络组件配置信息表">
             <column name="id" remarks="主键" type="BIGINT(20)" incrementBy="1" startWith="1" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false" />
             </column>
-            <column name="network_config_id" type="varchar(24)" remarks="键名" />
-            <column name="name" type="varchar(24)" remarks="键名" />
-            <column name="enabled" type="char(1)" remarks="键值(0=自动,1=不自动开启)" defaultValue="1" />
+            <column name="network_config_id" type="varchar(24)" remarks="组件号" />
+            <column name="name" type="varchar(24)" remarks="组件名" />
+            <column name="enabled" type="char(1)" remarks="自动开启(0=自动,1=不自动开启)" defaultValue="1" />
             <column name="type" type="varchar(24)" remarks="类型" />
             <column name="status" type="varchar(12)" remarks="状态" />
-            <column name="configuration" type="${clob.type}" remarks="配置" />
+            <column name="control" type="varchar(24)" remarks="控制权 own:设备;system：系统" />
+            <column name="configuration" type="${clob.type}" remarks="配置属性" />
             <column name="create_by" defaultValue="" remarks="创建者" type="VARCHAR(64)" />
             <column name="create_time" remarks="创建时间" type="datetime(6)" />
             <column name="update_by" defaultValue="" remarks="更新者" type="VARCHAR(64)" />

@@ -1,11 +1,14 @@
 package net.pingfang.network.tcp.server;
 
+import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.beanutils.Converter;
 import org.springframework.stereotype.Component;
 
 import io.vertx.core.Vertx;
@@ -13,15 +16,18 @@ import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import lombok.extern.slf4j.Slf4j;
 import net.pingfang.common.utils.bean.BeanUtils;
+import net.pingfang.iot.common.customizedsetting.repos.CustomizedSettingRepository;
+import net.pingfang.iot.common.customizedsetting.values.CustomizedSettingData;
+import net.pingfang.iot.common.network.NetworkType;
 import net.pingfang.network.DefaultNetworkType;
 import net.pingfang.network.Network;
 import net.pingfang.network.NetworkProperties;
 import net.pingfang.network.NetworkProvider;
-import net.pingfang.network.NetworkType;
 import net.pingfang.network.security.Certificate;
 import net.pingfang.network.security.CertificateManager;
 import net.pingfang.network.security.VertxKeyCertTrustOptions;
 import net.pingfang.network.tcp.parser.PayloadParserBuilder;
+import net.pingfang.network.tcp.parser.PayloadParserType;
 
 /**
  * TCP服务提供商
@@ -57,7 +63,8 @@ public class TcpServerProvider implements NetworkProvider<TcpServerProperties> {
 
 		VertxTcpServer tcpServer = new VertxTcpServer(properties.getId());
 		initTcpServer(tcpServer, properties);
-
+//		TcpServerMessageHandler messageHandler = new TcpServerMessageHandler(tcpServer);
+//		messageHandler.handler();
 		return tcpServer;
 	}
 
@@ -101,9 +108,16 @@ public class TcpServerProvider implements NetworkProvider<TcpServerProperties> {
 
 	@Nonnull
 	@Override
-	public TcpServerProperties createConfig(@Nonnull NetworkProperties properties) {
+	public TcpServerProperties createConfig(@Nonnull NetworkProperties properties)
+			throws InvocationTargetException, IllegalAccessException {
 		TcpServerProperties config = new TcpServerProperties();
-		BeanUtils.copyBeanProp(config, properties.getConfigurations());
+		ConvertUtils.register(new Converter() {
+			@Override
+			public Object convert(Class type, Object value) {
+				return PayloadParserType.valueOf(value.toString());
+			}
+		}, PayloadParserType.class);
+		BeanUtils.copyBean(config, properties.getConfigurations());
 		config.setId(properties.getId());
 		if (config.getOptions() == null) {
 			config.setOptions(new NetServerOptions());
@@ -116,5 +130,10 @@ public class TcpServerProvider implements NetworkProvider<TcpServerProperties> {
 			config.getOptions().setTrustOptions(vertxKeyCertTrustOptions);
 		}
 		return config;
+	}
+
+	@Override
+	public List<CustomizedSettingData> getBasicForm() {
+		return CustomizedSettingRepository.getValues(TcpServerBasicFormCustomized.values());
 	}
 }

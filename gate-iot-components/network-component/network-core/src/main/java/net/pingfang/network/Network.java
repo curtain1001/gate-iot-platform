@@ -1,5 +1,7 @@
 package net.pingfang.network;
 
+import net.pingfang.iot.common.network.NetworkType;
+
 /**
  * 网络组件，所有网络相关实例根接口
  *

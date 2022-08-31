@@ -3,8 +3,11 @@ package net.pingfang.device.licenseplate.instruction;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 
 import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.instruction.DeviceInstruction;
@@ -51,7 +54,8 @@ public class SaveImageToJpeg implements DeviceInstruction {
 	}
 
 	@Override
-	public InstructionResult<Object, String> execution(DeviceOperator deviceOperator) {
+	public InstructionResult<Object, String> execution(DeviceOperator deviceOperator, Map<String, Object> properties,
+			JsonNode jsonNode) {
 		LicensePlateDevice device = (LicensePlateDevice) deviceOperator;
 		String url = Injection.manager.getConfig(DefaultCustomized.PICTURE_STORE_DIRECTORY, deviceOperator.getLaneId());
 		File file = new File(url);

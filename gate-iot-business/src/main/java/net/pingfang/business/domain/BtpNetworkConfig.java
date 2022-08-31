@@ -5,31 +5,35 @@ import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
+import org.apache.ibatis.type.JdbcType;
+
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import net.pingfang.business.enums.NetworkConfigState;
 import net.pingfang.common.core.domain.BaseEntity;
+import net.pingfang.iot.common.network.NetworkType;
+import net.pingfang.iot.common.network.NetworkTypes;
+import net.pingfang.network.Control;
 import net.pingfang.network.NetworkProperties;
-import net.pingfang.network.NetworkType;
 
 /**
  * @author 王超
  * @description TODO
  * @date 2022-06-27 17:43
  */
-@EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
 @Data
-@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName("btp_network_config")
+@TableName(value = "btp_network_config", autoResultMap = true)
 public class BtpNetworkConfig extends BaseEntity implements Serializable {
 
 	private static final long serialVersionUID = -2425794209203640447L;
@@ -49,7 +53,12 @@ public class BtpNetworkConfig extends BaseEntity implements Serializable {
 
 	private NetworkConfigState status;
 
+	@TableField(jdbcType = JdbcType.VARCHAR, javaType = true, typeHandler = JacksonTypeHandler.class)
 	private Map<String, Object> configuration;
+	/**
+	 * 网络组件对象类型 设备与服务
+	 */
+	private Control control;
 
 	public NetworkType lookupNetworkType() {
 		return NetworkType.lookup(type).orElseGet(() -> NetworkType.of(type));
@@ -61,7 +70,8 @@ public class BtpNetworkConfig extends BaseEntity implements Serializable {
 		properties.setEnabled(status == NetworkConfigState.enabled);
 		properties.setId(networkConfigId);
 		properties.setName(name);
-
+		properties.setControl(control);
+		properties.setNetworkType(NetworkTypes.lookup(type).get());
 		return properties;
 	}
 }

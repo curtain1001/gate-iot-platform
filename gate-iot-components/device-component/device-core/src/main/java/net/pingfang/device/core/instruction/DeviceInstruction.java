@@ -1,5 +1,9 @@
 package net.pingfang.device.core.instruction;
 
+import java.util.Map;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.iot.common.instruction.Instruction;
 import net.pingfang.iot.common.instruction.InstructionResult;
@@ -19,7 +23,15 @@ public interface DeviceInstruction extends Instruction {
 
 	public abstract Product getProduct();
 
-	default InstructionResult execution(DeviceOperator deviceOperator) {
+	/**
+	 *
+	 * @param deviceOperator 设备控制器
+	 * @param properties     指令配置
+	 * @param jsonNode       指令参数
+	 * @return
+	 */
+	default InstructionResult execution(DeviceOperator deviceOperator, Map<String, Object> properties,
+			JsonNode jsonNode) {
 		throw new RuntimeException("暂未实现");
 	}
 

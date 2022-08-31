@@ -55,6 +55,7 @@ public class BtpAreaController extends BaseController {
 		LambdaQueryWrapper<BtpArea> queryWrapper = Wrappers.lambdaQuery();
 		queryWrapper.like(StringUtils.checkValNotNull(area.getAreaName()), BtpArea::getAreaName, area.getAreaName());
 		queryWrapper.like(StringUtils.checkValNotNull(area.getAreaNo()), BtpArea::getAreaNo, area.getAreaNo());
+		queryWrapper.orderByDesc(BtpArea::getCreateTime);
 		List<BtpArea> list = areaService.list(queryWrapper);
 		return getDataTable(list);
 	}

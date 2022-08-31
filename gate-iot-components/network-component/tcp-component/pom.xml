@@ -8,14 +8,11 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>tcp-component</artifactId>
-
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
-
     <dependencies>
         <!--        <dependency>-->
         <!--            <groupId>net.pingfang</groupId>-->
@@ -58,6 +55,12 @@
             <groupId>net.pingfang</groupId>
             <artifactId>common-component</artifactId>
             <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-core</artifactId>
+            <version>4.2.5</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

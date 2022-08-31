@@ -22,10 +22,8 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-import com.google.common.eventbus.EventBus;
-
 import lombok.extern.slf4j.Slf4j;
-import net.pingfang.common.utils.JsonUtils;
+import net.pingfang.common.event.EventBusCenter;
 import net.pingfang.device.core.DeviceManager;
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.DeviceProperties;
@@ -47,7 +45,7 @@ import reactor.core.publisher.Flux;
 public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProcessor, ApplicationRunner {
 
 	@Resource
-	EventBus eventBus;
+	EventBusCenter eventBusCenter;
 
 	@Resource
 	DefaultInstructionManager instructionManager;
@@ -70,18 +68,18 @@ public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProc
 			ScheduledExecutorService executorService) {
 		this.deviceConfigManager = deviceConfigManager;
 
-		executorService.scheduleWithFixedDelay(() -> {
-			Flux.fromStream(store.values().stream()).subscribe(d -> d.values().forEach(o -> {
-				log.info("执行心跳：{}", JsonUtils.toJsonString(o));
-				o.keepAlive();
-			}));
-		}, 5, 5, TimeUnit.SECONDS);
+//		executorService.scheduleWithFixedDelay(() -> {
+//			Flux.fromStream(store.values().stream()).subscribe(d -> d.values().forEach(o -> {
+//				log.info("执行心跳：{}", JsonUtils.toJsonString(o));
+////				o.keepAlive();
+//			}));
+//		}, 5, 5, TimeUnit.SECONDS);
 		executorService.scheduleWithFixedDelay(() -> {
 			Flux.fromStream(store.values().stream()).subscribe(d -> d.values().forEach(o -> {
 				log.info("设备：{};状态{}", o.getDeviceId(), o.getStatus());
 
 			}));
-		}, 10, 13, TimeUnit.SECONDS);
+		}, 25, 25, TimeUnit.SECONDS);
 	}
 
 	public List<DeviceOperator> getDevice() {
@@ -147,21 +145,21 @@ public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProc
 							Optional<Instruction> optional = instructions.stream()
 									.filter(i -> i.getInsType() == InstructionType.up && i.isSupport(x.getPayload()))
 									.findFirst();
-							optional.ifPresent(instruction -> eventBus.post(MessageUpEvent.builder() //
+							optional.ifPresent(instruction -> eventBusCenter.postAsync(MessageUpEvent.builder() //
 									.laneId(x.getLaneId()) //
 									.product(x.getProduct())//
 									.deviceId(x.getDeviceId()) //
 									.instruction(instruction)//
 									.message(x.getPayload()) //
-									.type(x.getType().name())//
+									.type(x.getType())//
 									.build()));
 						} else {
-							eventBus.post(MessageUpEvent.builder() //
+							eventBusCenter.postAsync(MessageUpEvent.builder() //
 									.laneId(x.getLaneId()) //
 									.product(x.getProduct())//
 									.deviceId(x.getDeviceId()) //
 									.message(x.getPayload()) //
-									.type(x.getType().name())//
+									.type(x.getType())//
 									.build());
 						}
 					} catch (Exception e) {
@@ -231,7 +229,7 @@ public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProc
 	}
 
 	/**
-	 * 检查网络 把需要加载的网络组件启动起来
+	 * 检查网络 把需要加载的设备启动起来
 	 */
 	protected void checkDevice() {
 		// 获取并过滤所有停止的网络组件

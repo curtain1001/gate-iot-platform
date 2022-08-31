@@ -2,6 +2,7 @@ package net.pingfang.flow.values;
 
 import lombok.Builder;
 import lombok.Data;
+import net.pingfang.iot.common.MessagePayloadType;
 import net.pingfang.iot.common.instruction.Instruction;
 import net.pingfang.iot.common.product.Product;
 
@@ -33,9 +34,9 @@ public class ProcessMessage {
 	 */
 	private final Instruction instruction;
 	/**
-	 *
+	 * 报文类型
 	 */
-	private final String type;
+	private final MessagePayloadType type;
 	/**
 	 * 消息id
 	 */

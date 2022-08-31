@@ -32,7 +32,6 @@
         <poi.version>4.1.2</poi.version>
         <velocity.version>2.3</velocity.version>
         <jwt.version>0.9.1</jwt.version>
-        <hsweb.framework.version>4.0.13</hsweb.framework.version>
         <jackson.version>2.12.3</jackson.version>
         <liquibase.version>4.4.3</liquibase.version>
         <maven-liquibase-plugin>3.4.1</maven-liquibase-plugin>
@@ -52,7 +51,10 @@
                 <version>1.18.24</version>
                 <scope>provided</scope>
             </dependency>
-
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+            </dependency>
 
             <!--          LiquibaseConfig -->
             <dependency>
@@ -266,6 +268,12 @@
                 <artifactId>network-component</artifactId>
                 <version>${gate-iot.version}</version>
             </dependency>
+            <dependency>
+                <groupId>net.pingfang</groupId>
+                <artifactId>containerocr-component</artifactId>
+                <version>${gate-iot.version}</version>
+            </dependency>
+
 
             <dependency>
                 <groupId>net.pingfang</groupId>
@@ -298,19 +306,6 @@
                 <artifactId>mybatis-plus-boot-starter-test</artifactId>
                 <version>3.5.2</version>
             </dependency>
-
-            <dependency>
-                <groupId>org.flowable</groupId>
-                <artifactId>flowable-spring-boot-starter</artifactId>
-                <version>${flowable.version}</version>
-                <exclusions><!-- 需要排除flowable的mybatis依赖，不然会跟mybatis-plus冲突 -->
-                    <exclusion>
-                        <groupId>org.mybatis</groupId>
-                        <artifactId>mybatis</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
 
         </dependencies>
     </dependencyManagement>

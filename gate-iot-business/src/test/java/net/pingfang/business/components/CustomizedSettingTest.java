@@ -8,6 +8,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import net.pingfang.common.utils.JsonUtils;
 import net.pingfang.iot.common.customizedsetting.repos.CustomizedSettingRepository;
+import net.pingfang.iot.common.customizedsetting.values.DefaultCustomized;
 
 /**
  * @author 王超
@@ -21,6 +22,6 @@ public class CustomizedSettingTest {
 
 	@Test
 	public void list() {
-		logger.info(() -> JsonUtils.toJsonString(CustomizedSettingRepository.getValues()));
+		logger.info(() -> JsonUtils.toJsonString(CustomizedSettingRepository.getValues(DefaultCustomized.values())));
 	}
 }

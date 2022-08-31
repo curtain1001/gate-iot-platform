@@ -21,6 +21,7 @@ import net.pingfang.common.core.domain.BaseEntity;
 import net.pingfang.device.core.DeviceProperties;
 import net.pingfang.iot.common.instruction.Instruction;
 import net.pingfang.iot.common.product.ProductSupports;
+import net.pingfang.network.NetworkProperties;
 
 /**
  * @author 王超
@@ -58,7 +59,7 @@ public class BtpDevice extends BaseEntity {
 	 */
 	private int enabled;
 	/**
-	 * 状态
+	 * 状态 (0:启动 1：关闭)
 	 */
 	private int status;
 	/**
@@ -82,6 +83,15 @@ public class BtpDevice extends BaseEntity {
 		properties.setLaneId(this.laneId);
 		properties.setEnabled(this.enabled == 0);
 		properties.setConfiguration(this.configuration);
+		return properties;
+	}
+
+	public NetworkProperties toNetworkProperties() {
+		NetworkProperties properties = new NetworkProperties();
+		properties.setConfigurations(this.configuration);
+		properties.setEnabled(this.status == 0);
+		properties.setId(this.deviceId);
+		properties.setName(this.deviceName);
 		return properties;
 	}
 

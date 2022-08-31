@@ -34,7 +34,7 @@ public class DefaultDeviceConfigManager implements DeviceConfigManager {
 		if (device != null) {
 			return device.toProperties();
 		}
-		return null;
+		return new DeviceProperties();
 	}
 
 	@Override

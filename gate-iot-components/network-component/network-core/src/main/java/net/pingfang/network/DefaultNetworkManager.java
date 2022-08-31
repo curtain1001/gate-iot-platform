@@ -1,14 +1,19 @@
 package net.pingfang.network;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import lombok.AllArgsConstructor;
@@ -16,6 +21,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import net.pingfang.iot.common.network.NetworkType;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -25,7 +32,7 @@ import reactor.core.publisher.Mono;
  */
 @Component
 @Slf4j
-public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor {
+public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor, ApplicationRunner {
 
 	private final NetworkConfigManager configManager;
 
@@ -46,29 +53,48 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor 
 				.subscribe();
 	}
 
-//	@PostConstruct
-//	public void start() {
-//		Flux.interval(Duration.ofSeconds(10)).subscribe(t -> this.checkNetwork());
-//	}
+	@Override
+	public void reload(NetworkType type, String id) {
+		Mono.justOrEmpty(getNetworkStore(type) //
+				.get(id)) //
+				.doOnNext(Network::shutdown) //
+				.then(Mono.just(getNetwork(type, id))) //
+				.subscribe();
+	}
+
+	@PostConstruct
+	public void start() {
+		Flux.interval(Duration.ofSeconds(10)).subscribe(t -> this.checkNetwork());
+	}
 
 	/**
 	 * 检查网络 把需要加载的网络组件启动起来
 	 */
 	protected void checkNetwork() {
-		// 获取并过滤所有停止的网络组件
-		// 重新加载启动状态的网络组件
-		Collection<Map<String, Network>> networks = store.values();
-		networks.stream().flatMap(m -> m.values().stream()).filter(x -> !x.isAlive()).forEach(network -> {
-			NetworkProvider<Object> provider = providerSupport.get(network.getType().getId());
-			if (provider == null || !network.isAutoReload()) {
-				return;
-			}
-			NetworkProperties properties = configManager.getConfig(network.getType(), network.getId());
-			if (properties != null && properties.isEnabled()) {
-				Object o = provider.createConfig(properties);
-				this.doCreate(provider, network.getId(), o);
-			}
-		});
+		try {
+			// 获取并过滤所有停止的网络组件
+			// 重新加载启动状态的网络组件
+			Collection<Map<String, Network>> networks = store.values();
+			networks.stream().flatMap(m -> m.values().stream()).filter(x -> !x.isAlive()).forEach(network -> {
+				NetworkProvider<Object> provider = providerSupport.get(network.getType().getId());
+				if (provider == null || !network.isAutoReload()) {
+					return;
+				}
+				NetworkProperties properties = configManager.getConfig(network.getId());
+				if (properties != null && properties.isEnabled()) {
+					try {
+						Object o = provider.createConfig(properties);
+						this.doCreate(provider, network.getId(), o);
+					} catch (Exception e) {
+						log.error("网络组件启动失败：", e);
+					}
+
+				}
+			});
+		} catch (Exception e) {
+			log.error("网络组件启动失败：", e);
+		}
+
 	}
 
 	private Map<String, Network> getNetworkStore(String type) {
@@ -77,6 +103,11 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor 
 
 	private Map<String, Network> getNetworkStore(NetworkType type) {
 		return getNetworkStore(type.getId());
+	}
+
+	@Override
+	public Map<String, Network> getNetwork(NetworkType type) {
+		return getNetworkStore(type);
 	}
 
 	@Override
@@ -127,7 +158,13 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor 
 			if (properties == null) {
 				throw new UnsupportedOperationException("网络[" + type.getName() + "]配置[" + id + "]不存在");
 			}
-			Object config = provider.createConfig(properties);
+			Object config = null;
+			try {
+				config = provider.createConfig(properties);
+			} catch (Exception e) {
+				log.error("设备配置创建失败;", e);
+				throw new RuntimeException("设备配置创建失败");
+			}
 			return doCreate(provider, id, config);
 		}
 	}
@@ -137,13 +174,19 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor 
 		if (provider == null) {
 			throw new UnsupportedOperationException("不支持的类型:" + type.getName());
 		} else {
-			NetworkProperties properties = configManager.getConfig(type, id);
+			NetworkProperties properties = configManager.getConfig(id);
 			if (properties == null) {
 				throw new UnsupportedOperationException("网络[" + type.getName() + "]配置[" + id + "]不存在");
 			} else if (!properties.isEnabled()) {
 				throw new UnsupportedOperationException("网络[" + type.getName() + "]配置[" + id + "]已禁用");
 			}
-			Object config = provider.createConfig(properties);
+			Object config = null;
+			try {
+				config = provider.createConfig(properties);
+			} catch (Exception e) {
+				log.error("设备配置创建失败;", e);
+				throw new RuntimeException("设备配置创建失败");
+			}
 			return doCreate(provider, id, config);
 		}
 	}
@@ -172,6 +215,22 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor 
 			network.shutdown();
 			getNetworkStore(type).remove(id);
 		}
+	}
+
+	@Override
+	public void run(ApplicationArguments args) throws Exception {
+		List<NetworkProperties> networkProperties = configManager.getConfig();
+		networkProperties.stream().filter(x -> x.getControl() == Control.system && x.isEnabled()).forEach(pro -> {
+			NetworkProvider<Object> provider = providerSupport.get(pro.getNetworkType().getId());
+			Object o = null;
+			try {
+				o = provider.createConfig(pro);
+			} catch (Exception e) {
+				log.error("设备配置创建失败;", e);
+			}
+			Network network = doCreate(provider, pro.getId(), o);
+			log.info("网络设备：{}-{}---启动成功", network.getType(), network.getId());
+		});
 	}
 
 	@Getter

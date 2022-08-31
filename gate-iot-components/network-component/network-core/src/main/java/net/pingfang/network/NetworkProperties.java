@@ -5,6 +5,7 @@ import java.util.Map;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.pingfang.iot.common.network.NetworkType;
 
 @Getter
 @Setter
@@ -16,6 +17,10 @@ public class NetworkProperties implements Serializable {
 	private String name;
 
 	private boolean enabled;
+
+	private Control control;
+
+	private NetworkType networkType;
 
 	private Map<String, Object> configurations;
 

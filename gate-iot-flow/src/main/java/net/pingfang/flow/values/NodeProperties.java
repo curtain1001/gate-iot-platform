@@ -1,5 +1,7 @@
 package net.pingfang.flow.values;
 
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AllArgsConstructor;
@@ -41,4 +43,7 @@ public class NodeProperties {
 	 * 设备Id
 	 */
 	private String deviceId;
+
+	private Map<String, Object> properties;
+
 }

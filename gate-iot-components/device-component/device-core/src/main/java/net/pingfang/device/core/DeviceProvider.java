@@ -40,7 +40,4 @@ public interface DeviceProvider<P> {
 	 */
 	P createConfig(DeviceProperties properties);
 
-//	void encode(Instruction instruction);
-//
-//	Instruction decode();
 }

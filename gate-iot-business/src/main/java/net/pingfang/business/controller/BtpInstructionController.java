@@ -22,7 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.google.common.collect.Maps;
 
+import lombok.extern.slf4j.Slf4j;
 import net.pingfang.business.domain.BtpDevice;
 import net.pingfang.business.domain.BtpInstruction;
 import net.pingfang.business.manager.DefaultDeviceOperatorManager;
@@ -35,9 +37,11 @@ import net.pingfang.common.core.controller.BaseController;
 import net.pingfang.common.core.domain.AjaxResult;
 import net.pingfang.common.core.page.TableDataInfo;
 import net.pingfang.common.enums.BusinessType;
+import net.pingfang.common.utils.JsonUtils;
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.instruction.DeviceInstruction;
 import net.pingfang.framework.manager.AsyncManager;
+import net.pingfang.iot.common.instruction.InstructionParam;
 import net.pingfang.iot.common.instruction.InstructionResult;
 import net.pingfang.iot.common.instruction.ObjectType;
 
@@ -48,6 +52,7 @@ import net.pingfang.iot.common.instruction.ObjectType;
  */
 @RestController
 @RequestMapping("business/instruction")
+@Slf4j
 public class BtpInstructionController extends BaseController {
 	@Resource
 	private IBtpInstructionService instructionService;
@@ -102,7 +107,8 @@ public class BtpInstructionController extends BaseController {
 		if (operator == null) {
 			return AjaxResult.error("设备未启动");
 		}
-		InstructionResult<Object, String> resultMono = i.execution(operator);
+		InstructionResult<Object, String> resultMono = i.execution(operator, Maps.newHashMap(),
+				JsonUtils.getObjectNode());
 		if (resultMono == null) {
 			return AjaxResult.error("指令执行失败");
 		}
@@ -110,6 +116,29 @@ public class BtpInstructionController extends BaseController {
 			return AjaxResult.success("指令执行成功:" + resultMono.getMessage());
 		} else {
 			return AjaxResult.error("指令执行失败:" + resultMono.getMessage());
+		}
+	}
+
+	/**
+	 * 执行指令
+	 */
+	@PreAuthorize("@ss.hasPermi('business:device:open')")
+	@Log(title = "指令管理", businessType = BusinessType.UPDATE)
+	@PutMapping("exec")
+	public AjaxResult run(InstructionParam param) {
+		try {
+			InstructionResult result = instructionManager.exec(param);
+			if (result == null) {
+				return AjaxResult.error("指令执行失败");
+			}
+			if (result.isSuccess()) {
+				return AjaxResult.success("指令执行成功:" + result.getMessage());
+			} else {
+				return AjaxResult.error("指令执行失败:" + result.getMessage());
+			}
+		} catch (Exception e) {
+			log.error("指令执行失败;", e);
+			return AjaxResult.error("指令执行失败：" + e.getMessage());
 		}
 	}
 

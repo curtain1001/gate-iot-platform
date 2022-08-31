@@ -17,6 +17,10 @@
 //import lombok.extern.slf4j.Slf4j;
 //import net.pingfang.common.utils.JsonUtils;
 //import net.pingfang.framework.web.service.TokenService;
+//import net.pingfang.framework.websocket.Message;
+//import net.pingfang.framework.websocket.MessagingManager;
+//import net.pingfang.framework.websocket.MessagingRequest;
+//import net.pingfang.framework.websocket.SubscribeRequest;
 //import reactor.core.Disposable;
 //import reactor.core.publisher.Mono;
 //
@@ -77,7 +81,7 @@
 //							if (old != null && !old.isDisposed()) {
 //								return;
 //							}
-//							Disposable sub = messagingManager.subscribe(SubscribeRequest.of(request, auth))
+//							Disposable sub = messagingManager.subscribe(SubscribeRequest.of(request))
 //									.doOnEach(err -> log.error("{},{}", err.getThrowable(), err))
 //									.onErrorResume(
 //											err -> Mono.just(Message.error(request.getId(), request.getTopic(), err)))

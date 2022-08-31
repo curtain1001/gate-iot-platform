@@ -13,12 +13,9 @@
 //import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter;
 //
 //import net.pingfang.framework.web.service.TokenService;
+//import net.pingfang.framework.websocket.MessagingManager;
 //
 ////@Configuration
-////@ConditionalOnBean({
-////    ReactiveAuthenticationManager.class,
-////    UserTokenManager.class
-////})
 //public class WebSocketMessagingHandlerConfiguration {
 //
 //	@Bean
@@ -27,7 +24,7 @@
 //
 //		WebSocketMessagingHandler messagingHandler = new WebSocketMessagingHandler(messagingManager, tokenService);
 //		final Map<String, WebSocketHandler> map = new HashMap<>(1);
-//		map.put("/messaging/**", messagingHandler);
+//		map.put("/websocket/**", messagingHandler);
 //
 //		final SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
 //		mapping.setOrder(Ordered.HIGHEST_PRECEDENCE);

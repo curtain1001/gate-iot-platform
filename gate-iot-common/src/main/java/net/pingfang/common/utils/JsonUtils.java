@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
@@ -23,6 +24,10 @@ public class JsonUtils {
 		objectMapper.registerModule(new Jdk8Module());
 		objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 		return objectMapper;
+	}
+
+	public static ObjectNode getObjectNode() {
+		return MAPPER.createObjectNode();
 	}
 
 	/**

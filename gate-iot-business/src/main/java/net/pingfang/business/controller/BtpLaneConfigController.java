@@ -30,6 +30,7 @@ import net.pingfang.common.core.domain.AjaxResult;
 import net.pingfang.common.core.page.TableDataInfo;
 import net.pingfang.common.enums.BusinessType;
 import net.pingfang.iot.common.customizedsetting.repos.CustomizedSettingRepository;
+import net.pingfang.iot.common.customizedsetting.values.DefaultCustomized;
 
 /**
  * @author 王超
@@ -48,7 +49,7 @@ public class BtpLaneConfigController extends BaseController {
 	 */
 	@GetMapping(value = "/options")
 	public AjaxResult getList() {
-		return AjaxResult.success(CustomizedSettingRepository.getValues());
+		return AjaxResult.success(CustomizedSettingRepository.getValues(DefaultCustomized.values()));
 	}
 
 	/**
@@ -66,6 +67,7 @@ public class BtpLaneConfigController extends BaseController {
 				laneConfig.getLaneId());
 		queryWrapper.like(StringUtils.checkValNotNull(laneConfig.getLaneConfigKey()), BtpLaneConfig::getLaneConfigKey,
 				laneConfig.getLaneConfigKey());
+		queryWrapper.orderByDesc(BtpLaneConfig::getCreateTime);
 		List<BtpLaneConfig> list = laneConfigService.list(queryWrapper);
 		return getDataTable(list);
 	}

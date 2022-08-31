@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
+import io.vertx.core.WorkerExecutor;
 
 /**
  * @author 王超
@@ -24,6 +25,11 @@ public class VertxConfiguration {
 	@Bean
 	public Vertx vertx(VertxOptions vertxOptions) {
 		return Vertx.vertx(vertxOptions);
+	}
+
+	@Bean
+	public WorkerExecutor workerExecutor(Vertx vertx) {
+		return vertx.createSharedWorkerExecutor("worker-pool");
 	}
 
 }

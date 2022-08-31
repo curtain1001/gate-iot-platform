@@ -1,11 +1,17 @@
 package net.pingfang.device.licenseplate;
 
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Component;
 
+import net.pingfang.iot.common.customizedsetting.repos.CustomizedSettingRepository;
+import net.pingfang.iot.common.customizedsetting.values.CustomizedSettingData;
+import net.pingfang.iot.common.network.NetworkType;
 import net.pingfang.iot.common.product.Product;
 import net.pingfang.iot.common.product.ProductSupports;
+import net.pingfang.network.DefaultNetworkType;
 
 /**
  * @author 王超
@@ -29,6 +35,16 @@ public enum LicensePlateProduct implements Product {
 	@Override
 	public String getValue() {
 		return name();
+	}
+
+	@Override
+	public NetworkType getNetwork() {
+		return DefaultNetworkType.INTERNAL;
+	}
+
+	@Override
+	public List<CustomizedSettingData> getBasicForm() {
+		return CustomizedSettingRepository.getValues(LpBasicFormCustomized.values());
 	}
 
 	@Component

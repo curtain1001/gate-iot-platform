@@ -68,6 +68,7 @@ public class BtpFlowDeploymentController extends BaseController {
 				deployment.getLaneId());
 		queryWrapper.like(StringUtils.checkValNotNull(deployment.getFlowId()), FlowDeployment::getFlowId,
 				deployment.getFlowId());
+		queryWrapper.orderByDesc(FlowDeployment::getCreateTime);
 		List<FlowDeployment> list = deploymentService.list(queryWrapper);
 		return getDataTable(list);
 	}

@@ -16,4 +16,5 @@ public class CustomizedSettingData {
 	final Object value;
 	final String label;
 	final Object options;
+	final Object defaults;
 }

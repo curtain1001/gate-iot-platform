@@ -44,6 +44,8 @@ public class FlowExecuteHistory {
 	 * 节点名称
 	 */
 	private String nodeName;
+
+	private String nodeType;
 	/**
 	 * 执行指令
 	 */

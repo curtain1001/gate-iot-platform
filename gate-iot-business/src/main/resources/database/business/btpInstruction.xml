@@ -59,6 +59,12 @@
         </addColumn>
 
     </changeSet>
+    <changeSet id="btp_instruction::addColumn::configuration" author="wangchao">
+        <addColumn tableName="btp_instruction">
+            <column name="configuration" type="${clob.type}" remarks="配置信息" />
+        </addColumn>
+
+    </changeSet>
 
 
 </databaseChangeLog>

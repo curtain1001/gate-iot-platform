@@ -1,15 +1,19 @@
 package net.pingfang.device.plc.instruction;
 
-import java.util.Arrays;
+import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import lombok.extern.slf4j.Slf4j;
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.instruction.DeviceInstruction;
 import net.pingfang.device.core.manager.InstructionConfigManager;
@@ -30,6 +34,7 @@ import net.pingfang.network.tcp.TcpMessage;
  * @date 2022-07-06 11:52
  */
 @Component
+@Slf4j
 public class PLCInstructionProvider implements InstructionProvider {
 	@Resource
 	InstructionConfigManager instructionConfigManager;
@@ -47,6 +52,7 @@ public class PLCInstructionProvider implements InstructionProvider {
 	@Override
 	public List<Instruction> getCommand() {
 		List<InsEntity> entities = instructionConfigManager.getInstruction(PLCProduct.PLC);
+
 		return entities.stream().map(x -> new DeviceInstruction() {
 			@Override
 			public String getName() {
@@ -69,13 +75,14 @@ public class PLCInstructionProvider implements InstructionProvider {
 			}
 
 			@Override
-			public InstructionResult<Object, String> execution(DeviceOperator deviceOperator) {
+			public InstructionResult<Object, String> execution(DeviceOperator deviceOperator,
+					Map<String, Object> properties, JsonNode jsonNode) {
 				PLCDevice device = (PLCDevice) deviceOperator;
 				byte[] bytes = ByteUtils.convertHexStrToByteArray(x.getContent().toString());
 				ByteBuf byteBuf = ByteBufAllocator.DEFAULT.ioBuffer();
 				byteBuf.writeBytes(bytes);
 				TcpMessage tcpMessage = new TcpMessage(byteBuf);
-				Boolean bln = device.send(tcpMessage).block();
+				Boolean bln = device.send(tcpMessage).block(Duration.ofMinutes(1L));
 				if (bln != null && bln) {
 					return InstructionResult.success(true, "指令下发成功");
 				} else {
@@ -85,8 +92,9 @@ public class PLCInstructionProvider implements InstructionProvider {
 
 			@Override
 			public boolean isSupport(Object object) {
-				byte[] target = ByteUtils.convertHexStrToByteArray(x.getContent().toString());
-				return Arrays.equals((byte[]) object, target);
+				return object.equals(x.getContent().toString());
+//				byte[] target = ByteUtils.convertHexStrToByteArray();
+//				return Arrays.equals((byte[]) object, target);
 			}
 		}).collect(Collectors.toList());
 	}

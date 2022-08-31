@@ -47,7 +47,7 @@ public class SdkInit {
 	@PreDestroy
 	public static void shutdownHook() {
 		net.Net_UNinit();
-		log.error("程序退出,释放sdk资源");
+		log.warn("程序退出,释放sdk资源");
 	}
 
 }

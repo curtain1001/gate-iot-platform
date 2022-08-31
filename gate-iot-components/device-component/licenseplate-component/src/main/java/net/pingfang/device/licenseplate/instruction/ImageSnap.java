@@ -1,5 +1,9 @@
 package net.pingfang.device.licenseplate.instruction;
 
+import java.util.Map;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.instruction.DeviceInstruction;
 import net.pingfang.device.licenseplate.LicensePlateDevice;
@@ -36,7 +40,8 @@ public class ImageSnap implements DeviceInstruction {
 	}
 
 	@Override
-	public InstructionResult<String, String> execution(DeviceOperator deviceOperator) {
+	public InstructionResult<String, String> execution(DeviceOperator deviceOperator, Map<String, Object> properties,
+			JsonNode jsonNode) {
 		LicensePlateDevice device = (LicensePlateDevice) deviceOperator;
 		int is = device.imageSnap();
 		String message = StatusCode.getStatusCode(is, "Net_ImageSnap");

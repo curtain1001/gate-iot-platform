@@ -1,5 +1,10 @@
 package net.pingfang.common.utils.spring;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Modifier;
+import java.util.Collection;
+import java.util.Map;
+
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -8,7 +13,10 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
 import net.pingfang.common.utils.StringUtils;
 
 /**
@@ -17,6 +25,7 @@ import net.pingfang.common.utils.StringUtils;
  * @author ruoyi
  */
 @Component
+@Slf4j
 public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationContextAware {
 	/** Spring应用上下文环境 */
 	private static ConfigurableListableBeanFactory beanFactory;
@@ -54,6 +63,20 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
 	}
 
 	/**
+	 * 获取标记注解的对象
+	 *
+	 * @param annotation
+	 * @return
+	 * @throws org.springframework.beans.BeansException
+	 *
+	 */
+	public static Collection<Object> getBeansWithAnnotation(Class<? extends Annotation> annotation)
+			throws BeansException {
+		Map<String, Object> beanMap = beanFactory.getBeansWithAnnotation(annotation);
+		return beanMap.values();
+	}
+
+	/**
 	 * 如果BeanFactory包含一个与所给名称匹配的bean定义，则返回true
 	 *
 	 * @param name
@@ -74,6 +97,52 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
 	 */
 	public static boolean isSingleton(String name) throws NoSuchBeanDefinitionException {
 		return beanFactory.isSingleton(name);
+	}
+
+	/**
+	 * 方法描述 判断class对象是否带有spring的注解 存放實現
+	 *
+	 * @param cla jar中的每一个class
+	 * @return true 是spring bean false 不是spring bean
+	 * @method isSpringBeanClass
+	 */
+	public static boolean isSpringBeanClass(Class<?> cla) {
+
+		if (cla == null) {
+			return false;
+		}
+		// 是否是接口
+		if (cla.isInterface()) {
+			return false;
+		}
+		// 是否是抽象类
+		if (Modifier.isAbstract(cla.getModifiers())) {
+			return false;
+		}
+		try {
+			if (cla.getAnnotation(Component.class) != null) {
+				return true;
+			}
+		} catch (Exception e) {
+			log.error("出现异常：{}", e.getMessage());
+		}
+
+		try {
+			if (cla.getAnnotation(Repository.class) != null) {
+				return true;
+			}
+		} catch (Exception e) {
+			log.error("出现异常：{}", e.getMessage());
+		}
+
+		try {
+			if (cla.getAnnotation(Service.class) != null) {
+				return true;
+			}
+		} catch (Exception e) {
+			log.error("出现异常：{}", e.getMessage());
+		}
+		return false;
 	}
 
 	/**

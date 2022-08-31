@@ -1,5 +1,7 @@
 package net.pingfang.business.domain;
 
+import java.util.Map;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -60,4 +62,8 @@ public class BtpInstruction extends BaseEntity {
 	 * 状态
 	 */
 	private int status;
+	/**
+	 * 指令配置信息
+	 */
+	private Map<String, Object> configuration;
 }

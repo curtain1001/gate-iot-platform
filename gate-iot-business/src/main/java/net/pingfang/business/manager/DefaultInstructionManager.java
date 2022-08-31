@@ -8,17 +8,33 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
+
+import org.apache.commons.compress.utils.Lists;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Maps;
 
+import net.pingfang.common.event.EventBusCenter;
+import net.pingfang.common.utils.JsonUtils;
 import net.pingfang.common.utils.StringUtils;
+import net.pingfang.device.core.DeviceManager;
+import net.pingfang.device.core.DeviceOperator;
+import net.pingfang.device.core.event.MessageUpEvent;
+import net.pingfang.device.core.instruction.DeviceInstruction;
+import net.pingfang.iot.common.instruction.BusinessInstrParameter;
+import net.pingfang.iot.common.instruction.DeviceInstrParameter;
 import net.pingfang.iot.common.instruction.Instruction;
 import net.pingfang.iot.common.instruction.InstructionManager;
+import net.pingfang.iot.common.instruction.InstructionParam;
 import net.pingfang.iot.common.instruction.InstructionProvider;
+import net.pingfang.iot.common.instruction.InstructionResult;
+import net.pingfang.iot.common.instruction.ObjectType;
 import net.pingfang.iot.common.product.Product;
+import net.pingfang.iot.common.product.ProductSupports;
+import net.pingfang.servicecomponent.core.BusinessInstruction;
 
 /**
  * @author 王超
@@ -27,6 +43,11 @@ import net.pingfang.iot.common.product.Product;
  */
 @Component
 public class DefaultInstructionManager implements InstructionManager, BeanPostProcessor {
+
+	@Resource
+	private DeviceManager deviceManager;
+	@Resource
+	private EventBusCenter eventBusCenter;
 	/**
 	 * 指令缓存 key:指令value
 	 */
@@ -38,6 +59,32 @@ public class DefaultInstructionManager implements InstructionManager, BeanPostPr
 	 */
 	private final Map<String, InstructionProvider> providerSupport = new ConcurrentHashMap<>();
 
+	@Override
+	public InstructionResult exec(InstructionParam param) {
+		InstructionResult result = null;
+		Product product = ProductSupports.getSupport(param.getProduct());
+		Instruction ins = instrStore.get(product.getValue()).get(param.getInstructionName());
+		if (param.getObjectType().equals(ObjectType.service)) {
+			BusinessInstrParameter parameter = JsonUtils.toObject(param.getPayload().toString(),
+					BusinessInstrParameter.class);
+			BusinessInstruction instruction = (BusinessInstruction) ins;
+			result = instruction.execution(parameter.getJsonNode());
+		} else {
+
+			DeviceInstrParameter parameter = JsonUtils.toObject(param.getPayload().toString(),
+					DeviceInstrParameter.class);
+			DeviceInstruction instruction = (DeviceInstruction) ins;
+			DeviceOperator operator = deviceManager.getDevice(param.getLaneId(), parameter.getDeviceId());
+			result = instruction.execution(operator, parameter.getProperties(), parameter.getJsonNode());
+		}
+		eventBusCenter.postSync(MessageUpEvent.builder() //
+				.instruction(ins)//
+				.product(product)//
+				.message(result)//
+				.build());
+		return result;
+	}
+
 	public List<Instruction> getInstruction() {
 		return instrStore.values().stream().flatMap(f -> f.values().stream()).collect(Collectors.toList());
 	}
@@ -48,7 +95,11 @@ public class DefaultInstructionManager implements InstructionManager, BeanPostPr
 	}
 
 	public List<Instruction> getInstruction(Product product) {
-		return new ArrayList<>(instrStore.get(product.getValue()).values());
+		ConcurrentMap<String, Instruction> store = instrStore.get(product.getValue());
+		if (store != null) {
+			return new ArrayList<>(store.values());
+		}
+		return Lists.newArrayList();
 	}
 
 	/**

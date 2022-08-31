@@ -43,6 +43,6 @@ public class InsEntity {
 	/**
 	 * 报文格式类型（Json；）
 	 */
-	private String format;
+	private FormatType format;
 
 }

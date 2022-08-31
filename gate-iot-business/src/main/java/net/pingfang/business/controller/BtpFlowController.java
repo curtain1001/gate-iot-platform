@@ -58,6 +58,7 @@ public class BtpFlowController extends BaseController {
 		queryWrapper.like(StringUtils.checkValNotNull(flow.getFlowId()), BtpFlow::getFlowId, flow.getFlowId());
 		queryWrapper.like(StringUtils.checkValNotNull(flow.getFlowName()), BtpFlow::getFlowName, flow.getFlowName());
 		queryWrapper.like(StringUtils.checkValNotNull(flow.getLaneId()), BtpFlow::getLaneId, flow.getLaneId());
+		queryWrapper.orderByDesc(BtpFlow::getCreateTime);
 		List<BtpFlow> list = flowService.list(queryWrapper);
 		return getDataTable(list);
 	}

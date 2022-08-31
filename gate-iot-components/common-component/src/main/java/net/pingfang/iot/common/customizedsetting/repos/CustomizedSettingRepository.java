@@ -9,15 +9,15 @@ import org.apache.commons.compress.utils.Lists;
 import lombok.AllArgsConstructor;
 import net.pingfang.common.utils.JsonUtils;
 import net.pingfang.common.utils.StringUtils;
+import net.pingfang.iot.common.customizedsetting.Customized;
 import net.pingfang.iot.common.customizedsetting.values.CustomizedSettingData;
-import net.pingfang.iot.common.customizedsetting.values.DefaultCustomized;
 import net.pingfang.iot.common.customizedsetting.values.Options;
 
 @AllArgsConstructor
 public class CustomizedSettingRepository {
 
-	public static List<CustomizedSettingData> getValues() {
-		return Arrays.stream(DefaultCustomized.values()).map(x -> {
+	public static List<CustomizedSettingData> getValues(Customized[] customized) {
+		return Arrays.stream(customized).map(x -> {
 			return CustomizedSettingData.builder() //
 					.customizeType(x.getCustomizeType())//
 					.attribute(x) //
@@ -26,16 +26,11 @@ public class CustomizedSettingRepository {
 					.label(x.getLabel())//
 					.value(x.getValue())//
 					.type(x.getType()) //
+					.defaults(x.getDefaults())//
 					.build();
 		}).collect(Collectors.toList());
 	}
 
-//	public static CustomizedSettingData covert(String customized) {
-//		if (StringUtils.isEmpty(customized)) {
-//			return null;
-//		}
-//		DefaultCustomized defaultCustomized = DefaultCustomized.valueOf(customized);
-//	}
 	public static void main(String[] args) {
 		Options options1 = Options.builder().key("手动触发").value("shoudaong").build();
 		Options options2 = Options.builder().key("手动触发").value("shoudaong").build();

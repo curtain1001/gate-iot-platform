@@ -3,9 +3,6 @@ package net.pingfang;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.context.annotation.Import;
-
-import net.pingfang.network.tcp.client.VertxTcpClientProvider;
 
 /**
  * 启动程序
@@ -13,7 +10,7 @@ import net.pingfang.network.tcp.client.VertxTcpClientProvider;
  * @author ruoyi
  */
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class }, scanBasePackages = "net.pingfang")
-@Import(value = { VertxTcpClientProvider.class })
+//@Import(value = { VertxTcpClientProvider.class })
 public class RuoYiApplication {
 	public static void main(String[] args) {
 		// System.setProperty("spring.devtools.restart.enabled", "false");
