@@ -13,7 +13,7 @@ import net.pingfang.system.service.ISysRoleService;
 /**
  * 用户权限处理
  *
- * @author ruoyi
+ * @author 王超
  */
 @Component
 public class SysPermissionService {

@@ -26,7 +26,7 @@ import net.pingfang.business.domain.BtpDevice;
 import net.pingfang.business.manager.DefaultDeviceOperatorManager;
 import net.pingfang.business.manager.DefaultInstructionManager;
 import net.pingfang.business.service.IBtpDeviceService;
-import net.pingfang.business.service.IBtpInstrDeviceService;
+import net.pingfang.business.service.IBtpInstructionService;
 import net.pingfang.common.annotation.Log;
 import net.pingfang.common.core.controller.BaseController;
 import net.pingfang.common.core.domain.AjaxResult;
@@ -47,7 +47,7 @@ public class BtpDeviceController extends BaseController {
 	@Resource
 	IBtpDeviceService btpDeviceService;
 	@Resource
-	IBtpInstrDeviceService instrDeviceService;
+	IBtpInstructionService instructionService;
 	@Resource
 	DefaultDeviceOperatorManager operatorManager;
 	@Resource
@@ -80,7 +80,7 @@ public class BtpDeviceController extends BaseController {
 		TableDataInfo info = getDataTable(list);
 		info.setRows(info.getRows().stream().peek(x -> {
 			((BtpDevice) x).setInstructions(
-					instrDeviceService.getInstructions(ProductSupports.getSupport(((BtpDevice) x).getProduct())));
+					instructionService.getInstructions(ProductSupports.getSupport(((BtpDevice) x).getProduct())));
 		}).collect(Collectors.toList()));
 		return info;
 	}
@@ -97,7 +97,7 @@ public class BtpDeviceController extends BaseController {
 		List<BtpDevice> list = btpDeviceService.list(queryWrapper);
 		list = list.stream().peek(x -> {
 			x.setInstructions(
-					instrDeviceService.getInstructions(ProductSupports.getSupport(((BtpDevice) x).getProduct())));
+					instructionService.getInstructions(ProductSupports.getSupport(((BtpDevice) x).getProduct())));
 		}).collect(Collectors.toList());
 		return AjaxResult.success(list);
 	}
@@ -150,7 +150,6 @@ public class BtpDeviceController extends BaseController {
 	public AjaxResult add(@Validated @RequestBody BtpDevice device) {
 		LambdaQueryWrapper<BtpDevice> wrapper = Wrappers.lambdaQuery();
 		wrapper.eq(BtpDevice::getDeviceId, device.getDeviceId());
-		wrapper.eq(BtpDevice::getLaneId, device.getLaneId());
 		if (btpDeviceService.count(wrapper) > 0) {
 			return AjaxResult.error("新增设备'" + device.getDeviceId() + "'失败，设备号已存在");
 		}

@@ -63,7 +63,7 @@ public interface DeviceOperator {
 	/**
 	 * 订阅消息
 	 */
-	Flux<FunctionMessage> subscribe();
+	Flux<FunctionMessage> subscribe(Long laneId);
 
 	/**
 	 * 是否存活

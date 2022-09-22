@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
 import net.pingfang.business.domain.BtpDevice;
 import net.pingfang.business.domain.BtpNetworkConfig;
+import net.pingfang.business.enums.NetworkConfigState;
 import net.pingfang.business.service.IBtpDeviceService;
 import net.pingfang.business.service.IBtpNetworkConfigService;
 import net.pingfang.iot.common.network.NetworkType;
@@ -57,5 +58,16 @@ public class DefaultNetworkConfigManager implements NetworkConfigManager {
 			return configs.stream().map(BtpNetworkConfig::toNetworkProperties).collect(Collectors.toList());
 		}
 		return Lists.newArrayList();
+	}
+
+	@Override
+	public void update(String configId, String state) {
+		LambdaQueryWrapper<BtpNetworkConfig> queryWrapper = Wrappers.lambdaQuery();
+		queryWrapper.eq(BtpNetworkConfig::getNetworkConfigId, configId);
+		BtpNetworkConfig config = networkConfigService.getOne(queryWrapper);
+		config = config.toBuilder() //
+				.status(NetworkConfigState.valueOf(state)) //
+				.build();
+		networkConfigService.updateById(config);
 	}
 }

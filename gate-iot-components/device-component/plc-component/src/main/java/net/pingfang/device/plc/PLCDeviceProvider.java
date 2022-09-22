@@ -13,6 +13,7 @@ import net.pingfang.common.utils.JsonUtils;
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.DeviceProperties;
 import net.pingfang.device.core.DeviceProvider;
+import net.pingfang.iot.common.instruction.InstructionManager;
 import net.pingfang.iot.common.product.Product;
 import net.pingfang.network.NetworkManager;
 
@@ -26,6 +27,8 @@ import net.pingfang.network.NetworkManager;
 public class PLCDeviceProvider implements DeviceProvider<PLCDeviceProperties> {
 	@Resource
 	private NetworkManager networkManager;
+	@Resource
+	private InstructionManager instructionManager;
 
 	@Override
 	public Product getType() {
@@ -35,7 +38,7 @@ public class PLCDeviceProvider implements DeviceProvider<PLCDeviceProperties> {
 	@Override
 	public DeviceOperator createDevice(PLCDeviceProperties properties) {
 		PLCDevice device = new PLCDevice(properties.getLaneId(), properties.getId(), properties.getName(),
-				networkManager);
+				networkManager, instructionManager);
 		return init(device, properties);
 	}
 

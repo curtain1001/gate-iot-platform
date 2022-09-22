@@ -1,11 +1,15 @@
 package net.pingfang.device.licenseplate.config;
 
+import java.io.File;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
+import net.pingfang.common.utils.RuntimeUtils;
+import net.pingfang.device.licenseplate.utils.LoadLibUtils;
 import net.pingfang.device.licenseplate.values.ResultCode;
 import net.sdk.function.main.NET;
 import net.sdk.function.main.NetPath;
@@ -29,19 +33,34 @@ public class SdkInit {
 			Runtime.getRuntime().halt(0);
 		}
 		// 获取程序运行路径
-		String path = "\\sdk";
+		String path = "sdk";
 		if (System.getProperty("java.vm.name") == null || !System.getProperty("java.vm.name").contains("64-Bit")) {
-			path = path + "\\winSdk_x86\\";
+			path = path + File.separator + "winSdk_x86" + File.separator;
 		} else {
-			path = path + "\\winSdk_64\\";
+			path = path + File.separator + "winSdk_64" + File.separator;
 		}
-		NetPath.DLL_PATH = path;
-		net = NET.INSTANCE;
-		int init = net.Net_Init();
-		if (init != 0) {
-			log.error("相机驱动初始化失败程序退出：" + ResultCode.getMsg(init));
-			Runtime.getRuntime().halt(0);
+		if (RuntimeUtils.isStartupFromJar()) {
+			String tempPath = System.getProperty("java.io.tmpdir");
+			try {
+				LoadLibUtils.loadLib(path, tempPath);
+				NetPath.DLL_PATH = tempPath + path;
+			} catch (Exception e) {
+				log.error("加载动态库失败；", e);
+			}
+		} else {
+			NetPath.DLL_PATH = path;
 		}
+		try {
+			net = NET.INSTANCE;
+			int init = net.Net_Init();
+			if (init != 0) {
+				log.error("相机驱动初始化失败程序退出：" + ResultCode.getMsg(init));
+				Runtime.getRuntime().halt(0);
+			}
+		} catch (Exception e) {
+			log.error("相机驱动初始化失败：", e);
+		}
+
 	}
 
 	@PreDestroy

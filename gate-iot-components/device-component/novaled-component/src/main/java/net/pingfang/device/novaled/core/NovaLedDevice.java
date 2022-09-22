@@ -69,7 +69,7 @@ public class NovaLedDevice implements DeviceOperator {
 	}
 
 	@Override
-	public Flux<FunctionMessage> subscribe() {
+	public Flux<FunctionMessage> subscribe(Long laneId) {
 //		return tcpClient.subscribe().map(x -> new FunctionMessage(laneId, deviceId, NovaLedDeviceProduct.NOVA_LED,
 //				x.getPayload(), MessagePayloadType.BINARY));
 		return Flux.empty();

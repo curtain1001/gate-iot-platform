@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <property name="blob.type" dbms="mssql" value="varbinary(max)" />
+    <property name="blob.type" dbms="mysql" value="longblob" />
+    <property name="blob.type" dbms="h2" value="blob" />
+
+    <property name="clob.type" dbms="mssql" value="varchar(max)" />
+    <property name="clob.type" dbms="mysql" value="longtext" />
+    <property name="clob.type" dbms="h2" value="longtext" />
+    <property name="autoIncrement" value="true" dbms="h2" />
+
+    <changeSet author="wangchao" id="btpWorkIndex::create">
+        <createTable tableName="btp_work_index" remarks="汽车过闸信息索引表">
+            <column name="data_id" remarks="主键" type="BIGINT(20)" startWith="1" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="work_id" type="varchar(64)" remarks="数据id" />
+            <column name="area_no" type="varchar(64)" remarks="场站号" />
+            <column name="lane_no" type="varchar(64)" remarks="通道号" />
+            <column name="custom_no" type="varchar(64)" remarks="海关通道号" />
+            <column name="in_exit_flag" type="varchar(64)" remarks="进出闸类型" />
+            <column name="collection_time" type="datetime(6)" remarks="采集时间" />
+            <column name="license_plate" type="varchar(64)" remarks="车牌" />
+            <column name="forward_container_no" type="varchar(64)" remarks="前箱号" />
+            <column name="back_container_no" type="varchar(64)" remarks="后箱号" />
+            <column name="frame_plate" type="varchar(64)" remarks="车架号" />
+            <column name="wheel_hub_total" type="varchar(64)" remarks="车轮毂数" />
+            <column name="wheel_hub_mark" type="varchar(64)" remarks="车轮毂识别区域" />
+            <column name="weight" type="varchar(64)" remarks="地磅重量" />
+            <column name="pictures" type="${clob.type}" remarks="图片信息" />
+            <column name="create_by" defaultValue="" remarks="创建者" type="VARCHAR(64)" />
+            <column name="create_time" remarks="创建时间" type="datetime(6)" />
+            <column name="update_by" defaultValue="" remarks="更新者" type="VARCHAR(64)" />
+            <column name="update_time" remarks="更新时间" type="datetime(6)" />
+            <column name="remark" remarks="备注" type="VARCHAR(500)" />
+        </createTable>
+        <createIndex tableName="btp_work_index" indexName="work_query_idx">
+            <column name="work_id" />
+            <column name="lane_no" />
+            <column name="area_no" />
+            <column name="custom_no" />
+            <column name="in_exit_flag" />
+            <column name="license_plate" />
+            <column name="forward_container_no" />
+            <column name="back_container_no" />
+            <column name="collection_time" />
+            <column name="frame_plate" />
+            <column name="wheel_hub_total" />
+            <column name="wheel_hub_mark" />
+        </createIndex>
+        <createIndex tableName="btp_work_index" indexName="work_LP_idx">
+            <column name="license_plate" />
+        </createIndex>
+        <createIndex tableName="btp_work_index" indexName="work_CN_idx">
+            <column name="forward_container_no" />
+            <column name="back_container_no" />
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

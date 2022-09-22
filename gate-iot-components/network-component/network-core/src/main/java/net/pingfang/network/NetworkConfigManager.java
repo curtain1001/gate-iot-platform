@@ -17,4 +17,6 @@ public interface NetworkConfigManager {
 
 	List<NetworkProperties> getConfig();
 
+	void update(String configId, String state);
+
 }

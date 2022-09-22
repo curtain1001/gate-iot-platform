@@ -45,4 +45,9 @@ public class DefaultNetworkConfigManager implements NetworkConfigManager {
 	public List<NetworkProperties> getConfig() {
 		return null;
 	}
+
+	@Override
+	public void update(String configId, String state) {
+
+	}
 }

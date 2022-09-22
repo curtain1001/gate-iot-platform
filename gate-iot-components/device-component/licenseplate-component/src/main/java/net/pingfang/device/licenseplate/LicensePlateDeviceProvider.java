@@ -2,6 +2,8 @@ package net.pingfang.device.licenseplate;
 
 import java.lang.reflect.InvocationTargetException;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.stereotype.Component;
 
@@ -10,6 +12,7 @@ import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.DeviceProperties;
 import net.pingfang.device.core.DeviceProvider;
 import net.pingfang.device.licenseplate.config.SdkInit;
+import net.pingfang.iot.common.instruction.InstructionManager;
 import net.pingfang.iot.common.product.Product;
 
 /**
@@ -20,6 +23,9 @@ import net.pingfang.iot.common.product.Product;
 @Slf4j
 @Component
 public class LicensePlateDeviceProvider implements DeviceProvider<LicensePlateDeviceProperties> {
+	@Resource
+	private InstructionManager instructionManager;
+
 	@Override
 	public Product getType() {
 		return LicensePlateProduct.OCR_License_Plate;
@@ -32,7 +38,7 @@ public class LicensePlateDeviceProvider implements DeviceProvider<LicensePlateDe
 
 	public LicensePlateDevice init(LicensePlateDeviceProperties properties) {
 		LicensePlateDevice device = new LicensePlateDevice(properties.getLaneId(), properties.getId(),
-				properties.getName(), SdkInit.net);
+				properties.getName(), SdkInit.net, instructionManager);
 		device.init(properties.getHost(), (short) properties.getPort(), (short) properties.getTimeout());
 		return device;
 	}

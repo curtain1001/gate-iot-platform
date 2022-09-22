@@ -18,7 +18,6 @@ import net.pingfang.common.scripting.nashorn.NashornScriptRunner;
 import net.pingfang.common.utils.JsonUtils;
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.instruction.DeviceInstruction;
-import net.pingfang.device.core.manager.InstructionConfigManager;
 import net.pingfang.device.novaled.NovaLedDeviceProduct;
 import net.pingfang.device.novaled.core.NovaLedDevice;
 import net.pingfang.device.novaled.utils.ResultCode;
@@ -28,6 +27,7 @@ import net.pingfang.iot.common.instruction.Instruction;
 import net.pingfang.iot.common.instruction.InstructionProvider;
 import net.pingfang.iot.common.instruction.InstructionResult;
 import net.pingfang.iot.common.instruction.InstructionType;
+import net.pingfang.iot.common.manager.InstructionConfigManager;
 import net.pingfang.iot.common.product.Product;
 
 /**

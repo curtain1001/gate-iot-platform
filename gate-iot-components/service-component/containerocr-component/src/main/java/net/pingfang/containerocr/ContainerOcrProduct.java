@@ -1,8 +1,14 @@
 package net.pingfang.containerocr;
 
+import java.util.List;
+
+import net.pingfang.iot.common.customizedsetting.repos.CustomizedSettingRepository;
+import net.pingfang.iot.common.customizedsetting.values.CustomizedSettingData;
 import net.pingfang.iot.common.instruction.ObjectType;
+import net.pingfang.iot.common.network.NetworkType;
 import net.pingfang.iot.common.product.Product;
 import net.pingfang.iot.common.product.ProductSupports;
+import net.pingfang.network.DefaultNetworkType;
 
 /**
  * <p>
@@ -30,7 +36,18 @@ public enum ContainerOcrProduct implements Product {
 	}
 
 	@Override
+	public NetworkType getNetwork() {
+		return DefaultNetworkType.TCP_SERVER;
+	}
+
+	@Override
+	public List<CustomizedSettingData> getBasicForm() {
+		return CustomizedSettingRepository.getValues(ContainerOcrBasicFormCustomized.values());
+	}
+
+	@Override
 	public ObjectType getType() {
 		return ObjectType.service;
 	}
+
 }

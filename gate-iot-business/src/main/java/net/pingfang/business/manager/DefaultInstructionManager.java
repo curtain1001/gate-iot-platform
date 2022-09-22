@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
-
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.compress.utils.Lists;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Maps;
 
+import lombok.extern.slf4j.Slf4j;
 import net.pingfang.common.event.EventBusCenter;
 import net.pingfang.common.utils.JsonUtils;
 import net.pingfang.common.utils.StringUtils;
@@ -24,6 +25,7 @@ import net.pingfang.device.core.DeviceManager;
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.event.MessageUpEvent;
 import net.pingfang.device.core.instruction.DeviceInstruction;
+import net.pingfang.iot.common.FunctionMessage;
 import net.pingfang.iot.common.instruction.BusinessInstrParameter;
 import net.pingfang.iot.common.instruction.DeviceInstrParameter;
 import net.pingfang.iot.common.instruction.Instruction;
@@ -31,10 +33,15 @@ import net.pingfang.iot.common.instruction.InstructionManager;
 import net.pingfang.iot.common.instruction.InstructionParam;
 import net.pingfang.iot.common.instruction.InstructionProvider;
 import net.pingfang.iot.common.instruction.InstructionResult;
+import net.pingfang.iot.common.instruction.InstructionType;
 import net.pingfang.iot.common.instruction.ObjectType;
 import net.pingfang.iot.common.product.Product;
 import net.pingfang.iot.common.product.ProductSupports;
 import net.pingfang.servicecomponent.core.BusinessInstruction;
+import net.pingfang.servicecomponent.core.ServerManager;
+import reactor.core.publisher.EmitterProcessor;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
 
 /**
  * @author 王超
@@ -42,12 +49,15 @@ import net.pingfang.servicecomponent.core.BusinessInstruction;
  * @date 2022-07-06 15:55
  */
 @Component
+@Slf4j
 public class DefaultInstructionManager implements InstructionManager, BeanPostProcessor {
 
-	@Resource
-	private DeviceManager deviceManager;
-	@Resource
-	private EventBusCenter eventBusCenter;
+	private final EmitterProcessor<FunctionMessage> processor = EmitterProcessor.create(true);
+	private final FluxSink<FunctionMessage> sink = processor.sink(FluxSink.OverflowStrategy.BUFFER);
+
+	private final DeviceManager deviceManager;
+	private final ServerManager serverManager;
+	private final EventBusCenter eventBusCenter;
 	/**
 	 * 指令缓存 key:指令value
 	 */
@@ -58,6 +68,65 @@ public class DefaultInstructionManager implements InstructionManager, BeanPostPr
 	 * 指令代理
 	 */
 	private final Map<String, InstructionProvider> providerSupport = new ConcurrentHashMap<>();
+
+	public DefaultInstructionManager(DeviceManager deviceManager, ServerManager serverManager,
+			EventBusCenter eventBusCenter) {
+		this.deviceManager = deviceManager;
+		this.serverManager = serverManager;
+		this.eventBusCenter = eventBusCenter;
+
+		deviceManager.subscribe().subscribe(device -> {
+			device.subscribe(null).subscribe(x -> {
+				try {
+					List<Instruction> instructions = getInstruction(x.getProduct());
+					if (CollectionUtils.isNotEmpty(instructions)) {
+						Optional<Instruction> optional = instructions.stream()
+								.filter(i -> i.getInsType() == InstructionType.up && i.isSupport(x.getPayload()))
+								.findFirst();
+						optional.ifPresent(instruction -> eventBusCenter.postAsync(MessageUpEvent.builder() //
+								.laneId(x.getLaneId()) //
+								.product(x.getProduct())//
+								.deviceId(x.getDeviceId()) //
+								.instruction(instruction)//
+								.message(x.getPayload()) //
+								.type(x.getType())//
+								.build()));
+					}
+				} catch (Exception e) {
+					log.error("消费车道设备消息异常：", e);
+				}
+			});
+		});
+		serverManager.subscribe().subscribe(operator -> {
+			operator.subscribe(null).subscribe(x -> {
+				try {
+					List<Instruction> instructions = getInstruction(x.getProduct());
+					if (CollectionUtils.isNotEmpty(instructions)) {
+						Optional<Instruction> optional = instructions.stream()
+								.filter(i -> i.getInsType() == InstructionType.up && i.isSupport(x.getPayload()))
+								.findFirst();
+						optional.ifPresent(instruction -> eventBusCenter.postAsync(MessageUpEvent.builder() //
+								.laneId(x.getLaneId()) //
+								.product(x.getProduct())//
+								.deviceId(x.getDeviceId()) //
+								.instruction(instruction)//
+								.message(x.getPayload()) //
+								.type(x.getType())//
+								.build()));
+						received(x);
+					}
+				} catch (Exception e) {
+					log.error("消费服务消息异常：", e);
+				}
+			});
+		});
+
+	}
+
+	@Override
+	public Flux<FunctionMessage> subscribe(Long laneId, String deviceId, String instrName) {
+		return Flux.empty();
+	}
 
 	@Override
 	public InstructionResult exec(InstructionParam param) {
@@ -160,6 +229,14 @@ public class DefaultInstructionManager implements InstructionManager, BeanPostPr
 
 	public void deviceExecute(String deviceId, String value) {
 
+	}
+
+	public void received(FunctionMessage functionMessage) {
+		if (processor.getPending() > processor.getBufferSize() / 2) {
+			log.warn(" message pending {} ,drop message:{}", processor.getPending(), functionMessage.toString());
+			return;
+		}
+		sink.next(functionMessage);
 	}
 
 	@Override

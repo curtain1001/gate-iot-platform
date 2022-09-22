@@ -12,9 +12,9 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
 import net.pingfang.business.domain.BtpInstruction;
 import net.pingfang.business.service.IBtpInstructionService;
-import net.pingfang.device.core.manager.InstructionConfigManager;
 import net.pingfang.iot.common.instruction.FormatType;
 import net.pingfang.iot.common.instruction.InsEntity;
+import net.pingfang.iot.common.manager.InstructionConfigManager;
 import net.pingfang.iot.common.product.Product;
 
 /**

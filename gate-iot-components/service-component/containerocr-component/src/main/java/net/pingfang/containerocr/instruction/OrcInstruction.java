@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import net.pingfang.iot.common.instruction.InstructionResult;
 import net.pingfang.iot.common.instruction.InstructionType;
+import net.pingfang.iot.common.instruction.ObjectType;
 import net.pingfang.servicecomponent.core.BusinessInstruction;
 
 /**
@@ -28,6 +29,16 @@ public class OrcInstruction implements BusinessInstruction {
 	@Override
 	public InstructionType getInsType() {
 		return InstructionType.up;
+	}
+
+	@Override
+	public ObjectType getObjectType() {
+		return BusinessInstruction.super.getObjectType();
+	}
+
+	@Override
+	public boolean isSupport(Object object) {
+		return BusinessInstruction.super.isSupport(object);
 	}
 
 	@Override

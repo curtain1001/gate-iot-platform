@@ -137,24 +137,26 @@ public class ProcessTask {
 		processQueryWrapper.eq(FlowProcessInstance::getStatus, InstanceStatus.IN_PROGRESS.name());
 		FlowProcessInstance initInstance = processInstanceService.getOne(processQueryWrapper);
 		if (initInstance != null) {
+
 			this.instanceId = initInstance.getInstanceId();
 			LambdaQueryWrapper<FlowDeployment> queryWrapper = Wrappers.lambdaQuery();
 			queryWrapper.eq(FlowDeployment::getLaneId, this.laneId);
 			queryWrapper.eq(FlowDeployment::getDeployId, initInstance.getDeployId());
 			FlowDeployment deployment = this.deploymentService.getOne(queryWrapper);
+			// 流程节点及连线
 			setFlow(deployment);
 			LambdaQueryWrapper<FlowExecuteHistory> historyLambdaQueryWrapper = Wrappers.lambdaQuery();
 			historyLambdaQueryWrapper.eq(FlowExecuteHistory::getInstanceId, this.instanceId);
 			historyLambdaQueryWrapper.eq(FlowExecuteHistory::getStatus, ProcessStatus.WAIT.name());
 			List<FlowExecuteHistory> executeHistories = historyService.list(historyLambdaQueryWrapper);
 			if (executeHistories.isEmpty()) {
-				List<FlowNode> flowNodes = getStartNode(deployment);
+				List<FlowNode> startNode = getStartNode(deployment);
 				if (CollectionUtils.isEmpty(flowNodes)) {
 					log.error("流程有误：不存在开始节点");
 					throw new ServiceException("流程有误：不存在开始节点");
 				} else {
-					this.currentNodes.addAll(flowNodes);
-					this.startNode.addAll(flowNodes);
+					this.currentNodes.addAll(startNode);
+					this.startNode.addAll(startNode);
 				}
 			} else {
 				List<String> currentNodeIds = executeHistories.stream().map(FlowExecuteHistory::getNodeId)

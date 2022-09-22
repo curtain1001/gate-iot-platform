@@ -78,10 +78,14 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor,
 			networks.stream().flatMap(m -> m.values().stream()).filter(x -> !x.isAlive()).forEach(network -> {
 				NetworkProvider<Object> provider = providerSupport.get(network.getType().getId());
 				if (provider == null || !network.isAutoReload()) {
+					// 记录状态
+					configManager.update(network.getId(), "disabled");
 					return;
 				}
 				NetworkProperties properties = configManager.getConfig(network.getId());
 				if (properties != null && properties.isEnabled()) {
+					// 记录状态
+					configManager.update(network.getId(), "reboot");
 					try {
 						Object o = provider.createConfig(properties);
 						this.doCreate(provider, network.getId(), o);
@@ -218,19 +222,24 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor,
 	}
 
 	@Override
-	public void run(ApplicationArguments args) throws Exception {
-		List<NetworkProperties> networkProperties = configManager.getConfig();
-		networkProperties.stream().filter(x -> x.getControl() == Control.system && x.isEnabled()).forEach(pro -> {
-			NetworkProvider<Object> provider = providerSupport.get(pro.getNetworkType().getId());
-			Object o = null;
-			try {
-				o = provider.createConfig(pro);
-			} catch (Exception e) {
-				log.error("设备配置创建失败;", e);
-			}
-			Network network = doCreate(provider, pro.getId(), o);
-			log.info("网络设备：{}-{}---启动成功", network.getType(), network.getId());
-		});
+	public void run(ApplicationArguments args) {
+		try {
+			List<NetworkProperties> networkProperties = configManager.getConfig();
+			networkProperties.stream().filter(x -> x.getControl() == Control.system && x.isEnabled()).forEach(pro -> {
+				NetworkProvider<Object> provider = providerSupport.get(pro.getNetworkType().getId());
+				Object o = null;
+				try {
+					o = provider.createConfig(pro);
+				} catch (Exception e) {
+					log.error("网络组件配置创建失败;", e);
+				}
+				Network network = doCreate(provider, pro.getId(), o);
+				log.info("网络组件：{}-{}---启动成功", network.getType(), network.getId());
+			});
+		} catch (Exception e) {
+			log.error("网络组件启动失败：", e);
+		}
+
 	}
 
 	@Getter

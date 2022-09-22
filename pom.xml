@@ -33,7 +33,7 @@
         <velocity.version>2.3</velocity.version>
         <jwt.version>0.9.1</jwt.version>
         <jackson.version>2.12.3</jackson.version>
-        <liquibase.version>4.4.3</liquibase.version>
+        <liquibase.version>4.16.0</liquibase.version>
         <maven-liquibase-plugin>3.4.1</maven-liquibase-plugin>
         <mybatis-plus.version>3.4.2</mybatis-plus.version>
         <flowable.version>6.7.2</flowable.version>

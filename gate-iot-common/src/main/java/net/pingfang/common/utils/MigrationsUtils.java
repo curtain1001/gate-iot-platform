@@ -1,7 +1,5 @@
 package net.pingfang.common.utils;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,8 +17,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import java.util.stream.Stream;
+
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -31,13 +29,15 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
 
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class MigrationsUtils {
@@ -47,10 +47,9 @@ public class MigrationsUtils {
 		this.tempDir = tempDir;
 	}
 
-
 	public static String generate(List<String> changes) {
 		String including = changes.stream().map(c -> {
-			c = c.replaceFirst("/database","classpath:");
+//			c = c.replaceFirst("/database","classpath:");
 			return "<include file=\"" + c + "\" relativeToChangelogFile=\"true\" />";
 		}).collect(Collectors.joining("\r\n"));
 		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
@@ -60,7 +59,6 @@ public class MigrationsUtils {
 				+ "         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd\">\r\n" + including //
 				+ "</databaseChangeLog>";
 	}
-
 
 	/**
 	 *

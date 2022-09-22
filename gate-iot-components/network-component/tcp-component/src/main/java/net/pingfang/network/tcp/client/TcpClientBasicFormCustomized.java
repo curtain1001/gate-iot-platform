@@ -1,6 +1,7 @@
 package net.pingfang.network.tcp.client;
 
 import net.pingfang.iot.common.customizedsetting.Customized;
+import net.pingfang.network.tcp.parser.CustomizedOptions;
 
 /**
  * <p>
@@ -13,6 +14,7 @@ import net.pingfang.iot.common.customizedsetting.Customized;
 public enum TcpClientBasicFormCustomized implements Customized {
 	IP("host", "string", "", "ip地址", "", ""), //
 	PORT("port", "number", "", "端口号", "", ""), //
+	PARSER_TYPE("parserType", "customized", CustomizedOptions.parserTypeOptions(), "解析方式", "", ""), //
 	;
 
 	TcpClientBasicFormCustomized(String value, String type, String options, String label, String customizeType,

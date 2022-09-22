@@ -16,6 +16,10 @@ public class TableDataInfo implements Serializable {
 
 	/** 列表数据 */
 	private List<?> rows;
+	/**
+	 * 附带额外参数
+	 */
+	private Object params;
 
 	/** 消息状态码 */
 	private int code;
@@ -70,5 +74,13 @@ public class TableDataInfo implements Serializable {
 
 	public void setMsg(String msg) {
 		this.msg = msg;
+	}
+
+	public Object getParams() {
+		return params;
+	}
+
+	public void setParams(Object params) {
+		this.params = params;
 	}
 }

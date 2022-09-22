@@ -13,9 +13,9 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
 import net.pingfang.business.domain.BtpLaneConfig;
 import net.pingfang.business.service.IBtpLaneConfigService;
-import net.pingfang.device.core.manager.LaneConfigManager;
 import net.pingfang.iot.common.customizedsetting.Customized;
 import net.pingfang.iot.common.customizedsetting.values.DefaultCustomized;
+import net.pingfang.iot.common.manager.LaneConfigManager;
 
 /**
  * @author 王超

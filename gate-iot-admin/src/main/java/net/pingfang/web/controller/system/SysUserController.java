@@ -37,7 +37,7 @@ import net.pingfang.system.service.ISysUserService;
 /**
  * 用户信息
  *
- * @author ruoyi
+ * @author wangchao
  */
 @RestController
 @RequestMapping("/system/user")

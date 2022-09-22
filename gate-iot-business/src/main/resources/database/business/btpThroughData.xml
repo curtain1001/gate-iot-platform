@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <property name="blob.type" dbms="mssql" value="varbinary(max)" />
+    <property name="blob.type" dbms="mysql" value="longblob" />
+    <property name="blob.type" dbms="h2" value="blob" />
+
+    <property name="clob.type" dbms="mssql" value="varchar(max)" />
+    <property name="clob.type" dbms="mysql" value="longtext" />
+    <property name="clob.type" dbms="h2" value="longtext" />
+    <property name="autoIncrement" value="true" dbms="h2" />
+
+    <changeSet author="wangchao" id="btpThroughData::create">
+        <createTable tableName="btp_through_data" remarks="过车流程数据">
+            <column name="data_id" remarks="主键" type="BIGINT(20)" startWith="1" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="work_id" type="varchar(64)" remarks="数据id" />
+            <column name="lane_no" type="varchar(24)" remarks="车道号" />
+            <column name="area_no" type="varchar(24)" remarks="箱区号" />
+            <column name="custom_no" type="varchar(24)" remarks="海关通关号" />
+            <column name="license_plate" type="varchar(64)" remarks="车牌号 多个车牌 '-' 隔开" />
+            <column name="in_exit_flag" type="char(1)" remarks="进出闸类型" />
+            <column name="data" type="${clob.type}" remarks="数据" />
+            <column name="create_by" defaultValue="" remarks="创建者" type="VARCHAR(64)" />
+            <column name="create_time" remarks="创建时间" type="datetime(6)" />
+            <column name="update_by" defaultValue="" remarks="更新者" type="VARCHAR(64)" />
+            <column name="update_time" remarks="更新时间" type="datetime(6)" />
+            <column name="remark" remarks="备注" type="VARCHAR(500)" />
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

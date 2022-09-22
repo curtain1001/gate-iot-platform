@@ -37,6 +37,8 @@ public class TcpClientProperties implements ValueObject {
 
 	private boolean enabled;
 
+	private boolean KeepAlive;
+
 	@Override
 	public Map<String, Object> values() {
 		return parserConfiguration;

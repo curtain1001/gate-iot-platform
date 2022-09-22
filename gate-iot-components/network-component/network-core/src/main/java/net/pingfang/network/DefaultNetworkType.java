@@ -39,27 +39,4 @@ public enum DefaultNetworkType implements NetworkType {
 	public String getId() {
 		return name();
 	}
-
-	//
-//	@Override
-//	public String getText() {
-//		return name;
-//	}
-//
-//	@Override
-//	public String getValue() {
-//		return name();
-//	}
-//
-//	@Override
-//	public Object getWriteJSONObject() {
-//		if (isWriteJSONObjectEnabled()) {
-//			Map<String, Object> jsonObject = new HashMap<>();
-//			jsonObject.put("value", getValue());
-//			jsonObject.put("text", getText());
-//			jsonObject.put("name", getText());
-//			return jsonObject;
-//		}
-//		return name();
-//	}
 }

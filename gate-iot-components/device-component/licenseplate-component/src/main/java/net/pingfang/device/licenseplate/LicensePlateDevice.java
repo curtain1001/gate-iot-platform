@@ -10,11 +10,13 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.DeviceState;
+import net.pingfang.device.licenseplate.instruction.RecvReport;
 import net.pingfang.device.licenseplate.values.ImageRecvInfo;
 import net.pingfang.device.licenseplate.values.ResultCode;
 import net.pingfang.device.licenseplate.values.StatusCode;
 import net.pingfang.iot.common.FunctionMessage;
 import net.pingfang.iot.common.MessagePayloadType;
+import net.pingfang.iot.common.instruction.InstructionManager;
 import net.pingfang.iot.common.product.Product;
 import net.sdk.bean.basicconfig.reportmess.Data_T_IOStateRsp;
 import net.sdk.bean.serviceconfig.imagesnap.Data_T_DCImageSnap.T_DCImageSnap;
@@ -44,14 +46,17 @@ public class LicensePlateDevice implements DeviceOperator {
 	final String deviceId;
 	final Long laneId;
 	final String deviceName;
+	private final InstructionManager instructionManager;
 	private final EmitterProcessor<FunctionMessage> processor = EmitterProcessor.create(true);
 	private final FluxSink<FunctionMessage> sink = processor.sink(FluxSink.OverflowStrategy.BUFFER);
 
-	public LicensePlateDevice(Long laneId, String deviceId, String deviceName, NET net) {
+	public LicensePlateDevice(Long laneId, String deviceId, String deviceName, NET net,
+			InstructionManager instructionManager) {
 		this.deviceId = deviceId;
 		this.laneId = laneId;
 		this.deviceName = deviceName;
 		this.net = net;
+		this.instructionManager = instructionManager;
 	}
 
 	public void init(String ip, short port, short timeout) {
@@ -127,8 +132,14 @@ public class LicensePlateDevice implements DeviceOperator {
 	}
 
 	@Override
-	public Flux<FunctionMessage> subscribe() {
-		return processor.map(Function.identity()).cast(FunctionMessage.class);
+	public Flux<FunctionMessage> subscribe(Long laneId) {
+		return processor.map(Function.identity()).cast(FunctionMessage.class).filterWhen(x -> {
+			if (laneId != null) {
+				return Mono.just(laneId.equals(x.getLaneId()));
+			} else {
+				return Mono.just(true);
+			}
+		});
 	}
 
 	@Override
@@ -274,8 +285,10 @@ public class LicensePlateDevice implements DeviceOperator {
 							.product(LicensePlateProduct.OCR_License_Plate)//
 							.type(MessagePayloadType.JSON)//
 							.build();//
-
 					Mono.just(functionMessage).subscribe(x -> received(x));
+
+					RecvReport recvReport = (RecvReport) instructionManager.getInstruction("RECV_REPORT");
+					recvReport.received(functionMessage);
 				} catch (UnsupportedEncodingException e) {
 					log.error("获取车辆识别信息失败", e);
 				}

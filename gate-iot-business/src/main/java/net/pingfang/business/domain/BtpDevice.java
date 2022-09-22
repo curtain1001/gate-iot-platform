@@ -89,7 +89,7 @@ public class BtpDevice extends BaseEntity {
 	public NetworkProperties toNetworkProperties() {
 		NetworkProperties properties = new NetworkProperties();
 		properties.setConfigurations(this.configuration);
-		properties.setEnabled(this.status == 0);
+		properties.setEnabled(this.enabled == 0);
 		properties.setId(this.deviceId);
 		properties.setName(this.deviceName);
 		return properties;

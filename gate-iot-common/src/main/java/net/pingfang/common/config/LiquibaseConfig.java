@@ -1,15 +1,12 @@
 package net.pingfang.common.config;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.Collection;
+import java.rmi.RemoteException;
 import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.Resource;
@@ -18,14 +15,10 @@ import javax.sql.DataSource;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResourceLoader;
-
-import com.google.common.io.Files;
+import org.springframework.core.io.DefaultResourceLoader;
 
 import liquibase.integration.spring.SpringLiquibase;
 import lombok.extern.slf4j.Slf4j;
-import net.pingfang.common.utils.MigrationsUtils;
 
 @Configuration
 @ConditionalOnBean(value = LiquibaseProperties.class)
@@ -38,51 +31,64 @@ public class LiquibaseConfig {
 
 	@Bean("liquibase")
 	public SpringLiquibase liquibase(DataSource dataSource) throws IOException {
-		List<String> paths = properties.getChangelog();
-		MigrationsUtils migrationsUtils = new MigrationsUtils(com.google.common.io.Files.createTempDir());
-		List<String> files = paths.stream().map(migrationsUtils::writeResourceToMigrationDirectory)
-				.flatMap(Collection::stream).collect(Collectors.toList());
-		String str = MigrationsUtils.generate(files);
-
-		ClassPathResource resource = new ClassPathResource("database/migrations.xml");
-		// 获取文件
-		File file = resource.getFile();
-		Files.write(str.getBytes(StandardCharsets.UTF_8), file);
-		log.info("Dynamic Migration File: {}", file.getAbsolutePath());
-
+//		File temDir = com.google.common.io.Files.createTempDir();
+//		List<String> paths = properties.getChangelog();
+//		MigrationsUtils migrationsUtils = new MigrationsUtils(temDir);
+//		List<String> files = paths.stream().map(migrationsUtils::writeResourceToMigrationDirectory)
+//				.flatMap(Collection::stream).collect(Collectors.toList());
+//		String str = MigrationsUtils.generate(files);
+//		File file = new File(temDir, "migrations.xml");
+//		// 获取文件
+//		Files.write(str.getBytes(StandardCharsets.UTF_8), file);
+//		log.info("Dynamic Migration File: {}", file.getAbsolutePath());
 		SpringLiquibase liquibase = new SpringLiquibase();
 		liquibase.setDataSource(dataSource);
-		liquibase.setChangeLog("classpath:database/migrations.xml");
-		liquibase.setResourceLoader(new FileSystemResourceLoader());
-		liquibase.setShouldRun(true);
+		liquibase.setChangeLog("classpath:database/changelog.xml");
+		liquibase.setResourceLoader(new DefaultResourceLoader());
+//		liquibase.setShouldRun(file.exists());
+//		directory(temDir);
+		return liquibase;
+	}
 
+	/**
+	 * 创建临时文本文件
+	 *
+	 * @param txt 内容
+	 * @return
+	 * @throws IOException
+	 */
+	public static File craeteTempFileTxt(String txt) throws IOException {
+		File temp = File.createTempFile("data_", ".xml");
+		temp.deleteOnExit();
+		BufferedWriter out = new BufferedWriter(new FileWriter(temp));
+		out.write(txt);
+		out.close();
+		if (temp.exists()) {
+			log.info("文件存在");
+			String name = temp.getName();
+			String absolutePath = temp.getAbsolutePath();
+			log.info("文件名称:" + name);
+			log.info("文件路径" + absolutePath);
+			return temp;
+		} else {
+			log.info("文件不存在");
+			throw new RemoteException("文件不存在");
+		}
+	}
+
+	public void directory(File file) {
 		// cleanup directory on exit
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
 				try (Stream<Path> dir = java.nio.file.Files.walk(file.toPath())) {
 					dir.sorted(Comparator.reverseOrder()) //
-							.map(x -> {
-								try {
-									return new FileWriter(x.toFile());
-								} catch (IOException e) {
-									e.printStackTrace();
-									return null;
-								}
-							}).filter(Objects::nonNull) //
-							.forEach(x -> {
-								try {
-									x.write("");
-								} catch (IOException e) {
-									e.printStackTrace();
-								}
-							});
+							.map(Path::toFile) //
+							.forEach(File::delete);
 				} catch (IOException e) {
 					log.error("Shutdown Cleanup Error", e);
 				}
 			}
 		});
-
-		return liquibase;
 	}
 }

@@ -9,6 +9,7 @@ import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.DeviceState;
 import net.pingfang.iot.common.FunctionMessage;
 import net.pingfang.iot.common.MessagePayloadType;
+import net.pingfang.iot.common.instruction.InstructionManager;
 import net.pingfang.iot.common.product.Product;
 import net.pingfang.network.DefaultNetworkType;
 import net.pingfang.network.NetworkManager;
@@ -31,12 +32,15 @@ public class PLCDevice implements DeviceOperator {
 	final String deviceName;
 	private TcpClient tcpClient;
 	final NetworkManager networkManager;
+	final InstructionManager instructionManager;
 
-	public PLCDevice(Long laneId, String deviceId, String deviceName, NetworkManager networkManager) {
+	public PLCDevice(Long laneId, String deviceId, String deviceName, NetworkManager networkManager,
+			InstructionManager instructionManager) {
 		this.deviceId = deviceId;
 		this.laneId = laneId;
 		this.deviceName = deviceName;
 		this.networkManager = networkManager;
+		this.instructionManager = instructionManager;
 	}
 
 	@Override
@@ -71,9 +75,20 @@ public class PLCDevice implements DeviceOperator {
 	}
 
 	@Override
-	public Flux<FunctionMessage> subscribe() {
-		return tcpClient.subscribe().map(x -> new FunctionMessage(laneId, deviceId, PLCProduct.PLC,
-				BytesUtils.getBufHexStr(x.payloadAsBytes()), MessagePayloadType.STRING));
+	public Flux<FunctionMessage> subscribe(Long laneId) {
+		return tcpClient.subscribe() //
+				.map(x -> new FunctionMessage(this.laneId, deviceId, PLCProduct.PLC, //
+						BytesUtils.getBufHexStr(x.payloadAsBytes()), MessagePayloadType.STRING)) //
+//				.doOnNext(x -> {
+//					List<Instruction> instructions = instructionManager.getInstruction(PLCProduct.PLC);
+//				}) //
+				.filterWhen(x -> {
+					if (laneId != null) {
+						return Mono.just(laneId.equals(x.getLaneId()));
+					} else {
+						return Mono.just(true);
+					}
+				});
 	}
 
 	public Mono<Boolean> send(TcpMessage message) {

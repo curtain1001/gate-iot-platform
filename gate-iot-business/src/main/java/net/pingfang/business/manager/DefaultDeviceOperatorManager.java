@@ -5,17 +5,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.annotation.Resource;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.ApplicationArguments;
@@ -23,17 +21,16 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
-import net.pingfang.common.event.EventBusCenter;
+import net.pingfang.common.utils.JsonUtils;
 import net.pingfang.device.core.DeviceManager;
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.DeviceProperties;
 import net.pingfang.device.core.DeviceProvider;
-import net.pingfang.device.core.event.MessageUpEvent;
 import net.pingfang.device.core.manager.DeviceConfigManager;
-import net.pingfang.iot.common.instruction.Instruction;
-import net.pingfang.iot.common.instruction.InstructionType;
 import net.pingfang.iot.common.product.Product;
+import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
 
 /**
  * @author 王超
@@ -44,11 +41,14 @@ import reactor.core.publisher.Flux;
 @Slf4j
 public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProcessor, ApplicationRunner {
 
-	@Resource
-	EventBusCenter eventBusCenter;
+//	@Resource
+//	EventBusCenter eventBusCenter;
+//
+//	@Resource
+//	DefaultInstructionManager instructionManager;
 
-	@Resource
-	DefaultInstructionManager instructionManager;
+	private final EmitterProcessor<DeviceOperator> processor = EmitterProcessor.create(true);
+	private final FluxSink<DeviceOperator> sink = processor.sink(FluxSink.OverflowStrategy.BUFFER);
 
 	/**
 	 * 设备代理
@@ -57,7 +57,7 @@ public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProc
 	/**
 	 * 车道设备对象缓存
 	 */
-	private final Map<Long, Map<String, DeviceOperator>> store = new ConcurrentHashMap<>();
+	private final Map<Long/* 车道id */, Map<String/* 设备号 */, DeviceOperator>> store = new ConcurrentHashMap<>();
 
 	/**
 	 * 设备配置管理器
@@ -96,6 +96,7 @@ public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProc
 		DeviceOperator deviceOperator = operatorMap.get(deviceId);
 		if (deviceOperator == null || !deviceOperator.isAlive()) {
 			deviceOperator = createDeviceOperator(type, deviceId);
+			this.received(deviceOperator);
 		}
 		return deviceOperator;
 
@@ -105,6 +106,12 @@ public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProc
 	public <T extends DeviceOperator> DeviceOperator getDevice(Long laneId, String deviceId) {
 		Map<String, DeviceOperator> operatorMap = getDeviceStore(laneId);
 		return operatorMap.get(deviceId);
+	}
+
+	@Override
+	public <T extends DeviceOperator> List<DeviceOperator> getDevices(Product product) {
+		return store.values().stream().flatMap(x -> x.values().stream()).filter(x -> x.getProduct() == product)
+				.collect(Collectors.toList());
 	}
 
 	public DeviceOperator createDeviceOperator(Product type, String id) {
@@ -137,35 +144,36 @@ public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProc
 			if (operator == null) {
 				operator = provider.createDevice(properties);
 				log.info("设备启动成功：deviceId:{},deviceName:{}", operator.getDeviceId(), operator.getDeviceName());
-				// 发布事件
-				operator.subscribe().doOnError(x -> log.error("订阅设备消息异常：" + x.getMessage())).subscribe(x -> {
-					try {
-						List<Instruction> instructions = instructionManager.getInstruction(x.getProduct());
-						if (CollectionUtils.isNotEmpty(instructions)) {
-							Optional<Instruction> optional = instructions.stream()
-									.filter(i -> i.getInsType() == InstructionType.up && i.isSupport(x.getPayload()))
-									.findFirst();
-							optional.ifPresent(instruction -> eventBusCenter.postAsync(MessageUpEvent.builder() //
-									.laneId(x.getLaneId()) //
-									.product(x.getProduct())//
-									.deviceId(x.getDeviceId()) //
-									.instruction(instruction)//
-									.message(x.getPayload()) //
-									.type(x.getType())//
-									.build()));
-						} else {
-							eventBusCenter.postAsync(MessageUpEvent.builder() //
-									.laneId(x.getLaneId()) //
-									.product(x.getProduct())//
-									.deviceId(x.getDeviceId()) //
-									.message(x.getPayload()) //
-									.type(x.getType())//
-									.build());
-						}
-					} catch (Exception e) {
-						log.error("消费车道设备消息异常：", e);
-					}
-				});
+//				// 发布事件
+//				operator.subscribe(1L).subscribe(x -> log.warn("订阅1车道的设备"));
+//				operator.subscribe(null).doOnError(x -> log.error("订阅设备消息异常：" + x.getMessage())).subscribe(x -> {
+//					try {
+//						List<Instruction> instructions = instructionManager.getInstruction(x.getProduct());
+//						if (CollectionUtils.isNotEmpty(instructions)) {
+//							Optional<Instruction> optional = instructions.stream()
+//									.filter(i -> i.getInsType() == InstructionType.up && i.isSupport(x.getPayload()))
+//									.findFirst();
+//							optional.ifPresent(instruction -> eventBusCenter.postAsync(MessageUpEvent.builder() //
+//									.laneId(x.getLaneId()) //
+//									.product(x.getProduct())//
+//									.deviceId(x.getDeviceId()) //
+//									.instruction(instruction)//
+//									.message(x.getPayload()) //
+//									.type(x.getType())//
+//									.build()));
+//						} else {
+//							eventBusCenter.postAsync(MessageUpEvent.builder() //
+//									.laneId(x.getLaneId()) //
+//									.product(x.getProduct())//
+//									.deviceId(x.getDeviceId()) //
+//									.message(x.getPayload()) //
+//									.type(x.getType())//
+//									.build());
+//						}
+//					} catch (Exception e) {
+//						log.error("消费车道设备消息异常：", e);
+//					}
+//				});
 			} else {
 				// 单例，已经存在则重新加载
 				provider.reload(operator, properties);
@@ -200,6 +208,11 @@ public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProc
 			return null;
 		});
 		getDeviceStore(laneId).remove(deviceId);
+	}
+
+	@Override
+	public Flux<DeviceOperator> subscribe() {
+		return processor.map(Function.identity());
 	}
 
 	public void register(DeviceProvider<Object> provider) {
@@ -259,13 +272,18 @@ public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProc
 	}
 
 	protected void startDevice() {
+
 		List<DeviceProperties> properties = deviceConfigManager.getProperties();
 		properties.stream().filter(DeviceProperties::isEnabled).forEach(pro -> {
-			DeviceProvider<Object> provider = providerSupport.get(pro.getProduct().getName());
-			if (pro.isEnabled()) {
-				Object o = provider.createConfig(pro);
-				this.doCreate(provider, pro.getLaneId(), pro.getDeviceId(), o);
-			}
+			this.create(pro.getLaneId(), pro.getDeviceId(), pro.getProduct());
 		});
+	}
+
+	public void received(DeviceOperator operator) {
+		if (processor.getPending() > processor.getBufferSize() / 2) {
+			log.warn(" message pending {} ,drop message:{}", processor.getPending(), JsonUtils.toJsonString(operator));
+			return;
+		}
+		sink.next(operator);
 	}
 }

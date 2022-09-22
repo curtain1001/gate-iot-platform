@@ -20,6 +20,8 @@ public enum PayloadParserType {
 
 	PLC("自定义PLC设备"), //
 
+	OCR("箱号识别"), //
+
 	LED("诺瓦LED");
 
 	private final String text;

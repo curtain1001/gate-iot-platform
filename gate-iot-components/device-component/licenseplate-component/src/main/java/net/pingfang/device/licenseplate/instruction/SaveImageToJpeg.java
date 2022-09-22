@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.instruction.DeviceInstruction;
-import net.pingfang.device.core.manager.LaneConfigManager;
 import net.pingfang.device.licenseplate.LicensePlateDevice;
 import net.pingfang.device.licenseplate.LicensePlateProduct;
 import net.pingfang.device.licenseplate.values.StatusCode;
@@ -19,6 +18,7 @@ import net.pingfang.iot.common.customizedsetting.values.DefaultCustomized;
 import net.pingfang.iot.common.instruction.InstructionResult;
 import net.pingfang.iot.common.instruction.InstructionType;
 import net.pingfang.iot.common.instruction.ObjectType;
+import net.pingfang.iot.common.manager.LaneConfigManager;
 import net.pingfang.iot.common.product.Product;
 
 /**

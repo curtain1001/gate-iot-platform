@@ -1,5 +1,7 @@
 package net.pingfang.iot.common.instruction;
 
+import net.pingfang.iot.common.FunctionMessage;
+
 /**
  * @author 王超
  * @description 指令
@@ -34,6 +36,15 @@ public interface Instruction {
 	 * @return
 	 */
 	InstructionType getInsType();
+
+	/**
+	 * 触发指令
+	 *
+	 * @param functionMessage 指令消息
+	 */
+	default void received(FunctionMessage functionMessage) {
+
+	}
 
 	/**
 	 * 指令匹配

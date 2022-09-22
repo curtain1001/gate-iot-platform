@@ -46,7 +46,7 @@ public class BtpNetworkConfig extends BaseEntity implements Serializable {
 
 	private String name;
 
-	private boolean enabled;
+	private int enabled;
 
 	@NotNull(message = "类型不能为空")
 	private String type;
@@ -67,7 +67,7 @@ public class BtpNetworkConfig extends BaseEntity implements Serializable {
 	public NetworkProperties toNetworkProperties() {
 		NetworkProperties properties = new NetworkProperties();
 		properties.setConfigurations(configuration);
-		properties.setEnabled(status == NetworkConfigState.enabled);
+		properties.setEnabled(enabled == 0);
 		properties.setId(networkConfigId);
 		properties.setName(name);
 		properties.setControl(control);

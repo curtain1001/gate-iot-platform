@@ -29,10 +29,20 @@ public class EventBusCenter implements BeanPostProcessor {
 	// 管理异步事件
 	private AsyncEventBus asyncEventBus = new AsyncEventBus(Executors.newCachedThreadPool());
 
+	/**
+	 * 发布同步事件
+	 *
+	 * @param event
+	 */
 	public void postSync(Object event) {
 		syncEventBus.post(event);
 	}
 
+	/**
+	 * 发布异步事件
+	 *
+	 * @param event
+	 */
 	public void postAsync(Object event) {
 		asyncEventBus.post(event);
 	}
