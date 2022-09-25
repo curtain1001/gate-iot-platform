@@ -27,6 +27,8 @@ public enum DefaultNetworkType implements NetworkType {
 
 	COAP_CLIENT("CoAP客户端"), //
 	COAP_SERVER("CoAP服务"), //
+
+	LP_DLL("识别相机服务"), //
 	INTERNAL("内置服务"),;
 
 	static {

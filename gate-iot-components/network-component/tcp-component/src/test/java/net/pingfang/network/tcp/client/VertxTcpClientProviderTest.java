@@ -1,20 +1,22 @@
 package net.pingfang.network.tcp.client;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+
+import org.junit.Test;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.net.NetClientOptions;
-import net.pingfang.network.tcp.TcpMessage;
+import lombok.extern.slf4j.Slf4j;
+import net.pingfang.network.NetworkMessage;
 import net.pingfang.network.tcp.parser.DefaultPayloadParserBuilder;
 import net.pingfang.network.tcp.parser.PayloadParserType;
 import reactor.test.StepVerifier;
 
 //@RunWith(SpringRunner.class)
-//@Slf4j
+@Slf4j
 public class VertxTcpClientProviderTest {
 
-//	@Test
+	@Test
 	public void test() {
 		Vertx vertx = Vertx.vertx();
 
@@ -32,9 +34,8 @@ public class VertxTcpClientProviderTest {
 		properties.setParserConfiguration(Collections.singletonMap("size", 4));
 		properties.setOptions(new NetClientOptions());
 
-		provider.createNetwork(properties).subscribe().map(TcpMessage::getPayload)
-				.map(buf -> buf.toString(StandardCharsets.UTF_8)).take(2).as(StepVerifier::create)
-				.expectNext("test", "test").verifyComplete();
+		provider.createNetwork(properties).subscribe().map(NetworkMessage::payloadAsString).take(2)
+				.as(StepVerifier::create).expectNext("test", "test").verifyComplete();
 
 	}
 

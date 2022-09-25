@@ -1,6 +1,5 @@
 package net.pingfang.network.tcp.server;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -9,8 +8,7 @@ import org.junit.jupiter.api.Test;
 import io.vertx.core.Vertx;
 import io.vertx.core.net.NetServerOptions;
 import lombok.extern.slf4j.Slf4j;
-import net.pingfang.network.tcp.TcpMessage;
-import net.pingfang.network.tcp.client.TcpClient;
+import net.pingfang.network.NetworkMessage;
 import net.pingfang.network.tcp.parser.DefaultPayloadParserBuilder;
 import net.pingfang.network.tcp.parser.PayloadParserType;
 import reactor.test.StepVerifier;
@@ -26,7 +24,8 @@ class TcpServerProviderTest {
 				.options(new NetServerOptions()).parserType(PayloadParserType.FIXED_LENGTH)
 				.parserConfiguration(Collections.singletonMap("size", 5)).build();
 
-		TcpServerProvider provider = new TcpServerProvider(null, Vertx.vertx(), new DefaultPayloadParserBuilder());
+		TcpServerProvider provider = new TcpServerProvider(null, Vertx.vertx(), new DefaultPayloadParserBuilder(),
+				null);
 
 		tcpServer = provider.createNetwork(properties);
 	}
@@ -49,8 +48,7 @@ class TcpServerProviderTest {
 			}
 		});
 
-		tcpServer.handleConnection().flatMap(TcpClient::subscribe).map(TcpMessage::getPayload)
-				.map(payload -> payload.toString(StandardCharsets.UTF_8)).take(2).as(StepVerifier::create)
+		tcpServer.subscribe().map(NetworkMessage::payloadAsString).take(2).as(StepVerifier::create)
 				.expectNext("hello", "hello")// 收到2个完整的包
 				.verifyComplete();
 	}

@@ -19,6 +19,7 @@
     <modules>
         <module>network-core</module>
         <module>tcp-component</module>
+        <module>dll-component</module>
     </modules>
 
     <dependencies>

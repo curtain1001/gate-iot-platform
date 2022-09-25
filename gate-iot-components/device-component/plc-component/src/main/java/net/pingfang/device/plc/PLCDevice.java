@@ -5,6 +5,7 @@ import java.util.Map;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.ByteBufUtil;
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.DeviceState;
 import net.pingfang.iot.common.FunctionMessage;
@@ -78,10 +79,8 @@ public class PLCDevice implements DeviceOperator {
 	public Flux<FunctionMessage> subscribe(Long laneId) {
 		return tcpClient.subscribe() //
 				.map(x -> new FunctionMessage(this.laneId, deviceId, PLCProduct.PLC, //
-						BytesUtils.getBufHexStr(x.payloadAsBytes()), MessagePayloadType.STRING)) //
-//				.doOnNext(x -> {
-//					List<Instruction> instructions = instructionManager.getInstruction(PLCProduct.PLC);
-//				}) //
+						BytesUtils.getBufHexStr(ByteBufUtil.getBytes((ByteBuf) x.getPayload())),
+						MessagePayloadType.STRING)) //
 				.filterWhen(x -> {
 					if (laneId != null) {
 						return Mono.just(laneId.equals(x.getLaneId()));

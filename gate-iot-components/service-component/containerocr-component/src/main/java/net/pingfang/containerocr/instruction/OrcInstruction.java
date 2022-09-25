@@ -38,7 +38,7 @@ public class OrcInstruction implements BusinessInstruction {
 
 	@Override
 	public boolean isSupport(Object object) {
-		return BusinessInstruction.super.isSupport(object);
+		return true;
 	}
 
 	@Override

@@ -53,9 +53,6 @@ public interface Instruction {
 	 * @return
 	 */
 	default boolean isSupport(Object object) {
-		if (InstructionType.down.equals(getInsType())) {
-			return false;
-		}
-		throw new RuntimeException("未实现匹配规则");
+		return false;
 	}
 }

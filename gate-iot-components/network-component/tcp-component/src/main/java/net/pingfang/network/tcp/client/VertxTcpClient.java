@@ -18,8 +18,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.pingfang.iot.common.EncodedMessage;
+import net.pingfang.iot.common.MessagePayloadType;
 import net.pingfang.iot.common.network.NetworkType;
 import net.pingfang.network.DefaultNetworkType;
+import net.pingfang.network.NetworkMessage;
 import net.pingfang.network.tcp.TcpMessage;
 import net.pingfang.network.tcp.parser.PayloadParser;
 import reactor.core.publisher.EmitterProcessor;
@@ -33,18 +35,22 @@ public class VertxTcpClient implements TcpClient {
 	@Getter
 	private final String id;
 	private final List<Runnable> disconnectListener = new CopyOnWriteArrayList<>();
-	private final EmitterProcessor<TcpMessage> processor = EmitterProcessor.create(true);
-	private final FluxSink<TcpMessage> sink = processor.sink(FluxSink.OverflowStrategy.BUFFER);
+	private final EmitterProcessor<NetworkMessage> processor = EmitterProcessor.create(true);
+	private final FluxSink<NetworkMessage> sink = processor.sink(FluxSink.OverflowStrategy.BUFFER);
 	private final boolean serverClient;
 	public volatile NetClient client;
 	public NetSocket socket;
 	volatile PayloadParser payloadParser;
+	private final String deviceId;
+	private final Long laneId;
 	@Setter
 	private long keepAliveTimeoutMs = Duration.ofMinutes(10).toMillis();
 	private volatile long lastKeepAliveTime = System.currentTimeMillis();
 
-	public VertxTcpClient(String id, boolean serverClient) {
+	public VertxTcpClient(String id, Long laneId, boolean serverClient) {
 		this.id = id;
+		this.deviceId = id; // 设备id = 组件id
+		this.laneId = laneId;
 		this.serverClient = serverClient;
 	}
 
@@ -115,7 +121,7 @@ public class VertxTcpClient implements TcpClient {
 	 *
 	 * @param message TCP消息
 	 */
-	protected void received(TcpMessage message) {
+	protected void received(NetworkMessage message) {
 		if (processor.getPending() > processor.getBufferSize() / 2) {
 			log.warn("net.pingfang.gateiot.network.tcp [{}] message pending {} ,drop message:{}",
 					processor.getPending(), getRemoteAddress(), message.toString());
@@ -125,7 +131,7 @@ public class VertxTcpClient implements TcpClient {
 	}
 
 	@Override
-	public Flux<TcpMessage> subscribe() {
+	public Flux<NetworkMessage> subscribe() {
 		return processor.map(Function.identity());
 	}
 
@@ -195,7 +201,14 @@ public class VertxTcpClient implements TcpClient {
 			this.payloadParser = payloadParser;
 			this.payloadParser.handlePayload().onErrorContinue((err, res) -> {
 				log.error(err.getMessage(), err);
-			}).subscribe(buffer -> received(new TcpMessage(buffer.getByteBuf())));
+			}).subscribe(buffer -> {
+				received(NetworkMessage.builder() //
+						.deviceId(deviceId)//
+						.laneId(laneId)//
+						.payload(buffer.getBytes())//
+						.payloadType(MessagePayloadType.BINARY)//
+						.build());
+			});
 		}
 	}
 

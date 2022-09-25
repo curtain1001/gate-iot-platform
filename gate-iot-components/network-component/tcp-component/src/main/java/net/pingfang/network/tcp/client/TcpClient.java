@@ -5,6 +5,7 @@ import java.time.Duration;
 
 import net.pingfang.iot.common.ClientConnection;
 import net.pingfang.network.Network;
+import net.pingfang.network.NetworkMessage;
 import net.pingfang.network.tcp.TcpMessage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -29,7 +30,7 @@ public interface TcpClient extends Network, ClientConnection {
 	 *
 	 * @return TCP消息
 	 */
-	Flux<TcpMessage> subscribe();
+	Flux<NetworkMessage> subscribe();
 
 	/**
 	 * 向客户端发送数据

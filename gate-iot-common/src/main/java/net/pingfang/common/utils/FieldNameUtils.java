@@ -33,8 +33,8 @@ public class FieldNameUtils {
 				if (attr != null) {
 					field.setAccessible(true);
 					fields.add(Column.builder() //
-							.columnName(field.getName()) //
-							.columnValue(attr.value()) //
+							.columnName(attr.value()) //
+							.columnValue(field.getName()) //
 							.build());
 				}
 			}

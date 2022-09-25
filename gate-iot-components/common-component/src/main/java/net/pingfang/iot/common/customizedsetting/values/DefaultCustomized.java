@@ -22,7 +22,7 @@ public enum DefaultCustomized implements Customized {
 	UPLOAD_INTERVAL_SECOND("UPLOAD_INTERVAL_SECOND", "number", "", "设备状态报文上传间隔秒（毫秒）", "", ""), //
 	WORKING_SAVE_DAY("WORKING_SAVE_DAY", "number", "", "过车记录保存时间（天）", "", ""), //
 	LOG_SAVE_DAY("LOG_SAVE_DAY", "number", "", "日志保存时间（天）", "", ""), //
-	IP("IP", "string", "", "车道IP地址", "", ""),//
+	LANE_IP("LANE_IP", "string", "", "车道IP地址", "", ""),//
 	;
 
 	DefaultCustomized(String value, String type, String options, String label, String customizeType, Object defaults) {

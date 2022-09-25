@@ -4,12 +4,10 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import net.pingfang.containerocr.ContainerOcrProduct;
 import net.pingfang.iot.common.FunctionMessage;
-import net.pingfang.iot.common.MessagePayloadType;
 import net.pingfang.iot.common.instruction.InstructionManager;
 import net.pingfang.iot.common.product.Product;
 import net.pingfang.network.DefaultNetworkType;
 import net.pingfang.network.NetworkManager;
-import net.pingfang.network.tcp.client.TcpClient;
 import net.pingfang.network.tcp.server.TcpServer;
 import net.pingfang.servicecomponent.core.ServerOperator;
 import reactor.core.publisher.Flux;
@@ -74,8 +72,8 @@ public class ContainerOcrServer implements ServerOperator {
 	public Flux<FunctionMessage> subscribe(Long laneId) {
 		TcpServer tcpServer = (TcpServer) networkManager.getNetwork(DefaultNetworkType.TCP_SERVER, serverId);
 		if (tcpServer != null) {
-			return tcpServer.handleConnection().flatMap(TcpClient::subscribe).map(x -> new FunctionMessage(laneId, null,
-					ContainerOcrProduct.CONTAINER_OCR, x, MessagePayloadType.BINARY));
+			return tcpServer.subscribe().map(
+					x -> new FunctionMessage(laneId, null, ContainerOcrProduct.CONTAINER_OCR, x, x.getPayloadType()));
 		} else {
 			throw new RuntimeException("服务异常：网络组件未正常启动！");
 		}

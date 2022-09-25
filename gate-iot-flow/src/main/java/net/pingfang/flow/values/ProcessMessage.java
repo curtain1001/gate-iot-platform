@@ -20,7 +20,7 @@ public class ProcessMessage {
 	/**
 	 * 车道id
 	 */
-	private final long laneId;
+	private final Long laneId;
 	/**
 	 * 设备id
 	 */

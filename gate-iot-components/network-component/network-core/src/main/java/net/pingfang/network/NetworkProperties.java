@@ -16,6 +16,8 @@ public class NetworkProperties implements Serializable {
 
 	private String name;
 
+	private Long laneId;
+
 	private boolean enabled;
 
 	private Control control;

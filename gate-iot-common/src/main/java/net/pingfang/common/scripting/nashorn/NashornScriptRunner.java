@@ -35,7 +35,7 @@ import net.pingfang.common.scripting.ScriptRunner;
 @Slf4j
 public class NashornScriptRunner implements ScriptRunner {
 	static final ScriptEngineManager manager = new ScriptEngineManager();
-	static final ScriptEngine engine;
+	public static final ScriptEngine engine;
 	static final ObjectMapper objMapper;
 	static final String BIGNUMBER = "/js/bignumber.min.js";
 	static final String UTILS = "/js/utils.js";

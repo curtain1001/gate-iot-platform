@@ -9,19 +9,16 @@ import org.springframework.stereotype.Component;
 import com.google.common.eventbus.Subscribe;
 
 import lombok.extern.slf4j.Slf4j;
-import net.pingfang.common.event.EventBusCenter;
 import net.pingfang.common.event.EventBusListener;
 import net.pingfang.common.event.EventBusListener.Type;
 import net.pingfang.containerocr.ContainerOcrProduct;
 import net.pingfang.network.DefaultNetworkType;
 import net.pingfang.network.NetworkManager;
-import net.pingfang.network.tcp.TcpMessage;
-import net.pingfang.network.tcp.client.TcpClient;
+import net.pingfang.network.NetworkMessage;
 import net.pingfang.network.tcp.server.TcpServer;
 import net.pingfang.servicecomponent.core.SupportServerManager;
 import net.pingfang.servicecomponent.event.SupportServerEvent;
 import net.pingfang.servicecomponent.values.SupportConfigure;
-import reactor.core.Disposable;
 
 /**
  * <p>
@@ -39,10 +36,6 @@ public class ContainerOcr implements ApplicationRunner {
 	NetworkManager networkManager;
 	@Resource
 	SupportServerManager supportServerManager;
-	@Resource
-	EventBusCenter eventBusCenter;
-
-	private Disposable disposable;
 
 	@Subscribe
 	public void handler(SupportServerEvent event) {
@@ -53,13 +46,10 @@ public class ContainerOcr implements ApplicationRunner {
 				TcpServer tcpServer = (TcpServer) networkManager.getNetwork(DefaultNetworkType.TCP_SERVER,
 						configure.getNetworkId());
 				if (tcpServer != null) {
-					if (disposable != null) {
-						disposable.dispose();
-					}
-					tcpServer.handleConnection().flatMap(TcpClient::subscribe).map(TcpMessage::getPayload)
-							.subscribe(x -> {
-								log.info("箱号识别订阅:{}", x);
-							});
+
+					tcpServer.subscribe().map(NetworkMessage::getPayload).subscribe(x -> {
+						log.info("箱号识别订阅:{}", x);
+					});
 
 				}
 			}

@@ -9,10 +9,13 @@ import lombok.Setter;
 import net.pingfang.iot.common.EncodedMessage;
 
 /**
- * @author bsetfeng
- * @author zhouhao
- * @since 1.0
- **/
+ * <p>
+ *
+ * </p>
+ *
+ * @author 王超
+ * @since 2022-09-24 17:32
+ */
 @Getter
 @Setter
 @AllArgsConstructor

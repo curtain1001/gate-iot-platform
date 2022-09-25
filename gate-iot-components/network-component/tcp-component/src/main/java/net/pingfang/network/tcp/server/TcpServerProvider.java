@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.pingfang.common.utils.bean.BeanUtils;
 import net.pingfang.iot.common.customizedsetting.repos.CustomizedSettingRepository;
 import net.pingfang.iot.common.customizedsetting.values.CustomizedSettingData;
+import net.pingfang.iot.common.manager.LaneConfigManager;
 import net.pingfang.iot.common.network.NetworkType;
 import net.pingfang.network.DefaultNetworkType;
 import net.pingfang.network.Network;
@@ -44,11 +45,14 @@ public class TcpServerProvider implements NetworkProvider<TcpServerProperties> {
 
 	private final PayloadParserBuilder payloadParserBuilder;
 
+	private final LaneConfigManager configManager;
+
 	public TcpServerProvider(CertificateManager certificateManager, Vertx vertx,
-			PayloadParserBuilder payloadParserBuilder) {
+			PayloadParserBuilder payloadParserBuilder, LaneConfigManager configManager) {
 		this.certificateManager = certificateManager;
 		this.vertx = vertx;
 		this.payloadParserBuilder = payloadParserBuilder;
+		this.configManager = configManager;
 	}
 
 	@Nonnull
@@ -61,7 +65,7 @@ public class TcpServerProvider implements NetworkProvider<TcpServerProperties> {
 	@Override
 	public VertxTcpServer createNetwork(@Nonnull TcpServerProperties properties) {
 
-		VertxTcpServer tcpServer = new VertxTcpServer(properties.getId());
+		VertxTcpServer tcpServer = new VertxTcpServer(properties.getId(), properties.getLaneId(), configManager);
 		initTcpServer(tcpServer, properties);
 //		TcpServerMessageHandler messageHandler = new TcpServerMessageHandler(tcpServer);
 //		messageHandler.handler();
@@ -81,7 +85,6 @@ public class TcpServerProvider implements NetworkProvider<TcpServerProperties> {
 			instances.add(vertx.createNetServer(properties.getOptions()));
 		}
 		// 根据解析类型配置数据解析器
-		payloadParserBuilder.build(properties.getParserType(), properties);
 		tcpServer.setParserSupplier(() -> payloadParserBuilder.build(properties.getParserType(), properties));
 		tcpServer.setServer(instances);
 		tcpServer.setKeepAliveTimeout(properties.getLong("keepAliveTimeout", Duration.ofMinutes(10).toMillis()));
@@ -91,9 +94,9 @@ public class TcpServerProvider implements NetworkProvider<TcpServerProperties> {
 		for (NetServer netServer : instances) {
 			netServer.listen(properties.createSocketAddress(), result -> {
 				if (result.succeeded()) {
-					log.info("net.pingfang.gateiot.network.tcp server startup on {}", result.result().actualPort());
+					log.info("tcp server startup on {}", result.result().actualPort());
 				} else {
-					log.error("startup net.pingfang.gateiot.network.tcp server error", result.cause());
+					log.error("tcp server error", result.cause());
 				}
 			});
 		}

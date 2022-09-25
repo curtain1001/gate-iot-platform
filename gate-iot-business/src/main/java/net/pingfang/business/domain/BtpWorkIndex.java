@@ -11,8 +11,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import net.pingfang.business.values.ContainerInfo;
-import net.pingfang.business.values.Picture;
 import net.pingfang.common.annotation.FieldName;
 import net.pingfang.common.core.domain.BaseEntity;
 import net.pingfang.common.utils.Column;
@@ -27,7 +25,7 @@ import net.pingfang.common.utils.FieldNameUtils;
  * @since 2022-09-20 10:01
  */
 @SuperBuilder(toBuilder = true)
-@TableName(value = "btp_area")
+@TableName(value = "btp_work_index")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -35,7 +33,7 @@ public class BtpWorkIndex extends BaseEntity {
 
 	private static final long serialVersionUID = -1252932924613573523L;
 	@TableId(type = IdType.AUTO)
-	private Long id;
+	private Long dataId;
 
 	@FieldName(value = "作业号")
 	private String workId;
@@ -89,7 +87,7 @@ public class BtpWorkIndex extends BaseEntity {
 	 * 车轮毂数
 	 */
 	@FieldName(value = "车轮毂数")
-	private int wheelHubTotal;
+	private Integer wheelHubTotal;
 
 	/**
 	 * 车轮毂识别区域
@@ -101,25 +99,6 @@ public class BtpWorkIndex extends BaseEntity {
 	 */
 	@FieldName(value = "地磅重量")
 	private BigDecimal weight;
-
-	/**
-	 * 箱数
-	 */
-	@FieldName(value = "箱数")
-	private int containerTotal;
-	/**
-	 * 是否残损
-	 */
-	@FieldName(value = "是否残损")
-	private boolean containerIsDamage;
-	/**
-	 * 箱信息
-	 */
-	private List<ContainerInfo> containerList;
-	/**
-	 * 图片信息
-	 */
-	private Picture picture;
 
 	public static void main(String[] args) {
 		List<Column> columnList = FieldNameUtils.getColumns(BtpWorkIndex.class);

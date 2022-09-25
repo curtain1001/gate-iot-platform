@@ -21,6 +21,8 @@ public class TcpClientProperties implements ValueObject {
 
 	private String id;
 
+	private Long laneId;
+
 	private String host;
 
 	private int port;

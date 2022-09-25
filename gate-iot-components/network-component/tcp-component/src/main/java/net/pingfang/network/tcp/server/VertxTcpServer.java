@@ -2,18 +2,25 @@ package net.pingfang.network.tcp.server;
 
 import java.time.Duration;
 import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import org.apache.commons.codec.binary.Hex;
 
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetSocket;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import net.pingfang.iot.common.MessagePayloadType;
+import net.pingfang.iot.common.customizedsetting.values.DefaultCustomized;
+import net.pingfang.iot.common.manager.LaneConfigManager;
 import net.pingfang.iot.common.network.NetworkType;
 import net.pingfang.network.DefaultNetworkType;
-import net.pingfang.network.tcp.client.TcpClient;
-import net.pingfang.network.tcp.client.VertxTcpClient;
+import net.pingfang.network.NetworkMessage;
 import net.pingfang.network.tcp.parser.PayloadParser;
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
@@ -28,20 +35,22 @@ public class VertxTcpServer implements TcpServer {
 
 	@Getter
 	private final String id;
-	private final EmitterProcessor<TcpClient> processor = EmitterProcessor.create(false);
-	private final FluxSink<TcpClient> sink = processor.sink(FluxSink.OverflowStrategy.BUFFER);
+	private final EmitterProcessor<NetworkMessage> processor = EmitterProcessor.create(false);
+	private final FluxSink<NetworkMessage> sink = processor.sink(FluxSink.OverflowStrategy.BUFFER);
 	Collection<NetServer> tcpServers;
 	private Supplier<PayloadParser> parserSupplier;
+	private final String deviceId;
+	private final Long laneId;
+	private final LaneConfigManager configManager;
+
 	@Setter
 	private long keepAliveTimeout = Duration.ofMinutes(10).toMillis();
 
-	public VertxTcpServer(String id) {
+	public VertxTcpServer(String id, Long laneId, LaneConfigManager configManager) {
 		this.id = id;
-	}
-
-	@Override
-	public Flux<TcpClient> handleConnection() {
-		return processor.map(Function.identity());
+		this.deviceId = id; // 设备id = 组件id
+		this.laneId = laneId;
+		this.configManager = configManager;
 	}
 
 	private void execute(Runnable runnable) {
@@ -68,7 +77,9 @@ public class VertxTcpServer implements TcpServer {
 		this.tcpServers = servers;
 
 		for (NetServer tcpServer : this.tcpServers) {
-			tcpServer.connectHandler(this::acceptTcpConnection);
+			tcpServer.connectHandler(socket -> {
+				this.acceptTcpConnection(socket);
+			});
 		}
 
 	}
@@ -79,36 +90,23 @@ public class VertxTcpServer implements TcpServer {
 	 * @param socket socket
 	 */
 	protected void acceptTcpConnection(NetSocket socket) {
-		if (!processor.hasDownstreams()) {
-			log.warn("not handler for net.pingfang.gateiot.network.tcp client[{}]", socket.remoteAddress());
-			socket.close();
-			return;
-		}
-		// 客户端连接处理
-		VertxTcpClient client = new VertxTcpClient(id + "_" + socket.remoteAddress(), true);
-		client.setKeepAliveTimeoutMs(keepAliveTimeout);
 		try {
 			// TCP异常和关闭处理
 			socket.exceptionHandler(err -> {
-				log.error("net.pingfang.gateiot.network.tcp server client [{}] error", socket.remoteAddress(), err);
+				log.error("tcp server client [{}] error", socket.remoteAddress(), err);
 			}).closeHandler((nil) -> {
-				log.debug("net.pingfang.gateiot.network.tcp server client [{}] closed", socket.remoteAddress());
-				client.shutdown();
+				log.debug("tcp server client [{}] closed", socket.remoteAddress());
 			});
-			// 这个地方是在TCP服务初始化的时候设置的 parserSupplier
-			// set方法
-			// org.jetlinks.community.network.net.pingfang.gateiot.network.tcp.server.VertxTcpServer.setParserSupplier
-			// 调用坐标
-			// org.jetlinks.community.network.net.pingfang.gateiot.network.tcp.server.TcpServerProvider.initTcpServer
-			client.setRecordParser(parserSupplier.get());
-			client.setSocket(socket);
-			// client放进了发射器
-			sink.next(client);
-			log.debug("accept net.pingfang.gateiot.network.tcp client [{}] connection", socket.remoteAddress());
+			setSocket(socket);
+			log.debug("accept tcp server [{}] connection", socket.remoteAddress());
 		} catch (Exception e) {
-			log.error("create net.pingfang.gateiot.network.tcp server client error", e);
-			client.shutdown();
+			log.error("create tcp server error", e);
 		}
+	}
+
+	@Override
+	public Flux<NetworkMessage> subscribe() {
+		return this.processor.map(Function.identity());
 	}
 
 	@Override
@@ -135,4 +133,65 @@ public class VertxTcpServer implements TcpServer {
 	public boolean isAutoReload() {
 		return false;
 	}
+
+	/**
+	 * socket处理
+	 *
+	 * @param socket socket
+	 */
+	public void setSocket(NetSocket socket) {
+		synchronized (this) {
+			PayloadParser payloadParser = parserSupplier.get();
+			setRecordParser(socket, payloadParser);
+			Objects.requireNonNull(parserSupplier.get());
+			socket.closeHandler(v -> shutdown()).handler(buffer -> {
+				if (log.isDebugEnabled()) {
+					log.debug("handle tcp client[{}] payload:[{}]", socket.remoteAddress(),
+							Hex.encodeHexString(buffer.getBytes()));
+				}
+				payloadParser.handle(buffer);
+			});
+		}
+	}
+
+	/**
+	 * 设置客户端消息解析器
+	 *
+	 * @param payloadParser 消息解析器
+	 */
+	public void setRecordParser(NetSocket socket, PayloadParser payloadParser) {
+		synchronized (this) {
+			payloadParser.handlePayload().onErrorContinue((err, res) -> {
+				log.error(err.getMessage(), err);
+			}).subscribe(buffer -> {
+				Long laneId = this.laneId;
+				if (this.laneId == null && configManager != null) {
+					Map<Long, Object> configs = configManager.getConfig(DefaultCustomized.LANE_IP);
+					String remoteIp = socket.remoteAddress().host();
+					laneId = configs.entrySet().stream().filter(x -> remoteIp.equals(x.getValue())).map(Entry::getKey)
+							.findFirst().orElse(null);
+				}
+				received(NetworkMessage.builder() //
+						.deviceId(this.id)//
+						.laneId(laneId)//
+						.payload(buffer.getBytes())//
+						.payloadType(MessagePayloadType.BINARY)//
+						.build());
+			});
+		}
+	}
+
+	/**
+	 * 接收TCP消息
+	 *
+	 * @param message TCP消息
+	 */
+	protected void received(NetworkMessage message) {
+		if (processor.getPending() > processor.getBufferSize() / 2) {
+			log.warn("tcp server [{}],drop message:{}", processor.getPending(), message.toString());
+			return;
+		}
+		sink.next(message);
+	}
+
 }

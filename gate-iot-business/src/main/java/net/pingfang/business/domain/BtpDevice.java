@@ -92,6 +92,7 @@ public class BtpDevice extends BaseEntity {
 		properties.setEnabled(this.enabled == 0);
 		properties.setId(this.deviceId);
 		properties.setName(this.deviceName);
+		properties.setLaneId(this.laneId);
 		return properties;
 	}
 

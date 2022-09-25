@@ -34,12 +34,12 @@
         <!--            <artifactId>common-component</artifactId>-->
         <!--            <version>${project.version}</version>-->
         <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.hswebframework</groupId>-->
-        <!--            <artifactId>hsweb-expands-script</artifactId>-->
-        <!--            <version>3.0.2</version>-->
-        <!--            <scope>compile</scope>-->
-        <!--        </dependency>-->
+        <dependency>
+            <groupId>org.hswebframework</groupId>
+            <artifactId>hsweb-expands-script</artifactId>
+            <version>3.0.2</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-test</artifactId>

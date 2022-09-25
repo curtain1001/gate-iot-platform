@@ -14,4 +14,6 @@ public interface LaneConfigManager {
 
 	String getConfig(Customized value, Long laneId);
 
+	Map<Long, Object> getConfig(Customized value);
+
 }

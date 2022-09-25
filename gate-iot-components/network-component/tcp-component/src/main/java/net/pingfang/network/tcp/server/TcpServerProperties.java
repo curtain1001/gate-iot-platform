@@ -29,6 +29,8 @@ public class TcpServerProperties implements ValueObject {
 
 	private String id;
 
+	private Long laneId;
+
 	private NetServerOptions options;
 
 	private PayloadParserType parserType;
@@ -57,4 +59,5 @@ public class TcpServerProperties implements ValueObject {
 	public Map<String, Object> values() {
 		return parserConfiguration;
 	}
+
 }

@@ -6,10 +6,12 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.google.common.collect.Maps;
 
 import net.pingfang.business.domain.BtpLaneConfig;
 import net.pingfang.business.service.IBtpLaneConfigService;
@@ -43,5 +45,16 @@ public class DefaultLaneConfigManager implements LaneConfigManager {
 		queryWrapper.eq(BtpLaneConfig::getLaneConfigKey, value.getValue());
 		BtpLaneConfig config = laneConfigService.getOne(queryWrapper);
 		return config.getLaneConfigValue();
+	}
+
+	@Override
+	public Map<Long, Object> getConfig(Customized value) {
+		LambdaQueryWrapper<BtpLaneConfig> queryWrapper = Wrappers.lambdaQuery();
+		queryWrapper.eq(BtpLaneConfig::getLaneConfigKey, value.getValue());
+		queryWrapper.eq(BtpLaneConfig::getStatus, "0");
+		List<BtpLaneConfig> config = laneConfigService.list(queryWrapper);
+		return CollectionUtils.isNotEmpty(config)
+				? config.stream().collect(Collectors.toMap(BtpLaneConfig::getLaneId, BtpLaneConfig::getLaneConfigValue))
+				: Maps.newHashMap();
 	}
 }

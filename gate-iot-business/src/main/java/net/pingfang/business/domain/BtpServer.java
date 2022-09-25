@@ -94,6 +94,7 @@ public class BtpServer extends BaseEntity {
 		properties.setEnabled(this.enabled == 0);
 		properties.setId(this.serverId);
 		properties.setName(this.serverName);
+		properties.setLaneId(this.laneId);
 		return properties;
 	}
 
