@@ -26,12 +26,12 @@ import net.pingfang.common.annotation.Log;
 import net.pingfang.common.core.domain.model.LoginUser;
 import net.pingfang.common.enums.BusinessStatus;
 import net.pingfang.common.enums.HttpMethod;
+import net.pingfang.common.manager.AsyncManager;
 import net.pingfang.common.utils.JsonUtils;
 import net.pingfang.common.utils.SecurityUtils;
 import net.pingfang.common.utils.ServletUtils;
 import net.pingfang.common.utils.StringUtils;
 import net.pingfang.common.utils.ip.IpUtils;
-import net.pingfang.framework.manager.AsyncManager;
 import net.pingfang.framework.manager.factory.AsyncFactory;
 import net.pingfang.system.domain.SysOperLog;
 

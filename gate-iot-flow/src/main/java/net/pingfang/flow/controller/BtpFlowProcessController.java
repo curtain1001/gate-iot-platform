@@ -7,9 +7,9 @@ import javax.annotation.Resource;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -80,12 +80,12 @@ public class BtpFlowProcessController extends BaseController {
 	}
 
 	/**
-	 * 重置流程
+	 * 终止流程
 	 */
-	@PreAuthorize("@ss.hasPermi('business:flow-process:edit')")
-	@Log(title = "流程管理(流程实例记录)", businessType = BusinessType.UPDATE)
-	@PutMapping("{id}")
-	public AjaxResult reset(@Validated Long instanceId) {
+	@PreAuthorize("@ss.hasPermi('business:flow-process:remove')")
+	@Log(title = "流程管理(流程实例记录)", businessType = BusinessType.DELETE)
+	@DeleteMapping("{instanceId}")
+	public AjaxResult reset(@Validated @PathVariable(value = "instanceId") Long instanceId) {
 		FlowProcessInstance instance = processInstanceService.getById(instanceId);
 		if (instance == null) {
 			return AjaxResult.error("该流程实例不存在");
@@ -98,7 +98,7 @@ public class BtpFlowProcessController extends BaseController {
 	}
 
 	/**
-	 * 重置流程
+	 * 修改流程
 	 */
 	@PreAuthorize("@ss.hasPermi('business:flow-process:edit')")
 	@Log(title = "流程管理(流程实例记录)", businessType = BusinessType.UPDATE)

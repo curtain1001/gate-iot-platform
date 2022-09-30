@@ -2,6 +2,7 @@ package net.pingfang.device.plc.instruction;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,7 @@ import net.pingfang.device.core.instruction.DeviceInstruction;
 import net.pingfang.device.core.utils.ByteUtils;
 import net.pingfang.device.plc.PLCDevice;
 import net.pingfang.device.plc.PLCProduct;
+import net.pingfang.iot.common.NetworkMessage;
 import net.pingfang.iot.common.instruction.InsEntity;
 import net.pingfang.iot.common.instruction.Instruction;
 import net.pingfang.iot.common.instruction.InstructionProvider;
@@ -87,8 +89,9 @@ public class PLCInstructionProvider implements InstructionProvider {
 			}
 
 			@Override
-			public boolean isSupport(Object object) {
-				return object.equals(x.getContent().toString());
+			public boolean isSupport(NetworkMessage networkMessage) {
+				return networkMessage.payloadAsString().toUpperCase(Locale.ROOT)
+						.equals(x.getContent().toString().toUpperCase(Locale.ROOT));
 //				byte[] target = ByteUtils.convertHexStrToByteArray();
 //				return Arrays.equals((byte[]) object, target);
 			}

@@ -14,6 +14,7 @@ import eu.bitwalker.useragentutils.UserAgent;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.extern.slf4j.Slf4j;
 import net.pingfang.common.constant.Constants;
 import net.pingfang.common.core.domain.model.LoginUser;
 import net.pingfang.common.core.redis.RedisCache;
@@ -29,6 +30,7 @@ import net.pingfang.common.utils.uuid.IdUtils;
  * @author ruoyi
  */
 @Component
+@Slf4j
 public class TokenService {
 	protected static final long MILLIS_SECOND = 1000;
 	protected static final long MILLIS_MINUTE = 60 * MILLIS_SECOND;
@@ -62,6 +64,7 @@ public class TokenService {
 				LoginUser user = redisCache.getCacheObject(userKey);
 				return user;
 			} catch (Exception e) {
+				log.error("令牌失效：", e);
 			}
 		}
 		return null;

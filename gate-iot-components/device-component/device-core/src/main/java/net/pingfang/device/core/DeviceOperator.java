@@ -40,21 +40,6 @@ public interface DeviceOperator {
 	Product getProduct();
 
 	/**
-	 * 获取状态
-	 *
-	 * @return 状态
-	 */
-	DeviceState getStatus();
-
-	/**
-	 * 设置状态
-	 *
-	 * @param state 状态
-	 */
-
-	void setStatus(DeviceState state);
-
-	/**
 	 *
 	 * 断开连接
 	 */

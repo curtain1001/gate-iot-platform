@@ -39,7 +39,7 @@ public class TcpClientProperties implements ValueObject {
 
 	private boolean enabled;
 
-	private boolean KeepAlive;
+	private boolean keepalive;
 
 	@Override
 	public Map<String, Object> values() {

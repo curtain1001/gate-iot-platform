@@ -15,7 +15,10 @@ import net.pingfang.device.core.DeviceProperties;
 import net.pingfang.device.core.DeviceProvider;
 import net.pingfang.iot.common.instruction.InstructionManager;
 import net.pingfang.iot.common.product.Product;
+import net.pingfang.network.DefaultNetworkType;
 import net.pingfang.network.NetworkManager;
+import net.pingfang.network.NetworkProperties;
+import net.pingfang.network.tcp.client.TcpClient;
 
 /**
  * @author 王超
@@ -44,7 +47,15 @@ public class PLCDeviceProvider implements DeviceProvider<PLCDeviceProperties> {
 
 	public PLCDevice init(PLCDevice plcDevice, PLCDeviceProperties properties) {
 		Map<String, Object> tcpProperties = JsonUtils.toObject(JsonUtils.toJsonString(properties), Map.class);
-		plcDevice.setTcpClient(tcpProperties);
+		tcpProperties.putAll(PLCProduct.PLC.getDefaultProperties());
+		NetworkProperties networkProperties = new NetworkProperties();
+		networkProperties.setId(properties.getId());
+		networkProperties.setName("PLC::TCP::CLIENT::" + properties.getName());
+		networkProperties.setEnabled(true);
+		networkProperties.setConfigurations(tcpProperties);
+		TcpClient tcpClient = (TcpClient) networkManager.getNetwork(DefaultNetworkType.TCP_CLIENT, networkProperties,
+				properties.getId());
+		plcDevice.setTcpClient(tcpClient);
 		return plcDevice;
 	}
 

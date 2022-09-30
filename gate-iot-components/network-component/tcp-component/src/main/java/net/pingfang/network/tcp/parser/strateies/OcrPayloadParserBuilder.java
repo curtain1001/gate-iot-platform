@@ -1,15 +1,17 @@
 package net.pingfang.network.tcp.parser.strateies;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
+import io.vertx.core.buffer.Buffer;
 import lombok.extern.slf4j.Slf4j;
 import net.pingfang.iot.common.ValueObject;
 import net.pingfang.network.tcp.parser.PayloadParser;
 import net.pingfang.network.tcp.parser.PayloadParserBuilderStrategy;
 import net.pingfang.network.tcp.parser.PayloadParserType;
-import net.pingfang.network.utils.BytesUtils;
 
 /**
  * <p>
- *
+ * 箱号识别报文解析
  * </p>
  *
  * @author 王超
@@ -17,8 +19,6 @@ import net.pingfang.network.utils.BytesUtils;
  */
 @Slf4j
 public class OcrPayloadParserBuilder implements PayloadParserBuilderStrategy {
-
-	private static final int MAGIC_NUMBER = 0x06;
 
 	@Override
 	public PayloadParserType getType() {
@@ -28,15 +28,15 @@ public class OcrPayloadParserBuilder implements PayloadParserBuilderStrategy {
 	@Override
 	public PayloadParser build(ValueObject config) {
 		PipePayloadParser parser = new PipePayloadParser();
-		int size = -1;
-		parser.delimited(BytesUtils.getBufHexStr(new byte[] { MAGIC_NUMBER })).handler(buffer -> {
-			byte head = buffer.getByte(4);
-			if (head != (byte) 0xFE) {
-				log.info("---ignore---》" + head);
-				return;
-			}
-			parser.fixed(2);
-		}).handler(buffer -> parser.result(buffer).complete());
+		parser.delimited(StringEscapeUtils.unescapeJava("<Vehicle>"))//
+				.handler(buffer -> { //
+					parser.delimited(StringEscapeUtils.unescapeJava("</Vehicle>"));
+				}).handler(buffer -> {
+					Buffer b = Buffer.buffer("<Vehicle>");
+					b.appendBuffer(buffer);
+					b.appendBuffer(Buffer.buffer("</Vehicle>"));
+					parser.result(b).complete();
+				}).complete();
 		return parser;
 	}
 }

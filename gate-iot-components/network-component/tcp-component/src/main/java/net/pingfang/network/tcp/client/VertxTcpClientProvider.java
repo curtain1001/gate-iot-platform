@@ -51,7 +51,7 @@ public class VertxTcpClientProvider implements NetworkProvider<TcpClientProperti
 	@Nonnull
 	@Override
 	public VertxTcpClient createNetwork(@Nonnull TcpClientProperties properties) {
-		VertxTcpClient client = new VertxTcpClient(properties.getId(), properties.getLaneId(), true);
+		VertxTcpClient client = new VertxTcpClient(properties.getId(), properties.getLaneId(), false);
 		initClient(client, properties);
 		return client;
 	}
@@ -65,19 +65,21 @@ public class VertxTcpClientProvider implements NetworkProvider<TcpClientProperti
 		NetClientOptions options = properties.getOptions();
 		options.setReconnectAttempts(10);
 		options.setReconnectInterval(500);
-		options.setTcpKeepAlive(properties.isKeepAlive());
+		options.setTcpKeepAlive(properties.isKeepalive());
+		if (properties.isKeepalive()) {
+			options.setReconnectAttempts(Integer.MAX_VALUE);
+			options.setReconnectInterval(5);
+		}
 		NetClient netClient = vertx.createNetClient(options);
 		client.setClient(netClient);
 		client.setKeepAliveTimeoutMs(properties.getLong("keepAliveTimeout").orElse(Duration.ofMinutes(10).toMillis()));
 		netClient.connect(properties.getPort(), properties.getHost(), result -> {
 			if (result.succeeded()) {
-				log.debug("connect net.pingfang.gateiot.network.tcp [{}:{}] success", properties.getHost(),
-						properties.getPort());
+				log.debug("connect tcp [{}:{}] success", properties.getHost(), properties.getPort());
 				client.setRecordParser(payloadParserBuilder.build(properties.getParserType(), properties));
 				client.setSocket(result.result());
 			} else {
-				log.error("connect net.pingfang.gateiot.network.tcp [{}:{}] error", properties.getHost(),
-						properties.getPort(), result.cause());
+				log.error("connect tcp [{}:{}] error", properties.getHost(), properties.getPort(), result.cause());
 			}
 		});
 	}

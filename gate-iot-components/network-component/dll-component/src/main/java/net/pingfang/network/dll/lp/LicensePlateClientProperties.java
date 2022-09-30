@@ -19,4 +19,7 @@ public class LicensePlateClientProperties {
 
 	private int port;
 
+	private Long laneId;
+	private long timeout;
+
 }

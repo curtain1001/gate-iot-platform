@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <property name="blob.type" dbms="mssql" value="varbinary(max)" />
+    <property name="blob.type" dbms="mysql" value="longblob" />
+    <property name="blob.type" dbms="h2" value="blob" />
+
+    <property name="clob.type" dbms="mssql" value="varchar(max)" />
+    <property name="clob.type" dbms="mysql" value="longtext" />
+    <property name="clob.type" dbms="h2" value="longtext" />
+
+    <changeSet author="wangchao" id="btp_network::create">
+        <createTable tableName="btp_network" remarks="网络组件配置信息表">
+            <column name="id" remarks="主键" type="BIGINT(20)" startWith="1" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="network_id" type="varchar(24)" remarks="组件号" />
+            <column name="name" type="varchar(24)" remarks="组件名" />
+            <column name="enabled" type="char(1)" remarks="自动开启(0=自动,1=不自动开启)" defaultValue="1" />
+            <column name="type" type="varchar(24)" remarks="类型" />
+            <column name="status" type="varchar(12)" remarks="状态" />
+            <column name="control" type="varchar(24)" remarks="控制权 own:设备;system：系统" />
+            <column name="configuration" type="${clob.type}" remarks="配置属性" />
+            <column name="create_by" defaultValue="" remarks="创建者" type="VARCHAR(64)" />
+            <column name="create_time" remarks="创建时间" type="datetime(6)" />
+            <column name="update_by" defaultValue="" remarks="更新者" type="VARCHAR(64)" />
+            <column name="update_time" remarks="更新时间" type="datetime(6)" />
+            <column name="remark" remarks="备注" type="VARCHAR(500)" />
+        </createTable>
+        <createIndex tableName="btp_network" indexName="network_idx">
+            <column name="network_id" />
+            <column name="name" />
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

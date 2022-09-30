@@ -1,5 +1,6 @@
 package net.pingfang.network;
 
+import net.pingfang.iot.common.NetworkSession;
 import net.pingfang.iot.common.network.NetworkType;
 
 /**
@@ -9,7 +10,7 @@ import net.pingfang.iot.common.network.NetworkType;
  * @version 1.0
  * @since 1.0
  */
-public interface Network {
+public interface Network extends NetworkSession {
 
 	/**
 	 * ID唯一标识
@@ -23,16 +24,6 @@ public interface Network {
 	 * @see DefaultNetworkType
 	 */
 	NetworkType getType();
-
-	/**
-	 * 关闭网络组件
-	 */
-	void shutdown();
-
-	/**
-	 * @return 是否存活
-	 */
-	boolean isAlive();
 
 	/**
 	 * 当{@link Network#isAlive()}为false是,是否自动重新加载.

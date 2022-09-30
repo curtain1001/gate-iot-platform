@@ -39,7 +39,7 @@ public enum LicensePlateProduct implements Product {
 
 	@Override
 	public NetworkType getNetwork() {
-		return DefaultNetworkType.INTERNAL;
+		return DefaultNetworkType.LP_DLL;
 	}
 
 	@Override

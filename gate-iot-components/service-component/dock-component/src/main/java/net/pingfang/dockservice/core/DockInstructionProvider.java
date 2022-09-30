@@ -3,14 +3,15 @@ package net.pingfang.dockservice.core;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Component;
 
 import net.pingfang.dockservice.DockProduct;
-import net.pingfang.dockservice.customs.instruction.CustomsInstruction;
-import net.pingfang.dockservice.customs.instruction.DataSummaryInstruction;
-import net.pingfang.dockservice.customs.instruction.StartProcessInstruction;
+import net.pingfang.dockservice.instruction.DataSummaryInstruction;
 import net.pingfang.iot.common.instruction.Instruction;
 import net.pingfang.iot.common.instruction.InstructionProvider;
+import net.pingfang.iot.common.manager.ThroughDataManager;
 
 /**
  * <p>
@@ -22,6 +23,9 @@ import net.pingfang.iot.common.instruction.InstructionProvider;
  */
 @Component
 public class DockInstructionProvider implements InstructionProvider {
+	@Resource
+	ThroughDataManager throughDataManager;
+
 	@Override
 	public String getName() {
 		return DockProduct.DOCK_SERVICE.getValue();
@@ -30,10 +34,6 @@ public class DockInstructionProvider implements InstructionProvider {
 	@Override
 	public List<Instruction> getCommand() {
 		return Arrays.asList( //
-				new CustomsInstruction(), //
-				new StartProcessInstruction(), //
-				new DataSummaryInstruction() //
-
-		);
+				new DataSummaryInstruction(throughDataManager));
 	}
 }

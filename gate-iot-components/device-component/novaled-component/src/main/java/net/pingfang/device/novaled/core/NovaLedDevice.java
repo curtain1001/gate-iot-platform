@@ -2,7 +2,6 @@ package net.pingfang.device.novaled.core;
 
 import lombok.extern.slf4j.Slf4j;
 import net.pingfang.device.core.DeviceOperator;
-import net.pingfang.device.core.DeviceState;
 import net.pingfang.device.novaled.NovaLedDeviceProduct;
 import net.pingfang.device.novaled.NovaLedDeviceProperties;
 import net.pingfang.iot.common.FunctionMessage;
@@ -51,16 +50,6 @@ public class NovaLedDevice implements DeviceOperator {
 	@Override
 	public Product getProduct() {
 		return NovaLedDeviceProduct.NOVA_LED;
-	}
-
-	@Override
-	public DeviceState getStatus() {
-		return DeviceState.online;
-	}
-
-	@Override
-	public void setStatus(DeviceState deviceState) {
-
 	}
 
 	@Override

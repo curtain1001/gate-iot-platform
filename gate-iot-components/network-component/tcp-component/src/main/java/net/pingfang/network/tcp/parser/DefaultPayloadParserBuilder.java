@@ -13,6 +13,7 @@ import net.pingfang.network.tcp.parser.strateies.DelimitedPayloadParserBuilder;
 import net.pingfang.network.tcp.parser.strateies.DirectPayloadParserBuilder;
 import net.pingfang.network.tcp.parser.strateies.FixLengthPayloadParserBuilder;
 import net.pingfang.network.tcp.parser.strateies.NovaLedPayloadParserBuilder;
+import net.pingfang.network.tcp.parser.strateies.OcrPayloadParserBuilder;
 import net.pingfang.network.tcp.parser.strateies.PLCPayloadParserBuilder;
 import net.pingfang.network.tcp.parser.strateies.ScriptPayloadParserBuilder;
 
@@ -28,6 +29,7 @@ public class DefaultPayloadParserBuilder implements PayloadParserBuilder, BeanPo
 		register(new DirectPayloadParserBuilder());
 		register(new PLCPayloadParserBuilder());
 		register(new NovaLedPayloadParserBuilder());
+		register(new OcrPayloadParserBuilder());
 	}
 
 	@Override

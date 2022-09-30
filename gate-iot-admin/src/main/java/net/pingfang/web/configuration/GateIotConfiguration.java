@@ -10,10 +10,4 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class GateIotConfiguration {
 
-//	@Bean
-//	@ConfigurationProperties(prefix = "vertx")
-//	public VertxOptions vertxOptions() {
-//		return new VertxOptions();
-//	}
-
 }

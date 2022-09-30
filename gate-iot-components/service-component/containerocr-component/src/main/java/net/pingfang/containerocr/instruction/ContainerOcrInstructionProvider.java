@@ -18,6 +18,7 @@ import net.pingfang.iot.common.instruction.InstructionProvider;
 import net.pingfang.iot.common.instruction.InstructionResult;
 import net.pingfang.iot.common.instruction.InstructionType;
 import net.pingfang.iot.common.manager.InstructionConfigManager;
+import net.pingfang.iot.common.product.Product;
 import net.pingfang.servicecomponent.core.BusinessInstruction;
 
 /**
@@ -50,17 +51,23 @@ public class ContainerOcrInstructionProvider implements InstructionProvider {
 
 				@Override
 				public String getName() {
-					return null;
+					return x.getName();
+
 				}
 
 				@Override
 				public String getValue() {
-					return null;
+					return x.getValue();
+				}
+
+				@Override
+				public Product getProduct() {
+					return ContainerOcrProduct.CONTAINER_OCR;
 				}
 
 				@Override
 				public InstructionType getInsType() {
-					return null;
+					return InstructionType.valueOf(x.getType());
 				}
 			}).collect(Collectors.toList());
 			if (CollectionUtils.isNotEmpty(instructions)) {

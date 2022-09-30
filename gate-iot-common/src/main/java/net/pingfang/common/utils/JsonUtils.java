@@ -92,7 +92,6 @@ public class JsonUtils {
 		try {
 			return MAPPER.convertValue(obj, clazz);
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new IllegalArgumentException("Convert json string to object error from value:" + obj, e);
 		}
 	}
@@ -115,7 +114,6 @@ public class JsonUtils {
 		try {
 			return MAPPER.readValue(stream, clazz);
 		} catch (Exception e) {
-			e.printStackTrace();
 			try {
 				String content = IOUtils.toString(stream, "utf-8");
 				throw new IllegalArgumentException("Convert json stream to object error from: " + content, e);

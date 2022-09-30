@@ -9,11 +9,13 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import net.pingfang.common.utils.StringUtils;
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.instruction.DeviceInstruction;
 import net.pingfang.device.licenseplate.LicensePlateDevice;
 import net.pingfang.device.licenseplate.LicensePlateProduct;
 import net.pingfang.device.licenseplate.values.StatusCode;
+import net.pingfang.iot.common.NetworkMessage;
 import net.pingfang.iot.common.customizedsetting.values.DefaultCustomized;
 import net.pingfang.iot.common.instruction.InstructionResult;
 import net.pingfang.iot.common.instruction.InstructionType;
@@ -58,23 +60,33 @@ public class SaveImageToJpeg implements DeviceInstruction {
 			JsonNode jsonNode) {
 		LicensePlateDevice device = (LicensePlateDevice) deviceOperator;
 		String url = Injection.manager.getConfig(DefaultCustomized.PICTURE_STORE_DIRECTORY, deviceOperator.getLaneId());
+		if (StringUtils.isEmpty(url)) {
+			url = System.getProperty("java.io.tmpdir");
+		}
 		File file = new File(url);
 		if (!file.exists()) {
 			file.mkdir();
 		}
+		url = !url.endsWith("/") && !url.endsWith("\\") ? url + "\\" : url;
 		StringBuilder sbf = new StringBuilder(url);
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 		String dateName = dateFormat.format(new Date());
 		sbf.append("capture_");
 		sbf.append(dateName);
 		sbf.append(".jpeg");
-		int is = device.saveImageToJpeg(sbf.toString());
+		String imgPath = sbf.toString().replaceAll("\\\\", "/");
+		int is = device.saveImageToJpeg(imgPath);
 		if (is == 0) {
-			return InstructionResult.success(sbf.toString(), "执行成功，文件路径为：" + sbf.toString());
+			return InstructionResult.success(sbf.toString(), "执行成功，文件路径为：" + imgPath);
 		} else {
 			return InstructionResult.success(sbf.toString(),
 					"执行失败：" + StatusCode.getStatusCode(is, "Net_SaveImageToJpeg"));
 		}
+	}
+
+	@Override
+	public boolean isSupport(NetworkMessage networkMessage) {
+		return false;
 	}
 
 	@Component

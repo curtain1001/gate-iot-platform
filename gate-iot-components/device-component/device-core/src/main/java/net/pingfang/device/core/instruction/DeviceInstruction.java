@@ -8,7 +8,6 @@ import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.iot.common.instruction.Instruction;
 import net.pingfang.iot.common.instruction.InstructionResult;
 import net.pingfang.iot.common.instruction.ObjectType;
-import net.pingfang.iot.common.product.Product;
 
 /**
  * @author 王超
@@ -20,8 +19,6 @@ public interface DeviceInstruction extends Instruction {
 	default ObjectType getObjectType() {
 		return ObjectType.device;
 	}
-
-	public abstract Product getProduct();
 
 	/**
 	 *

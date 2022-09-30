@@ -1,9 +1,11 @@
 package net.pingfang.device.licenseplate.instruction;
 
 import lombok.extern.slf4j.Slf4j;
+import net.pingfang.common.utils.JsonUtils;
 import net.pingfang.device.core.instruction.DeviceInstruction;
 import net.pingfang.device.licenseplate.LicensePlateProduct;
 import net.pingfang.device.licenseplate.values.ImageRecvInfo;
+import net.pingfang.iot.common.NetworkMessage;
 import net.pingfang.iot.common.instruction.InstructionType;
 import net.pingfang.iot.common.instruction.ObjectType;
 import net.pingfang.iot.common.product.Product;
@@ -53,10 +55,11 @@ public class RecvReport implements DeviceInstruction {
 //	}
 
 	@Override
-	public boolean isSupport(Object object) {
-		if (object instanceof ImageRecvInfo) {
+	public boolean isSupport(NetworkMessage networkMessage) {
+		try {
+			ImageRecvInfo info = JsonUtils.convert(networkMessage.getPayload(), ImageRecvInfo.class);
 			return true;
-		} else {
+		} catch (Exception e) {
 			return false;
 		}
 	}

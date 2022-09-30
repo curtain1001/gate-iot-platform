@@ -44,7 +44,11 @@ public class DefaultLaneConfigManager implements LaneConfigManager {
 		queryWrapper.eq(BtpLaneConfig::getLaneId, laneId);
 		queryWrapper.eq(BtpLaneConfig::getLaneConfigKey, value.getValue());
 		BtpLaneConfig config = laneConfigService.getOne(queryWrapper);
-		return config.getLaneConfigValue();
+		if (config != null) {
+			return config.getLaneConfigValue();
+		} else {
+			return null;
+		}
 	}
 
 	@Override

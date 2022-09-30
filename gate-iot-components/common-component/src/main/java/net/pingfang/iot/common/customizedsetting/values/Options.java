@@ -12,5 +12,5 @@ import lombok.Data;
 @Builder
 public class Options {
 	final String key;
-	final String value;
+	final Object value;
 }

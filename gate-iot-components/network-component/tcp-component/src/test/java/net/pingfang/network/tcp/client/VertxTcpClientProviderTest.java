@@ -7,7 +7,7 @@ import org.junit.Test;
 import io.vertx.core.Vertx;
 import io.vertx.core.net.NetClientOptions;
 import lombok.extern.slf4j.Slf4j;
-import net.pingfang.network.NetworkMessage;
+import net.pingfang.iot.common.NetworkMessage;
 import net.pingfang.network.tcp.parser.DefaultPayloadParserBuilder;
 import net.pingfang.network.tcp.parser.PayloadParserType;
 import reactor.test.StepVerifier;

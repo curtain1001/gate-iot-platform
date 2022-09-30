@@ -273,6 +273,11 @@
                 <artifactId>containerocr-component</artifactId>
                 <version>${gate-iot.version}</version>
             </dependency>
+            <dependency>
+                <groupId>net.pingfang</groupId>
+                <artifactId>wheelhubocr-component</artifactId>
+                <version>${gate-iot.version}</version>
+            </dependency>
 
 
             <dependency>

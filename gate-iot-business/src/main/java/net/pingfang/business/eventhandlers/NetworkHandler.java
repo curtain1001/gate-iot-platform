@@ -9,12 +9,12 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.eventbus.Subscribe;
 
-import net.pingfang.business.domain.BtpNetworkConfig;
-import net.pingfang.business.enums.NetworkConfigState;
+import net.pingfang.business.domain.BtpNetwork;
+import net.pingfang.business.enums.NetworkState;
 import net.pingfang.business.events.ServerNetworkCreatedEvent;
 import net.pingfang.business.events.ServerNetworkDeleteEvent;
 import net.pingfang.business.events.ServerNetworkUpdateEvent;
-import net.pingfang.business.service.IBtpNetworkConfigService;
+import net.pingfang.business.service.IBtpNetworkService;
 import net.pingfang.common.event.EventBusListener;
 
 /**
@@ -29,29 +29,29 @@ import net.pingfang.common.event.EventBusListener;
 @Component
 public class NetworkHandler {
 	@Resource
-	public IBtpNetworkConfigService configService;
+	public IBtpNetworkService networkService;
 
 	@Subscribe
 	public void on(ServerNetworkCreatedEvent event) {
-		BtpNetworkConfig config = BtpNetworkConfig.builder()//
-				.networkConfigId(event.getId())//
+		BtpNetwork config = BtpNetwork.builder()//
+				.networkId(event.getId())//
 				.name(event.getName())//
 				.control(event.getControl())//
 				.configuration(event.getConfigurations())//
 				.enabled(event.getEnabled())//
 				.type(event.getType())//
-				.status(NetworkConfigState.disabled)//
+				.status(NetworkState.disabled)//
 				.createBy(event.getCreateBy())//
 				.createTime(event.getCreateTime())//
 				.build();
-		configService.save(config);
+		networkService.save(config);
 	}
 
 	@Subscribe
 	public void on(ServerNetworkUpdateEvent event) {
-		LambdaQueryWrapper<BtpNetworkConfig> queryWrapper = Wrappers.lambdaQuery();
-		queryWrapper.eq(BtpNetworkConfig::getNetworkConfigId, event.getId());
-		BtpNetworkConfig config = configService.getOne(queryWrapper);
+		LambdaQueryWrapper<BtpNetwork> queryWrapper = Wrappers.lambdaQuery();
+		queryWrapper.eq(BtpNetwork::getNetworkId, event.getId());
+		BtpNetwork config = networkService.getOne(queryWrapper);
 		if (config != null) {
 			config = config.toBuilder() //
 					.name(event.getName())//
@@ -62,15 +62,15 @@ public class NetworkHandler {
 					.updateBy(event.getUpdateBy())//
 					.updateTime(event.getUpdateTime())//
 					.build();
-			configService.updateById(config);
+			networkService.updateById(config);
 		}
 
 	}
 
 	@Subscribe
 	public void on(ServerNetworkDeleteEvent event) {
-		LambdaUpdateWrapper<BtpNetworkConfig> updateWrapper = Wrappers.lambdaUpdate();
-		updateWrapper.eq(BtpNetworkConfig::getNetworkConfigId, event.getId());
-		configService.remove(updateWrapper);
+		LambdaUpdateWrapper<BtpNetwork> updateWrapper = Wrappers.lambdaUpdate();
+		updateWrapper.eq(BtpNetwork::getNetworkId, event.getId());
+		networkService.remove(updateWrapper);
 	}
 }

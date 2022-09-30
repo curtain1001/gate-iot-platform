@@ -1,30 +1,38 @@
 package net.pingfang.network.tcp.server;
 
+import java.net.SocketException;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.apache.commons.codec.binary.Hex;
 
+import com.google.common.collect.Maps;
+
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetSocket;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import net.pingfang.common.utils.StringUtils;
 import net.pingfang.iot.common.MessagePayloadType;
+import net.pingfang.iot.common.NetworkMessage;
 import net.pingfang.iot.common.customizedsetting.values.DefaultCustomized;
 import net.pingfang.iot.common.manager.LaneConfigManager;
 import net.pingfang.iot.common.network.NetworkType;
 import net.pingfang.network.DefaultNetworkType;
-import net.pingfang.network.NetworkMessage;
+import net.pingfang.network.tcp.TcpMessage;
 import net.pingfang.network.tcp.parser.PayloadParser;
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
+import reactor.core.publisher.Mono;
 
 /**
  * @author bsetfeng
@@ -37,6 +45,7 @@ public class VertxTcpServer implements TcpServer {
 	private final String id;
 	private final EmitterProcessor<NetworkMessage> processor = EmitterProcessor.create(false);
 	private final FluxSink<NetworkMessage> sink = processor.sink(FluxSink.OverflowStrategy.BUFFER);
+	private final ConcurrentMap<String, NetSocket> ipSocket = Maps.newConcurrentMap();
 	Collection<NetServer> tcpServers;
 	private Supplier<PayloadParser> parserSupplier;
 	private final String deviceId;
@@ -57,7 +66,7 @@ public class VertxTcpServer implements TcpServer {
 		try {
 			runnable.run();
 		} catch (Exception e) {
-			log.warn("close net.pingfang.gateiot.network.tcp server error", e);
+			log.warn("close tcp server error", e);
 		}
 	}
 
@@ -75,13 +84,37 @@ public class VertxTcpServer implements TcpServer {
 			shutdown();
 		}
 		this.tcpServers = servers;
-
 		for (NetServer tcpServer : this.tcpServers) {
-			tcpServer.connectHandler(socket -> {
-				this.acceptTcpConnection(socket);
-			});
+			tcpServer.connectHandler(this::acceptTcpConnection);
 		}
+	}
 
+	@Override
+	public Mono<Boolean> send(String ip, TcpMessage message) {
+		return Mono.create((sink) -> {
+			Buffer buffer = Buffer.buffer(message.getPayload());
+			if (StringUtils.isEmpty(ip)) {
+				ipSocket.values().forEach(netSocket -> netSocket.write(buffer, r -> {
+					if (r.succeeded()) {
+						sink.success();
+					} else {
+						sink.error(r.cause());
+					}
+				}));
+			} else {
+				if (ipSocket.get(ip) == null) {
+					sink.error(new SocketException("socket closed"));
+					return;
+				}
+				ipSocket.get(ip).write(buffer, r -> {
+					if (r.succeeded()) {
+						sink.success();
+					} else {
+						sink.error(r.cause());
+					}
+				});
+			}
+		});
 	}
 
 	/**
@@ -98,10 +131,12 @@ public class VertxTcpServer implements TcpServer {
 				log.debug("tcp server client [{}] closed", socket.remoteAddress());
 			});
 			setSocket(socket);
+			ipSocket.put(socket.remoteAddress().host(), socket);
 			log.debug("accept tcp server [{}] connection", socket.remoteAddress());
 		} catch (Exception e) {
 			log.error("create tcp server error", e);
 		}
+
 	}
 
 	@Override
@@ -131,7 +166,7 @@ public class VertxTcpServer implements TcpServer {
 
 	@Override
 	public boolean isAutoReload() {
-		return false;
+		return true;
 	}
 
 	/**
@@ -144,7 +179,7 @@ public class VertxTcpServer implements TcpServer {
 			PayloadParser payloadParser = parserSupplier.get();
 			setRecordParser(socket, payloadParser);
 			Objects.requireNonNull(parserSupplier.get());
-			socket.closeHandler(v -> shutdown()).handler(buffer -> {
+			socket.handler(buffer -> {
 				if (log.isDebugEnabled()) {
 					log.debug("handle tcp client[{}] payload:[{}]", socket.remoteAddress(),
 							Hex.encodeHexString(buffer.getBytes()));
@@ -176,6 +211,7 @@ public class VertxTcpServer implements TcpServer {
 						.laneId(laneId)//
 						.payload(buffer.getBytes())//
 						.payloadType(MessagePayloadType.BINARY)//
+						.networkType(DefaultNetworkType.TCP_SERVER)//
 						.build());
 			});
 		}

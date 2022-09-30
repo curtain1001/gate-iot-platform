@@ -1,11 +1,11 @@
 package net.pingfang.network;
 
-import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
@@ -16,11 +16,9 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import net.pingfang.common.manager.AsyncManager;
+import net.pingfang.iot.common.manager.SessionManager;
 import net.pingfang.iot.common.network.NetworkType;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -36,12 +34,15 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor,
 
 	private final NetworkConfigManager configManager;
 
+	private final SessionManager sessionManager;
+
 	private final Map<String, Map<String, Network>> store = new ConcurrentHashMap<>();
 
 	private final Map<String, NetworkProvider<Object>> providerSupport = new ConcurrentHashMap<>();
 
-	public DefaultNetworkManager(NetworkConfigManager configManager) {
+	public DefaultNetworkManager(NetworkConfigManager configManager, SessionManager sessionManager) {
 		this.configManager = configManager;
+		this.sessionManager = sessionManager;
 	}
 
 	@Override
@@ -77,9 +78,9 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor,
 			Collection<Map<String, Network>> networks = store.values();
 			networks.stream().flatMap(m -> m.values().stream()).filter(x -> !x.isAlive()).forEach(network -> {
 				NetworkProvider<Object> provider = providerSupport.get(network.getType().getId());
+				// 记录状态
+				configManager.update(network.getId(), "disabled");
 				if (provider == null || !network.isAutoReload()) {
-					// 记录状态
-					configManager.update(network.getId(), "disabled");
 					return;
 				}
 				NetworkProperties properties = configManager.getConfig(network.getId());
@@ -92,7 +93,6 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor,
 					} catch (Exception e) {
 						log.error("网络组件启动失败：", e);
 					}
-
 				}
 			});
 		} catch (Exception e) {
@@ -146,9 +146,20 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor,
 		return getNetworkStore(provider.getType()).compute(id, (s, network) -> {
 			if (network == null) {
 				network = provider.createNetwork(properties);
+				sessionManager.register(network.getId(), network);
+				configManager.update(network.getId(), "enabled");
 			} else {
 				// 单例，已经存在则重新加载
 				provider.reload(network, properties);
+				Network finalNetwork = network;
+				AsyncManager.me().execute(new TimerTask() {
+					@Override
+					public void run() {
+						if (finalNetwork.isAlive()) {
+							configManager.update(finalNetwork.getId(), "enabled");
+						}
+					}
+				});
 			}
 			return network;
 		});
@@ -216,8 +227,10 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor,
 	public void shutdown(NetworkType type, String id) {
 		Network network = getNetworkStore(type).get(id);
 		if (network != null) {
-			network.shutdown();
+			configManager.update(network.getId(), "disabled");
 			getNetworkStore(type).remove(id);
+			sessionManager.shutdown(id);
+			network.shutdown();
 		}
 	}
 
@@ -240,15 +253,5 @@ public class DefaultNetworkManager implements NetworkManager, BeanPostProcessor,
 			log.error("网络组件启动失败：", e);
 		}
 
-	}
-
-	@Getter
-	@Setter
-	@AllArgsConstructor
-	@NoArgsConstructor
-	public static class Synchronization implements Serializable {
-		private NetworkType type;
-
-		private String id;
 	}
 }

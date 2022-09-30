@@ -17,9 +17,9 @@ import net.pingfang.common.constant.Constants;
 import net.pingfang.common.constant.HttpStatus;
 import net.pingfang.common.core.domain.AjaxResult;
 import net.pingfang.common.core.domain.model.LoginUser;
+import net.pingfang.common.manager.AsyncManager;
 import net.pingfang.common.utils.ServletUtils;
 import net.pingfang.common.utils.StringUtils;
-import net.pingfang.framework.manager.AsyncManager;
 import net.pingfang.framework.manager.factory.AsyncFactory;
 import net.pingfang.framework.web.service.TokenService;
 

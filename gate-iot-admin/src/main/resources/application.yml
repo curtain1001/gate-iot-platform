@@ -143,12 +143,14 @@ vertx:
   max-worker-execute-time-unit: seconds
   max-worker-execute-time: 30
   prefer-native-transport: true
-
+websocket:
+  topicEndPoint: '/public'
+  userEndPoint: '/private'
 liquibase:
   changelog:
     - /database/business/btpArea.xml
     - /database/business/btpLane.xml
-    - /database/business/btpNetworkConfig.xml
+    - /database/business/btpNetwork.xml
     - /database/business/btpCertificate.xml
     - /database/business/btpDevice.xml
     - /database/business/btpInstruction.xml

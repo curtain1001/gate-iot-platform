@@ -1,6 +1,7 @@
 package net.pingfang.iot.common.instruction;
 
-import net.pingfang.iot.common.FunctionMessage;
+import net.pingfang.iot.common.NetworkMessage;
+import net.pingfang.iot.common.product.Product;
 
 /**
  * @author 王超
@@ -37,13 +38,10 @@ public interface Instruction {
 	 */
 	InstructionType getInsType();
 
-	/**
-	 * 触发指令
-	 *
-	 * @param functionMessage 指令消息
-	 */
-	default void received(FunctionMessage functionMessage) {
+	Product getProduct();
 
+	default NetworkMessage decode(NetworkMessage networkMessage) {
+		return networkMessage;
 	}
 
 	/**
@@ -52,7 +50,7 @@ public interface Instruction {
 	 * @param object
 	 * @return
 	 */
-	default boolean isSupport(Object object) {
+	default boolean isSupport(NetworkMessage networkMessage) {
 		return false;
 	}
 }

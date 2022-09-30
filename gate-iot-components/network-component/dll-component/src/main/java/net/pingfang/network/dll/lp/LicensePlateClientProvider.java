@@ -1,126 +1,101 @@
-//package net.pingfang.network.dll.lp;
-//
-//import java.lang.reflect.InvocationTargetException;
-//import java.time.Duration;
-//import java.util.List;
-//
-//import javax.annotation.Nonnull;
-//
-//import org.springframework.stereotype.Component;
-//
-//import io.vertx.core.Vertx;
-//import io.vertx.core.net.NetClient;
-//import io.vertx.core.net.NetClientOptions;
-//import net.pingfang.common.utils.bean.BeanUtils;
-//import net.pingfang.iot.common.customizedsetting.repos.CustomizedSettingRepository;
-//import net.pingfang.iot.common.customizedsetting.values.CustomizedSettingData;
-//import net.pingfang.iot.common.network.NetworkType;
-//import net.pingfang.network.DefaultNetworkType;
-//import net.pingfang.network.Network;
-//import net.pingfang.network.NetworkProperties;
-//import net.pingfang.network.NetworkProvider;
-//import net.pingfang.network.dll.lp.config.SdkInit;
-//import net.pingfang.network.security.CertificateManager;
-//import net.sdk.function.main.NET;
-//
-///**
-// * <p>
-// *
-// * </p>
-// *
-// * @author 王超
-// * @since 2022-09-24 15:37
-// */
-//@Component
-//public class LicensePlateClientProvider implements NetworkProvider<LicensePlateClientProperties> {
-//	final NET net;
-//
-//	public LicensePlateClientProvider() {
-//		SdkInit.init();
-//		this.net = SdkInit.net;
-//	}
-//
-//	@Override
-//	public NetworkType getType() {
-//		return DefaultNetworkType.LP_DLL;
-//	}
-//
-//	@Override
-//	public LicensePlateClient createNetwork(LicensePlateClientProperties properties) {
-//		LicensePlateClient client = new LicensePlateClient();
-//		VertxTcpClient client = new VertxTcpClient(properties.getId(), true);
-//		initClient(client, properties);
-//		return client;
-//		return null;
-//	}
-//
-//	@Override
-//	public void reload(Network network, LicensePlateClientProperties properties) {
-//
-//	}
-//
-//	@Override
-//	public LicensePlateClientProperties createConfig(NetworkProperties properties)
-//			throws InvocationTargetException, IllegalAccessException {
-//		LicensePlateClientProperties config = new LicensePlateClientProperties();
-//		BeanUtils.copyBean(config, properties.getConfigurations());
-//		config.setId(properties.getId());
-//		return config;
-//	}
-//
-//	@Override
-//	public List<CustomizedSettingData> getBasicForm() {
-//		return null;
-//	}}
-//
-//	private final CertificateManager certificateManager;
-//
-//	private final PayloadParserBuilder payloadParserBuilder;
-//
-//	private final Vertx vertx;
-//
-//	public VertxTcpClientProvider(CertificateManager certificateManager, Vertx vertx,
-//			PayloadParserBuilder payloadParserBuilder) {
-//		this.certificateManager = certificateManager;
-//		this.vertx = vertx;
-//		this.payloadParserBuilder = payloadParserBuilder;
-//	}
-//
-//	@Nonnull
-//	@Override
-//	public VertxTcpClient createNetwork(@Nonnull TcpClientProperties properties) {
-//		VertxTcpClient client = new VertxTcpClient(properties.getId(), true);
-//		initClient(client, properties);
-//		return client;
-//	}
-//
-//	@Override
-//	public void reload(@Nonnull Network network, @Nonnull TcpClientProperties properties) {
-//		initClient(((VertxTcpClient) network), properties);
-//	}
-//
-//	public void initClient(VertxTcpClient client, TcpClientProperties properties) {
-//		NetClientOptions options = properties.getOptions();
-//		options.setReconnectAttempts(10);
-//		options.setReconnectInterval(500);
-//		options.setTcpKeepAlive(properties.isKeepAlive());
-//		NetClient netClient = vertx.createNetClient(options);
-//		client.setClient(netClient);
-//		client.setKeepAliveTimeoutMs(properties.getLong("keepAliveTimeout").orElse(Duration.ofMinutes(10).toMillis()));
-//		netClient.connect(properties.getPort(), properties.getHost(), result -> {
-//			if (result.succeeded()) {
-//				log.debug("connect net.pingfang.gateiot.network.tcp [{}:{}] success", properties.getHost(),
-//						properties.getPort());
-//				client.setRecordParser(payloadParserBuilder.build(properties.getParserType(), properties));
-//				client.setSocket(result.result());
-//			} else {
-//				log.error("connect net.pingfang.gateiot.network.tcp [{}:{}] error", properties.getHost(),
-//						properties.getPort(), result.cause());
-//			}
-//		});
-//	}
-//
-//	@Override
-//	public List<CustomizedSettingData> getBasicForm() {
-//		return CustomizedSettingRepository.getValues(TcpClientBasicFormCustomized.values());
-//	}
+package net.pingfang.network.dll.lp;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+
+import org.springframework.stereotype.Component;
+
+import com.google.common.collect.Lists;
+import com.sun.jna.Pointer;
+
+import lombok.extern.slf4j.Slf4j;
+import net.pingfang.common.utils.bean.BeanUtils;
+import net.pingfang.iot.common.customizedsetting.values.CustomizedSettingData;
+import net.pingfang.iot.common.network.NetworkType;
+import net.pingfang.network.DefaultNetworkType;
+import net.pingfang.network.Network;
+import net.pingfang.network.NetworkProperties;
+import net.pingfang.network.NetworkProvider;
+import net.pingfang.network.dll.lp.config.SdkNet;
+import net.pingfang.network.dll.lp.values.ResultCode;
+
+/**
+ * <p>
+ *
+ * </p>
+ *
+ * @author 王超
+ * @since 2022-09-24 15:37
+ */
+@Component
+@Slf4j
+public class LicensePlateClientProvider implements NetworkProvider<LicensePlateClientProperties> {
+
+	public LicensePlateClientProvider() {
+		SdkNet.init();
+	}
+
+	@Override
+	public NetworkType getType() {
+		return DefaultNetworkType.LP_DLL;
+	}
+
+	@Override
+	public LicensePlateClient createNetwork(LicensePlateClientProperties properties) {
+		LicensePlateClient client = new LicensePlateClient(properties.getId(), properties.getLaneId());
+		int handle = init(properties.getHost(), (short) properties.getPort(), (short) properties.getTimeout(), client);
+		client.setHandle(handle);
+		return client;
+	}
+
+	/**
+	 * 初始化连接
+	 *
+	 * @param ip      IP地址
+	 * @param port    端口号
+	 * @param timeout 连接超时时间
+	 */
+	public int init(String ip, short port, short timeout, LicensePlateClient client) {
+		int handle = -1;
+		// 添加相机
+		handle = SdkNet.net.Net_AddCamera(ip);
+		if (handle != -1) {
+			int conn = SdkNet.net.Net_ConnCamera(handle, port, timeout);
+			if (conn != 0) {
+				log.error("相机连接：" + ResultCode.getMsg(conn));
+			}
+			int rem = SdkNet.net.Net_RegReportMessEx(handle, client.reportCBEx(), Pointer.NULL);
+			if (rem != 0) {
+				throw new RuntimeException("车牌识别结果获取回调函数注册完毕：" + ResultCode.getMsg(rem));
+			}
+			int rev = SdkNet.net.Net_RegImageRecvEx(handle, client.imageCBEx(), Pointer.createConstant(port));
+			if (rev != 0) {
+				throw new RuntimeException("车牌识别结果获取回调函数注册完毕：" + ResultCode.getMsg(rev));
+			}
+		}
+		return handle;
+	}
+
+	@Override
+	public void reload(Network network, LicensePlateClientProperties properties) {
+		LicensePlateClient plateClient = ((LicensePlateClient) network);
+		int handle = init(properties.getHost(), (short) properties.getPort(), (short) properties.getTimeout(),
+				plateClient);
+		plateClient.setHandle(handle);
+	}
+
+	@Override
+	public LicensePlateClientProperties createConfig(NetworkProperties properties)
+			throws InvocationTargetException, IllegalAccessException {
+		LicensePlateClientProperties config = new LicensePlateClientProperties();
+		BeanUtils.copyBean(config, properties.getConfigurations());
+		config.setId(properties.getId());
+		config.setLaneId(properties.getLaneId());
+		return config;
+	}
+
+	@Override
+	public List<CustomizedSettingData> getBasicForm() {
+		return Lists.newArrayList();
+	}
+}

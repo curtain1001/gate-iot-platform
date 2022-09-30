@@ -12,10 +12,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
 import net.pingfang.business.domain.BtpDevice;
-import net.pingfang.business.domain.BtpNetworkConfig;
-import net.pingfang.business.enums.NetworkConfigState;
+import net.pingfang.business.domain.BtpNetwork;
+import net.pingfang.business.enums.NetworkState;
 import net.pingfang.business.service.IBtpDeviceService;
-import net.pingfang.business.service.IBtpNetworkConfigService;
+import net.pingfang.business.service.IBtpNetworkService;
 import net.pingfang.iot.common.network.NetworkType;
 import net.pingfang.network.NetworkConfigManager;
 import net.pingfang.network.NetworkProperties;
@@ -28,7 +28,7 @@ import net.pingfang.network.NetworkProperties;
 @Component
 public class DefaultNetworkConfigManager implements NetworkConfigManager {
 	@Resource
-	public IBtpNetworkConfigService networkConfigService;
+	public IBtpNetworkService networkService;
 
 	@Resource
 	public IBtpDeviceService deviceService;
@@ -42,9 +42,9 @@ public class DefaultNetworkConfigManager implements NetworkConfigManager {
 
 	@Override
 	public NetworkProperties getConfig(String configId) {
-		LambdaQueryWrapper<BtpNetworkConfig> queryWrapper = Wrappers.lambdaQuery();
-		queryWrapper.eq(BtpNetworkConfig::getNetworkConfigId, configId);
-		BtpNetworkConfig config = networkConfigService.getOne(queryWrapper);
+		LambdaQueryWrapper<BtpNetwork> queryWrapper = Wrappers.lambdaQuery();
+		queryWrapper.eq(BtpNetwork::getNetworkId, configId);
+		BtpNetwork config = networkService.getOne(queryWrapper);
 		if (config != null) {
 			return config.toNetworkProperties();
 		}
@@ -53,21 +53,22 @@ public class DefaultNetworkConfigManager implements NetworkConfigManager {
 
 	@Override
 	public List<NetworkProperties> getConfig() {
-		List<BtpNetworkConfig> configs = networkConfigService.list();
+		List<BtpNetwork> configs = networkService.list();
 		if (!configs.isEmpty()) {
-			return configs.stream().map(BtpNetworkConfig::toNetworkProperties).collect(Collectors.toList());
+			return configs.stream().map(BtpNetwork::toNetworkProperties).collect(Collectors.toList());
 		}
 		return Lists.newArrayList();
 	}
 
 	@Override
 	public void update(String configId, String state) {
-		LambdaQueryWrapper<BtpNetworkConfig> queryWrapper = Wrappers.lambdaQuery();
-		queryWrapper.eq(BtpNetworkConfig::getNetworkConfigId, configId);
-		BtpNetworkConfig config = networkConfigService.getOne(queryWrapper);
+		LambdaQueryWrapper<BtpNetwork> queryWrapper = Wrappers.lambdaQuery();
+		queryWrapper.eq(BtpNetwork::getNetworkId, configId);
+		BtpNetwork config = networkService.getOne(queryWrapper);
+
 		config = config.toBuilder() //
-				.status(NetworkConfigState.valueOf(state)) //
+				.status(NetworkState.valueOf(state)) //
 				.build();
-		networkConfigService.updateById(config);
+		networkService.updateById(config);
 	}
 }

@@ -72,8 +72,8 @@ public class ContainerOcrServer implements ServerOperator {
 	public Flux<FunctionMessage> subscribe(Long laneId) {
 		TcpServer tcpServer = (TcpServer) networkManager.getNetwork(DefaultNetworkType.TCP_SERVER, serverId);
 		if (tcpServer != null) {
-			return tcpServer.subscribe().map(
-					x -> new FunctionMessage(laneId, null, ContainerOcrProduct.CONTAINER_OCR, x, x.getPayloadType()));
+			return tcpServer.subscribe().map(x -> new FunctionMessage(laneId, null, ContainerOcrProduct.CONTAINER_OCR,
+					x, x.getPayloadType(), null));
 		} else {
 			throw new RuntimeException("服务异常：网络组件未正常启动！");
 		}

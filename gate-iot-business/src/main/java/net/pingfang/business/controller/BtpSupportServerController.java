@@ -20,9 +20,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
-import net.pingfang.business.domain.BtpNetworkConfig;
+import net.pingfang.business.domain.BtpNetwork;
 import net.pingfang.business.domain.BtpSupportServer;
-import net.pingfang.business.service.IBtpNetworkConfigService;
+import net.pingfang.business.service.IBtpNetworkService;
 import net.pingfang.business.service.IBtpSupportServerService;
 import net.pingfang.common.annotation.Log;
 import net.pingfang.common.core.controller.BaseController;
@@ -47,7 +47,7 @@ public class BtpSupportServerController extends BaseController {
 	@Resource
 	public IBtpSupportServerService supportServerService;
 	@Resource
-	public IBtpNetworkConfigService networkConfigService;
+	public IBtpNetworkService networkService;
 	@Resource
 	public EventBusCenter eventBusCenter;
 
@@ -74,9 +74,9 @@ public class BtpSupportServerController extends BaseController {
 		TableDataInfo info = getDataTable(list);
 		info.setRows(info.getRows().stream().peek(x -> {
 			BtpSupportServer server = (BtpSupportServer) x;
-			LambdaQueryWrapper<BtpNetworkConfig> lambdaQueryWrapper = Wrappers.lambdaQuery();
-			lambdaQueryWrapper.eq(BtpNetworkConfig::getNetworkConfigId, server.getNetworkId());
-			BtpNetworkConfig networkConfig = networkConfigService.getOne(lambdaQueryWrapper);
+			LambdaQueryWrapper<BtpNetwork> lambdaQueryWrapper = Wrappers.lambdaQuery();
+			lambdaQueryWrapper.eq(BtpNetwork::getNetworkId, server.getNetworkId());
+			BtpNetwork networkConfig = networkService.getOne(lambdaQueryWrapper);
 			if (networkConfig != null) {
 				server.setNetworkName(networkConfig.getName());
 			}

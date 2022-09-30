@@ -24,7 +24,6 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
 import net.pingfang.business.domain.BtpDevice;
 import net.pingfang.business.manager.DefaultDeviceOperatorManager;
-import net.pingfang.business.manager.DefaultInstructionManager;
 import net.pingfang.business.service.IBtpDeviceService;
 import net.pingfang.business.service.IBtpInstructionService;
 import net.pingfang.common.annotation.Log;
@@ -50,8 +49,6 @@ public class BtpDeviceController extends BaseController {
 	IBtpInstructionService instructionService;
 	@Resource
 	DefaultDeviceOperatorManager operatorManager;
-	@Resource
-	DefaultInstructionManager instructionManager;
 
 	@GetMapping("/product/list")
 	public AjaxResult getDeviceProduct() {
@@ -165,7 +162,7 @@ public class BtpDeviceController extends BaseController {
 		// if (btpDeviceService.count(wrapper) > 0) {
 		// return AjaxResult.error("新增设备'" + device.getProduct() + "'失败，通道内设备产品唯一");
 		// }
-
+		device.setEnabled(1);
 		device.setCreateBy(getUsername());
 		device.setCreateTime(new Date());
 		return toAjax(btpDeviceService.save(device));
@@ -197,7 +194,9 @@ public class BtpDeviceController extends BaseController {
 	@Log(title = "设备管理", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
 	public AjaxResult remove(@PathVariable Long[] ids) {
-		btpDeviceService.removeByIds(Arrays.asList(ids));
+		Arrays.stream(ids).forEach(x -> {
+			btpDeviceService.removeById(x);
+		});
 		return AjaxResult.success();
 	}
 

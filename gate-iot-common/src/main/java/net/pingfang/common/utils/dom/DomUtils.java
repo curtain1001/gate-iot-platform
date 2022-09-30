@@ -78,8 +78,7 @@ public class DomUtils {
 		if (xmlstr == "" || xmlstr == null) {
 			return null;
 		}
-		Document document = DocumentHelper.parseText(xmlstr);
-		return document;
+		return DocumentHelper.parseText(xmlstr);
 	}
 
 	/**

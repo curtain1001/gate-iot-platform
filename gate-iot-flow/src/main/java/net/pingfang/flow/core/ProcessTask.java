@@ -22,6 +22,7 @@ import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import net.pingfang.common.event.EventBusCenter;
 import net.pingfang.common.exception.ServiceException;
+import net.pingfang.common.manager.AsyncManager;
 import net.pingfang.common.utils.JsonUtils;
 import net.pingfang.common.utils.StringUtils;
 import net.pingfang.device.core.DeviceManager;
@@ -43,7 +44,7 @@ import net.pingfang.flow.utils.FlowUtils;
 import net.pingfang.flow.values.EdgeProperties;
 import net.pingfang.flow.values.NodeProperties;
 import net.pingfang.flow.values.ProcessMessage;
-import net.pingfang.framework.manager.AsyncManager;
+import net.pingfang.iot.common.FunctionMessage;
 import net.pingfang.iot.common.instruction.InstructionManager;
 import net.pingfang.iot.common.instruction.InstructionResult;
 import net.pingfang.iot.common.instruction.InstructionType;
@@ -116,7 +117,7 @@ public class ProcessTask {
 	/**
 	 * 流程触发的报文
 	 */
-	private ProcessMessage message;
+	private FunctionMessage message;
 
 	public void put(ProcessMessage message) {
 		sink.next(message);
@@ -165,59 +166,65 @@ public class ProcessTask {
 						.collect(Collectors.toList()));
 			}
 		}
-
-		processor.subscribe(x -> {
-			this.message = x;
-			this.triggerNodes.clear();
-			try {
-				if (this.laneId != null) {
-					checkProcessInstance();
-				}
-				if (this.instanceId == null) {
-					LambdaQueryWrapper<FlowDeployment> queryWrapper = Wrappers.lambdaQuery();
-					queryWrapper.eq(FlowDeployment::getLaneId, this.laneId);
-					FlowDeployment deployment = this.deploymentService.getOne(queryWrapper);
-					List<FlowNode> flowNodes = getStartNode(deployment);
-					if (CollectionUtils.isEmpty(flowNodes)) {
-						log.error("流程有误：不存在开始节点");
-						return;
-					}
-					List<FlowNode> checked = flowNodes.stream().filter(node -> checkNode(x, node))
-							.collect(Collectors.toList());
-					if (CollectionUtils.isEmpty(checked)) {
-						return;
-					}
-					this.startNode.addAll(checked);
-					// 开始流程命中 流程开始
-					FlowProcessInstance instance = FlowProcessInstance.builder() //
-							.laneId(laneId)//
-							.deployId(deployment.getDeployId())//
-							.startTime(new Date())//
-							.status(InstanceStatus.IN_PROGRESS)//
-							.build();
-					processInstanceService.save(instance);//
-					this.instanceId = instance.getInstanceId();
-					// 设置完整流程节点信息
-					setFlow(deployment);
-					// 初始化返回报文内容
-					initResult();
-					// 同层多节点时分支处理
-					transfer(checked);
-				} else {
-					// 流程中
-					List<FlowNode> checked = this.currentNodes.stream().filter(node -> checkNode(x, node))
-							.collect(Collectors.toList());
-					if (CollectionUtils.isEmpty(checked)) {
-						return;
-					}
-					// 节点命中
-					transfer(checked);
-				}
-			} catch (Exception e) {
-				log.error("异常:", e);
+		this.flowNodes.forEach(node -> {
+			if (node.getProperties().getInsType().equals(InstructionType.up)) {
+				instructionManager.subscribe(laneId, node.getProperties().getDeviceId(),
+						node.getProperties().getInstruction().getValue()).subscribe(this::promote);
 			}
-
 		});
+	}
+
+	public void promote(FunctionMessage functionMessage) {
+
+		this.message = functionMessage;
+		this.triggerNodes.clear();
+		try {
+			if (this.laneId != null) {
+				checkProcessInstance();
+			}
+			if (this.instanceId == null) {
+				LambdaQueryWrapper<FlowDeployment> queryWrapper = Wrappers.lambdaQuery();
+				queryWrapper.eq(FlowDeployment::getLaneId, this.laneId);
+				FlowDeployment deployment = this.deploymentService.getOne(queryWrapper);
+				List<FlowNode> flowNodes = getStartNode(deployment);
+				if (CollectionUtils.isEmpty(flowNodes)) {
+					log.error("流程有误：不存在开始节点");
+					return;
+				}
+				List<FlowNode> checked = flowNodes.stream().filter(node -> checkNode(functionMessage, node))
+						.collect(Collectors.toList());
+				if (CollectionUtils.isEmpty(checked)) {
+					return;
+				}
+				this.startNode.addAll(checked);
+				// 开始流程命中 流程开始
+				FlowProcessInstance instance = FlowProcessInstance.builder() //
+						.laneId(laneId)//
+						.deployId(deployment.getDeployId())//
+						.startTime(new Date())//
+						.status(InstanceStatus.IN_PROGRESS)//
+						.build();
+				processInstanceService.save(instance);//
+				this.instanceId = instance.getInstanceId();
+				// 设置完整流程节点信息
+				setFlow(deployment);
+				// 初始化返回报文内容
+				initResult();
+				// 同层多节点时分支处理
+				transfer(checked);
+			} else {
+				// 流程中
+				List<FlowNode> checked = this.currentNodes.stream().filter(node -> checkNode(functionMessage, node))
+						.collect(Collectors.toList());
+				if (CollectionUtils.isEmpty(checked)) {
+					return;
+				}
+				// 节点命中
+				transfer(checked);
+			}
+		} catch (Exception e) {
+			log.error("异常:", e);
+		}
 	}
 
 	public void transfer(List<FlowNode> flowNodes) {
@@ -472,18 +479,18 @@ public class ProcessTask {
 	/**
 	 * 核验节点 判断节点与事件是否一致
 	 *
-	 * @param processMessage 触发事件报文
-	 * @param flowNode       触发流程节点
+	 * @param functionMessage 触发事件报文
+	 * @param flowNode        触发流程节点
 	 * @return 是否触发流程
 	 */
-	public boolean checkNode(ProcessMessage processMessage, FlowNode flowNode) {
+	public boolean checkNode(FunctionMessage functionMessage, FlowNode flowNode) {
 		boolean bln = false;
-		if (processMessage.getProduct().getType() == flowNode.getProperties().getObjectType()) {
-			if (processMessage.getProduct().getType() == ObjectType.device) {
-				bln = processMessage.getDeviceId().equals(flowNode.getProperties().getDeviceId())
-						&& processMessage.getInstruction() == flowNode.getProperties().getInstruction();
-			} else if (processMessage.getProduct().getType() == ObjectType.service) {
-				bln = processMessage.getInstruction() == flowNode.getProperties().getInstruction();
+		if (functionMessage.getProduct().getType() == flowNode.getProperties().getObjectType()) {
+			if (functionMessage.getProduct().getType() == ObjectType.device) {
+				bln = functionMessage.getDeviceId().equals(flowNode.getProperties().getDeviceId())
+						&& functionMessage.getInstruction() == flowNode.getProperties().getInstruction();
+			} else if (functionMessage.getProduct().getType() == ObjectType.service) {
+				bln = functionMessage.getInstruction() == flowNode.getProperties().getInstruction();
 			}
 		}
 		if (bln) {

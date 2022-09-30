@@ -1,8 +1,5 @@
 package net.pingfang.device.plc;
 
-import java.util.Collections;
-import java.util.Map;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.ByteBufUtil;
@@ -14,10 +11,8 @@ import net.pingfang.iot.common.instruction.InstructionManager;
 import net.pingfang.iot.common.product.Product;
 import net.pingfang.network.DefaultNetworkType;
 import net.pingfang.network.NetworkManager;
-import net.pingfang.network.NetworkProperties;
 import net.pingfang.network.tcp.TcpMessage;
 import net.pingfang.network.tcp.client.TcpClient;
-import net.pingfang.network.tcp.parser.PayloadParserType;
 import net.pingfang.network.utils.BytesUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -65,11 +60,6 @@ public class PLCDevice implements DeviceOperator {
 	}
 
 	@Override
-	public DeviceState getStatus() {
-		return checkStatus();
-	}
-
-	@Override
 	public void shutdown() {
 		networkManager.shutdown(DefaultNetworkType.TCP_CLIENT, deviceId);
 		this.tcpClient = null;
@@ -80,7 +70,7 @@ public class PLCDevice implements DeviceOperator {
 		return tcpClient.subscribe() //
 				.map(x -> new FunctionMessage(this.laneId, deviceId, PLCProduct.PLC, //
 						BytesUtils.getBufHexStr(ByteBufUtil.getBytes((ByteBuf) x.getPayload())),
-						MessagePayloadType.STRING)) //
+						MessagePayloadType.STRING, null)) //
 				.filterWhen(x -> {
 					if (laneId != null) {
 						return Mono.just(laneId.equals(x.getLaneId()));
@@ -108,11 +98,6 @@ public class PLCDevice implements DeviceOperator {
 	}
 
 	@Override
-	public void setStatus(DeviceState state) {
-
-	}
-
-	@Override
 	public boolean isAutoReload() {
 		return true;
 	}
@@ -136,18 +121,7 @@ public class PLCDevice implements DeviceOperator {
 		}
 	}
 
-	public void setTcpClient(Map<String, Object> properties) {
-		// 粘黏包处理设置
-		properties.put("parserType", PayloadParserType.FIXED_LENGTH);
-		properties.put("parserConfiguration", Collections.singletonMap("size", 4));
-
-		NetworkProperties networkProperties = new NetworkProperties();
-		networkProperties.setId(deviceId);
-		networkProperties.setName("PLC::TCP::CLIENT::" + deviceId);
-		networkProperties.setEnabled(true);
-		networkProperties.setConfigurations(properties);
-		this.tcpClient = (TcpClient) networkManager.getNetwork(DefaultNetworkType.TCP_CLIENT, networkProperties,
-				deviceId);
+	public void setTcpClient(TcpClient tcpClient) {
+		this.tcpClient = tcpClient;
 	}
-
 }

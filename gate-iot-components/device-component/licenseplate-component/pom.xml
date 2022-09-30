@@ -16,18 +16,6 @@
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
     <dependencies>
-        <!--        车牌识别sdk-->
-        <dependency>
-            <groupId>net.pingfang</groupId>
-            <artifactId>licenseplate-sdk</artifactId>
-            <version>3.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>net.pingfang</groupId>
-            <artifactId>jna</artifactId>
-            <version>1.0</version>
-        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
@@ -58,6 +46,12 @@
         <dependency>
             <groupId>net.pingfang</groupId>
             <artifactId>gate-iot-framework</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.pingfang</groupId>
+            <artifactId>dll-component</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
     <distributionManagement>

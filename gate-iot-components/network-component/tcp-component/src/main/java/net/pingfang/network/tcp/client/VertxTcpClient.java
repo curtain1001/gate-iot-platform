@@ -19,9 +19,9 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.pingfang.iot.common.EncodedMessage;
 import net.pingfang.iot.common.MessagePayloadType;
+import net.pingfang.iot.common.NetworkMessage;
 import net.pingfang.iot.common.network.NetworkType;
 import net.pingfang.network.DefaultNetworkType;
-import net.pingfang.network.NetworkMessage;
 import net.pingfang.network.tcp.TcpMessage;
 import net.pingfang.network.tcp.parser.PayloadParser;
 import reactor.core.publisher.EmitterProcessor;
@@ -96,8 +96,8 @@ public class VertxTcpClient implements TcpClient {
 	}
 
 	@Override
-	public Flux<EncodedMessage> receiveMessage() {
-		return this.subscribe().cast(EncodedMessage.class);
+	public Flux<NetworkMessage> receiveMessage() {
+		return this.subscribe().cast(NetworkMessage.class);
 	}
 
 	@Override
@@ -123,8 +123,8 @@ public class VertxTcpClient implements TcpClient {
 	 */
 	protected void received(NetworkMessage message) {
 		if (processor.getPending() > processor.getBufferSize() / 2) {
-			log.warn("net.pingfang.gateiot.network.tcp [{}] message pending {} ,drop message:{}",
-					processor.getPending(), getRemoteAddress(), message.toString());
+			log.warn("tcp client [{}] message pending {} ,drop message:{}", processor.getPending(), getRemoteAddress(),
+					message.toString());
 			return;
 		}
 		sink.next(message);
@@ -139,7 +139,7 @@ public class VertxTcpClient implements TcpClient {
 		try {
 			runnable.run();
 		} catch (Exception e) {
-			log.warn("close net.pingfang.gateiot.network.tcp client error", e);
+			log.warn("close tcp client error", e);
 		}
 	}
 
@@ -159,7 +159,7 @@ public class VertxTcpClient implements TcpClient {
 
 	@Override
 	public void shutdown() {
-		log.debug("net.pingfang.gateiot.network.tcp client [{}] disconnect", getId());
+		log.debug("tcp client [{}] disconnect", getId());
 		synchronized (this) {
 			if (null != client) {
 				execute(client::close);
@@ -178,6 +178,9 @@ public class VertxTcpClient implements TcpClient {
 			execute(runnable);
 		}
 		disconnectListener.clear();
+		if (serverClient) {
+			processor.onComplete();
+		}
 	}
 
 	public void setClient(NetClient client) {
@@ -205,8 +208,9 @@ public class VertxTcpClient implements TcpClient {
 				received(NetworkMessage.builder() //
 						.deviceId(deviceId)//
 						.laneId(laneId)//
-						.payload(buffer.getBytes())//
-						.payloadType(MessagePayloadType.BINARY)//
+						.payload(Hex.encodeHexString(buffer.getBytes()))//
+						.payloadType(MessagePayloadType.STRING)//
+						.networkType(DefaultNetworkType.TCP_CLIENT)//
 						.build());
 			});
 		}
@@ -225,13 +229,13 @@ public class VertxTcpClient implements TcpClient {
 			}
 			this.socket = socket.closeHandler(v -> shutdown()).handler(buffer -> {
 				if (log.isDebugEnabled()) {
-					log.debug("handle net.pingfang.gateiot.network.tcp client[{}] payload:[{}]", socket.remoteAddress(),
+					log.debug("handle tcp client[{}] payload:[{}]", socket.remoteAddress(),
 							Hex.encodeHexString(buffer.getBytes()));
 				}
 				keepAlive();
 				payloadParser.handle(buffer);
 				if (this.socket != socket) {
-					log.warn("net.pingfang.gateiot.network.tcp client [{}] memory leak ", socket.remoteAddress());
+					log.warn("tcp client [{}] memory leak ", socket.remoteAddress());
 					socket.close();
 				}
 			});

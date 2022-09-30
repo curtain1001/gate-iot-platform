@@ -31,7 +31,7 @@ public interface ClientConnection {
 	 *
 	 * @return 消息流
 	 */
-	Flux<EncodedMessage> receiveMessage();
+	Flux<NetworkMessage> receiveMessage();
 
 	/**
 	 * 断开连接

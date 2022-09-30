@@ -76,7 +76,7 @@ public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProc
 //		}, 5, 5, TimeUnit.SECONDS);
 		executorService.scheduleWithFixedDelay(() -> {
 			Flux.fromStream(store.values().stream()).subscribe(d -> d.values().forEach(o -> {
-				log.info("设备：{};状态{}", o.getDeviceId(), o.getStatus());
+				log.info("设备：{};状态{}", o.getDeviceId(), o.isAlive());
 
 			}));
 		}, 25, 25, TimeUnit.SECONDS);

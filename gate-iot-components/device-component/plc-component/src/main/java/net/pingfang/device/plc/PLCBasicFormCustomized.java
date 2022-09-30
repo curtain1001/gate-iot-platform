@@ -2,6 +2,7 @@ package net.pingfang.device.plc;
 
 import net.pingfang.common.utils.StringUtils;
 import net.pingfang.iot.common.customizedsetting.Customized;
+import net.pingfang.network.tcp.parser.CustomizedOptions;
 
 /**
  * <p>
@@ -15,7 +16,9 @@ public enum PLCBasicFormCustomized implements Customized {
 
 	IP("host", "string", "", "ip地址", "", ""), //
 	PORT("port", "number", "", "端口号", "", ""), //
-	TIMEOUT("timeout", "number", "", "超时时间", "", ""), //
+	KEEPALIVE("keepalive", "boolean", "", "长连接", "", "false"), //
+	TIMEOUT("keepAliveTimeout", "number", "", "超时时间", "", ""), //
+	PARSER_TYPE("parserType", "customized", CustomizedOptions.parserTypeOptions(), "解析方式", "", ""), //
 	;
 
 	PLCBasicFormCustomized(String value, String type, String options, String label, String customizeType,
@@ -66,7 +69,7 @@ public enum PLCBasicFormCustomized implements Customized {
 	}
 
 	private String booleanOptions() {
-		return "[{\"key\": \"是\",\"value\": \"1\"},{\"key\": \"否\",\"value\": \"0\"}]";
+		return "[{\"key\": \"是\",\"value\": true},{\"key\": \"否\",\"value\": false}]";
 	}
 
 }

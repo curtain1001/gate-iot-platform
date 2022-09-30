@@ -15,5 +15,6 @@
         <module>service-core</module>
         <module>dock-component</module>
         <module>containerocr-component</module>
+        <module>wheelhubocr-component</module>
     </modules>
 </project>

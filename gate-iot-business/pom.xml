@@ -79,6 +79,13 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>http-component</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>network-core</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -108,6 +115,12 @@
         <dependency>
             <groupId>net.pingfang</groupId>
             <artifactId>containerocr-component</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.pingfang</groupId>
+            <artifactId>wheelhubocr-component</artifactId>
             <version>1.0.0</version>
             <scope>compile</scope>
         </dependency>

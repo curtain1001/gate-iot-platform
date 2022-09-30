@@ -83,7 +83,6 @@
             <artifactId>network-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-
     </dependencies>
 
     <build>
