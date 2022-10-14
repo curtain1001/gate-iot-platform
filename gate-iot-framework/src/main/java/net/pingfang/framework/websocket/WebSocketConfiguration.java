@@ -1,10 +1,12 @@
 package net.pingfang.framework.websocket;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.security.Principal;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
+import net.pingfang.common.utils.JsonUtils;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.ServerHttpRequest;
@@ -55,12 +57,14 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
 		registry.addEndpoint(webSocketProperties.getTopicEndPoint()) //
 				.addInterceptors(interceptor) //
 				.setHandshakeHandler(handshakeHandler) //
-				.setAllowedOrigins("*").withSockJS(); //
+				.setAllowedOriginPatterns("*") //
+				.withSockJS(); //
 		// 用于点对点通信的endPoint
 		registry.addEndpoint(webSocketProperties.getUserEndPoint()) //
 				.addInterceptors(interceptor) //
 				.setHandshakeHandler(handshakeHandler) //
-				.setAllowedOrigins("*").withSockJS();
+				.setAllowedOriginPatterns("*") //
+				.withSockJS();
 	}
 
 	@Override
@@ -77,20 +81,18 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
 		@Override
 		public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
 				WebSocketHandler wsHandler, Map<String, Object> attributes) {
-			ServletServerHttpRequest req = (ServletServerHttpRequest) request;
-			try {
-
-				LoginUser loginUser = tokenService
-						.getLoginUser(((ServletServerHttpRequest) request).getServletRequest());
-				if (loginUser == null) {
-					log.error("token is invalid, webSocket connect can`t be establish");
-					return false;
-				}
-				attributes.put("userId", loginUser.getUserId());
-			} catch (Exception e) {
-				log.error("权限验证失败：", e);
-				return false;
-			}
+//			try {
+//				LoginUser loginUser = tokenService
+//						.getLoginUser(((ServletServerHttpRequest) request).getServletRequest());
+//				if (loginUser == null) {
+//					log.error("token is invalid, webSocket connect can`t be establish");
+//					return false;
+//				}
+//				attributes.put("userId", loginUser.getUserId());
+//			} catch (Exception e) {
+//				log.error("权限验证失败：", e);
+//				return false;
+//			}
 
 			return true;
 		}

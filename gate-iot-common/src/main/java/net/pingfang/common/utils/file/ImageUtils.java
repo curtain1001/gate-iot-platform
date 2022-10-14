@@ -28,7 +28,7 @@ public class ImageUtils {
 		try {
 			return IOUtils.toByteArray(is);
 		} catch (Exception e) {
-			log.error("图片加载异常 {}", e);
+			log.error("图片加载异常:", e);
 			return null;
 		} finally {
 			IOUtils.closeQuietly(is);

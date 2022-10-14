@@ -23,8 +23,8 @@ import net.pingfang.common.utils.spring.SpringUtils;
  *
  * @author ruoyi
  */
-@Component
-@ServerEndpoint(value = "/websocket/message", configurator = GetHttpSessionConfigurator.class)
+//@Component
+//@ServerEndpoint(value = "/websocket/message", configurator = GetHttpSessionConfigurator.class)
 @Slf4j
 public class WebSocketServer {
 

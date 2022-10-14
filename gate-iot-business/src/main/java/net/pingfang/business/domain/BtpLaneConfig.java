@@ -47,7 +47,6 @@ public class BtpLaneConfig extends BaseEntity {
 	 */
 	private String status;
 
-	@NotNull(message = "车道id不能为空")
 	public Long getLaneId() {
 		return laneId;
 	}

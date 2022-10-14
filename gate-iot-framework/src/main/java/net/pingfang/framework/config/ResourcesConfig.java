@@ -1,5 +1,7 @@
 package net.pingfang.framework.config;
 
+import com.google.common.collect.Lists;
+import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -58,6 +60,12 @@ public class ResourcesConfig implements WebMvcConfigurer {
 		config.addAllowedMethod("*");
 		// 有效期 1800秒
 		config.setMaxAge(1800L);
+		config.setExposedHeaders(Arrays.asList("Access-Control-Allow-Headers",
+				"Access-Control-Allow-Methods",
+				"Access-Control-Allow-Origin",
+				"Access-Control-Max-Age",
+				"Access-Control-Request-Headers",
+				"X-Frame-Options"));
 		// 添加映射路径，拦截一切请求
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", config);

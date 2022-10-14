@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 
-@Component
+//@Component
 public class DefaultMessagingManager implements MessagingManager, BeanPostProcessor {
 
 	private final Map<String, SubscriptionProvider> subProvider = new ConcurrentHashMap<>();

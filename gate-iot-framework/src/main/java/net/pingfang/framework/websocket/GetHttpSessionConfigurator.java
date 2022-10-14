@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
  * @date 2022-07-20 16:51
  */
 
-@Component
+//@Component
 public class GetHttpSessionConfigurator extends Configurator {
 	/**
 	 * 重写修改握手方法

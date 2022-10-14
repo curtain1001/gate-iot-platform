@@ -144,8 +144,8 @@ vertx:
   max-worker-execute-time: 30
   prefer-native-transport: true
 websocket:
-  topicEndPoint: '/public'
-  userEndPoint: '/private'
+  topicEndPoint: '/ws/public'
+  userEndPoint: '/ws/private'
 liquibase:
   changelog:
     - /database/business/btpArea.xml

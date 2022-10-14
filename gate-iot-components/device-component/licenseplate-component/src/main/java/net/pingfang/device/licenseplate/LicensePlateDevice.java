@@ -103,7 +103,7 @@ public class LicensePlateDevice implements DeviceOperator {
 
 	public int imageSnap() {
 		T_DCImageSnap.ByReference ptImageSnap = new T_DCImageSnap.ByReference();
-		int is = SdkNet.net.Net_ImageSnap(client.getHandle(), ptImageSnap);
+		int is = SdkNet.net.Net_ImageSnap(client.getHandle(),new T_DCImageSnap.ByReference());
 		log.info(StatusCode.getStatusCode(is, "Net_ImageSnap"));
 		if (is == 0) {
 			log.info("等待回调输出：");
