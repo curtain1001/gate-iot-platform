@@ -7,11 +7,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.instruction.DeviceInstruction;
 import net.pingfang.device.licenseplate.LicensePlateDevice;
-import net.pingfang.device.licenseplate.LicensePlateProduct;
+import net.pingfang.device.licenseplate.LicensePlateDeviceProduct;
 import net.pingfang.device.licenseplate.values.StatusCode;
 import net.pingfang.iot.common.instruction.InstructionResult;
 import net.pingfang.iot.common.instruction.InstructionType;
-import net.pingfang.iot.common.product.Product;
+import net.pingfang.iot.common.product.DeviceProduct;
 
 /**
  * @author 王超
@@ -35,8 +35,8 @@ public class ImageSnap implements DeviceInstruction {
 	}
 
 	@Override
-	public Product getProduct() {
-		return LicensePlateProduct.OCR_License_Plate;
+	public DeviceProduct getProduct() {
+		return LicensePlateDeviceProduct.OCR_LICENSE_PLATE_III;
 	}
 
 	@Override

@@ -27,7 +27,7 @@ import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.DeviceProperties;
 import net.pingfang.device.core.DeviceProvider;
 import net.pingfang.device.core.manager.DeviceConfigManager;
-import net.pingfang.iot.common.product.Product;
+import net.pingfang.iot.common.product.DeviceProduct;
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
@@ -91,7 +91,7 @@ public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProc
 	}
 
 	@Override
-	public <T extends DeviceOperator> DeviceOperator create(Long laneId, String deviceId, Product type) {
+	public <T extends DeviceOperator> DeviceOperator create(Long laneId, String deviceId, DeviceProduct type) {
 		Map<String, DeviceOperator> operatorMap = getDeviceStore(laneId);
 		DeviceOperator deviceOperator = operatorMap.get(deviceId);
 		if (deviceOperator == null || !deviceOperator.isAlive()) {
@@ -109,12 +109,12 @@ public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProc
 	}
 
 	@Override
-	public <T extends DeviceOperator> List<DeviceOperator> getDevices(Product product) {
-		return store.values().stream().flatMap(x -> x.values().stream()).filter(x -> x.getProduct() == product)
+	public <T extends DeviceOperator> List<DeviceOperator> getDevices(DeviceProduct deviceProduct) {
+		return store.values().stream().flatMap(x -> x.values().stream()).filter(x -> x.getProduct() == deviceProduct)
 				.collect(Collectors.toList());
 	}
 
-	public DeviceOperator createDeviceOperator(Product type, String id) {
+	public DeviceOperator createDeviceOperator(DeviceProduct type, String id) {
 		DeviceProvider<Object> provider = providerSupport.get(type.getName());
 		if (provider == null) {
 			throw new UnsupportedOperationException("不支持的类型:" + type.getName());
@@ -148,14 +148,14 @@ public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProc
 //				operator.subscribe(1L).subscribe(x -> log.warn("订阅1车道的设备"));
 //				operator.subscribe(null).doOnError(x -> log.error("订阅设备消息异常：" + x.getMessage())).subscribe(x -> {
 //					try {
-//						List<Instruction> instructions = instructionManager.getInstruction(x.getProduct());
+//						List<Instruction> instructions = instructionManager.getInstruction(x.getDeviceProduct());
 //						if (CollectionUtils.isNotEmpty(instructions)) {
 //							Optional<Instruction> optional = instructions.stream()
 //									.filter(i -> i.getInsType() == InstructionType.up && i.isSupport(x.getPayload()))
 //									.findFirst();
 //							optional.ifPresent(instruction -> eventBusCenter.postAsync(MessageUpEvent.builder() //
 //									.laneId(x.getLaneId()) //
-//									.product(x.getProduct())//
+//									.DeviceProduct(x.getDeviceProduct())//
 //									.deviceId(x.getDeviceId()) //
 //									.instruction(instruction)//
 //									.message(x.getPayload()) //
@@ -164,7 +164,7 @@ public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProc
 //						} else {
 //							eventBusCenter.postAsync(MessageUpEvent.builder() //
 //									.laneId(x.getLaneId()) //
-//									.product(x.getProduct())//
+//									.DeviceProduct(x.getDeviceProduct())//
 //									.deviceId(x.getDeviceId()) //
 //									.message(x.getPayload()) //
 //									.type(x.getType())//
@@ -248,9 +248,10 @@ public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProc
 		// 获取并过滤所有停止的网络组件
 		// 重新加载启动状态的网络组件
 		Collection<Map<String, DeviceOperator>> operators = store.values();
-		operators.stream().flatMap(m -> m.values().stream()).filter(x -> !x.isAlive()).forEach(operator -> {
+		operators.stream().flatMap(m -> m.values().stream()).filter(DeviceOperator::isAutoReload)
+				.filter(x -> !x.isAlive()).forEach(operator -> {
 			DeviceProvider<Object> provider = providerSupport.get(operator.getProduct().getName());
-			if (provider == null || !operator.isAutoReload()) {
+			if (provider == null) {
 				return;
 			}
 			DeviceProperties properties = deviceConfigManager.getProperties(operator.getDeviceId());
@@ -272,10 +273,14 @@ public class DefaultDeviceOperatorManager implements DeviceManager, BeanPostProc
 	}
 
 	protected void startDevice() {
-
 		List<DeviceProperties> properties = deviceConfigManager.getProperties();
 		properties.stream().filter(DeviceProperties::isEnabled).forEach(pro -> {
-			this.create(pro.getLaneId(), pro.getDeviceId(), pro.getProduct());
+			try {
+
+				this.create(pro.getLaneId(), pro.getDeviceId(), pro.getDeviceProduct());
+			} catch (Exception e) {
+				log.error("设备启动失败 车道：{} 设备号：{}", pro.getLaneId(), pro.getDeviceId(), e);
+			}
 		});
 	}
 

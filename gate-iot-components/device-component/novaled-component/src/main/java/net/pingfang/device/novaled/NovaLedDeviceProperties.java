@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.pingfang.iot.common.network.NetworkType;
 
 /**
  * <p>
@@ -35,13 +36,15 @@ public class NovaLedDeviceProperties {
 	/**
 	 * ip
 	 */
-	String host;
+	private String host;
 	/**
 	 * 端口
 	 */
-	int port;
+	private int port;
+
+	private NetworkType networkType;
 	/**
 	 * 显示设置
 	 */
-	Map<String, Object> properties;
+	private Map<String, Object> properties;
 }

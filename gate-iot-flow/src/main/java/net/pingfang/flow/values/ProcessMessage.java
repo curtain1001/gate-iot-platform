@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import net.pingfang.iot.common.MessagePayloadType;
 import net.pingfang.iot.common.instruction.Instruction;
-import net.pingfang.iot.common.product.Product;
+import net.pingfang.iot.common.product.DeviceProduct;
 
 /**
  * <p>
@@ -28,7 +28,7 @@ public class ProcessMessage {
 	/**
 	 * 设备产品类型
 	 */
-	private final Product product;
+	private final DeviceProduct deviceProduct;
 	/**
 	 * 指令
 	 */

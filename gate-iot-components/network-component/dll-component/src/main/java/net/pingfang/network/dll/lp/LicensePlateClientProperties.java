@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.pingfang.iot.common.network.NetworkType;
 
 @Getter
 @Setter
@@ -21,5 +22,7 @@ public class LicensePlateClientProperties {
 
 	private Long laneId;
 	private long timeout;
+
+	private NetworkType networkType;
 
 }

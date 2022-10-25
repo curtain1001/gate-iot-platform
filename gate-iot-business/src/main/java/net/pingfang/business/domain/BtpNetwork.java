@@ -46,7 +46,7 @@ public class BtpNetwork extends BaseEntity implements Serializable {
 
 	private String name;
 
-	private int enabled;
+	private boolean enabled;
 
 	@NotNull(message = "类型不能为空")
 	private String type;
@@ -56,7 +56,7 @@ public class BtpNetwork extends BaseEntity implements Serializable {
 	@TableField(jdbcType = JdbcType.VARCHAR, javaType = true, typeHandler = JacksonTypeHandler.class)
 	private Map<String, Object> configuration;
 	/**
-	 * 网络组件对象类型 设备与服务
+	 * 网络组件对象类型 系统创建或用户创建
 	 */
 	private Control control;
 
@@ -67,7 +67,7 @@ public class BtpNetwork extends BaseEntity implements Serializable {
 	public NetworkProperties toNetworkProperties() {
 		NetworkProperties properties = new NetworkProperties();
 		properties.setConfigurations(configuration);
-		properties.setEnabled(enabled == 0);
+		properties.setEnabled(enabled);
 		properties.setId(networkId);
 		properties.setName(name);
 		properties.setControl(control);

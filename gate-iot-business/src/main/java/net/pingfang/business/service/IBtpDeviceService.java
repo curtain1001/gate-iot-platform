@@ -13,8 +13,4 @@ public interface IBtpDeviceService extends IService<BtpDevice> {
 
 	boolean save(BtpDevice device);
 
-	boolean updateById(BtpDevice device);
-
-	boolean removeById(Long id);
-
 }

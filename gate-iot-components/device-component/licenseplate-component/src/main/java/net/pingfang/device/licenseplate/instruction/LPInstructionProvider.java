@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import net.pingfang.device.licenseplate.LicensePlateProduct;
+import net.pingfang.device.licenseplate.LicensePlateDeviceProduct;
 import net.pingfang.iot.common.instruction.Instruction;
 import net.pingfang.iot.common.instruction.InstructionProvider;
 
@@ -18,7 +18,7 @@ import net.pingfang.iot.common.instruction.InstructionProvider;
 public class LPInstructionProvider implements InstructionProvider {
 	@Override
 	public String getName() {
-		return LicensePlateProduct.OCR_License_Plate.name();
+		return LicensePlateDeviceProduct.OCR_LICENSE_PLATE_III.name();
 	}
 
 	@Override

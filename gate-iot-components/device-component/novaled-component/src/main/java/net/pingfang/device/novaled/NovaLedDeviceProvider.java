@@ -2,6 +2,8 @@ package net.pingfang.device.novaled;
 
 import java.lang.reflect.InvocationTargetException;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.stereotype.Component;
 
@@ -9,8 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.DeviceProperties;
 import net.pingfang.device.core.DeviceProvider;
-import net.pingfang.device.novaled.core.NovaLedDevice;
-import net.pingfang.iot.common.product.Product;
+import net.pingfang.iot.common.product.DeviceProduct;
+import net.pingfang.network.NetworkManager;
+import net.pingfang.network.nova.NovaLed;
 
 /**
  * <p>
@@ -23,28 +26,30 @@ import net.pingfang.iot.common.product.Product;
 @Slf4j
 @Component
 public class NovaLedDeviceProvider implements DeviceProvider<NovaLedDeviceProperties> {
+	@Resource
+	NetworkManager networkManager;
 
 	@Override
-	public Product getType() {
+	public DeviceProduct getType() {
 		return NovaLedDeviceProduct.NOVA_LED;
 	}
 
-//	public NovaLedDevice init(NovaLedDevice novaLedDevice, NovaLedDeviceProperties properties) {
-//		Map<String, Object> tcpProperties = JsonUtils.toObject(JsonUtils.toJsonString(properties), Map.class);
-//		novaLedDevice.setTcpClient(tcpProperties);
-//		return novaLedDevice;
-//	}
-
 	@Override
 	public DeviceOperator createDevice(NovaLedDeviceProperties properties) {
-		NovaLedDevice device = new NovaLedDevice(properties.getLaneId(), properties.getId(), properties.getName(),
+		NovaLed novaLed = (NovaLed) networkManager.getNetwork(properties.getNetworkType(), properties.getId());
+		NovaLedDevice novaLedDevice = new NovaLedDevice(properties.getLaneId(), properties.getId(),
+				properties.getName(),
 				properties);
-		return device;
+		novaLedDevice.setNovaLed(novaLed);
+		return novaLedDevice;
 	}
 
 	@Override
-	public void reload(DeviceOperator deviceOperator, NovaLedDeviceProperties novaLedDeviceProperties) {
-		((NovaLedDevice) deviceOperator).setProperties(novaLedDeviceProperties);
+	public void reload(DeviceOperator deviceOperator, NovaLedDeviceProperties properties) {
+		NovaLedDevice device = ((NovaLedDevice) deviceOperator);
+		NovaLed novaLed = (NovaLed) networkManager.getNetwork(properties.getNetworkType(), properties.getId());
+		device.setProperties(properties);
+		device.setNovaLed(novaLed);
 	}
 
 	@Override
@@ -58,6 +63,7 @@ public class NovaLedDeviceProvider implements DeviceProvider<NovaLedDeviceProper
 		config.setId(properties.getDeviceId());
 		config.setLaneId(properties.getLaneId());
 		config.setName(properties.getDeviceName());
+		config.setNetworkType(properties.getNetworkType());
 		return config;
 	}
 }

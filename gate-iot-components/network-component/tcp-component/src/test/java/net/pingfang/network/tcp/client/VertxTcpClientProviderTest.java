@@ -3,16 +3,17 @@ package net.pingfang.network.tcp.client;
 import java.util.Collections;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.net.NetClientOptions;
 import lombok.extern.slf4j.Slf4j;
-import net.pingfang.iot.common.NetworkMessage;
 import net.pingfang.network.tcp.parser.DefaultPayloadParserBuilder;
 import net.pingfang.network.tcp.parser.PayloadParserType;
 import reactor.test.StepVerifier;
 
-//@RunWith(SpringRunner.class)
+@RunWith(SpringRunner.class)
 @Slf4j
 public class VertxTcpClientProviderTest {
 
@@ -34,7 +35,9 @@ public class VertxTcpClientProviderTest {
 		properties.setParserConfiguration(Collections.singletonMap("size", 4));
 		properties.setOptions(new NetClientOptions());
 
-		provider.createNetwork(properties).subscribe().map(NetworkMessage::payloadAsString).take(2)
+		provider.createNetwork(properties).subscribe().map(x -> {
+			return x.payloadAsString();
+		}).take(2)
 				.as(StepVerifier::create).expectNext("test", "test").verifyComplete();
 
 	}

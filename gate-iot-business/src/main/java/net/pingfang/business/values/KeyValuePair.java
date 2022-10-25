@@ -1,5 +1,6 @@
 package net.pingfang.business.values;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,7 +11,8 @@ import lombok.Data;
  */
 @Data
 @Builder(toBuilder = true)
+@AllArgsConstructor
 public class KeyValuePair {
-	Object value;
-	String label;
+	final Object key;
+	final Object value;
 }

@@ -36,9 +36,8 @@ public class NetworkHandler {
 		BtpNetwork config = BtpNetwork.builder()//
 				.networkId(event.getId())//
 				.name(event.getName())//
-				.control(event.getControl())//
 				.configuration(event.getConfigurations())//
-				.enabled(event.getEnabled())//
+				.enabled(event.isEnabled())//
 				.type(event.getType())//
 				.status(NetworkState.disabled)//
 				.createBy(event.getCreateBy())//
@@ -55,9 +54,8 @@ public class NetworkHandler {
 		if (config != null) {
 			config = config.toBuilder() //
 					.name(event.getName())//
-					.control(event.getControl())//
 					.configuration(event.getConfigurations())//
-					.enabled(event.getEnabled())//
+					.enabled(event.isEnabled())//
 					.type(event.getType())//
 					.updateBy(event.getUpdateBy())//
 					.updateTime(event.getUpdateTime())//

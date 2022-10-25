@@ -118,34 +118,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>net.pingfang</groupId>
-            <artifactId>dock-component</artifactId>
-            <version>1.0.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.pingfang</groupId>
-            <artifactId>containerocr-component</artifactId>
-            <version>1.0.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.pingfang</groupId>
-            <artifactId>wheelhubocr-component</artifactId>
-            <version>1.0.0</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
             <groupId>org.javadelight</groupId>
             <artifactId>delight-nashorn-sandbox</artifactId>
             <version>0.2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>net.pingfang</groupId>
-            <artifactId>service-core</artifactId>
-            <version>1.0.0</version>
-            <scope>compile</scope>
         </dependency>
 
     </dependencies>

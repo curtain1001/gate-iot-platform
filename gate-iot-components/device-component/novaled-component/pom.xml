@@ -35,6 +35,12 @@
             <artifactId>common-component</artifactId>
             <version>1.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>net.pingfang.network</groupId>
+            <artifactId>nova-component</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
 
     </dependencies>
     <distributionManagement>

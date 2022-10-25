@@ -236,7 +236,7 @@ public class BtpInstructionController extends BaseController {
 	}
 
 	/**
-	 * 开启设备
+	 * 指令执行
 	 */
 	@PreAuthorize("@ss.hasPermi('business:instruction:open')")
 	@Log(title = "指令管理", businessType = BusinessType.UPDATE)

@@ -11,5 +11,4 @@ import net.pingfang.network.Network;
  * @since 2022-09-28 8:48
  */
 public interface HttpServer extends Network {
-
 }

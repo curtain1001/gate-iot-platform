@@ -12,7 +12,7 @@
 
     <changeSet author="wangchao" id="btp_device::create">
         <createTable tableName="btp_device">
-            <column name="id" remarks="主键" type="BIGINT(20)" incrementBy="1" startWith="1" autoIncrement="true">
+            <column name="id" remarks="主键" type="BIGINT(20)" startWith="1" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="device_id" remarks="设备号" type="varchar(36)">
@@ -24,8 +24,9 @@
             </column>
             <column name="device_name" remarks="设备名称" type="varchar(36)" />
             <column name="product" remarks="设备产品类型" type="varchar(36)" />
-            <column name="configuration" remarks="设备产品类型" type="${clob.type}" />
-            <column name="enabled" type="char(1)" remarks="键值(0=自动,1=不自动开启)" defaultValue="1" />
+            <column name="network_type" remarks="网络组件类型" type="varchar(36)" />
+            <column name="configuration" remarks="配置信息" type="${clob.type}" />
+            <column name="enabled" type="tinyint(1)" remarks="开关(1:开启；0：关闭)" defaultValue="0" />
             <column name="status" type="varchar(12)" remarks="状态" />
             <column name="create_by" defaultValue="" remarks="创建者" type="VARCHAR(64)" />
             <column name="create_time" remarks="创建时间" type="datetime(6)" />

@@ -19,10 +19,10 @@ import net.pingfang.common.utils.JsonUtils;
 import net.pingfang.common.utils.StringUtils;
 import net.pingfang.iot.common.MessagePayloadType;
 import net.pingfang.iot.common.NetworkMessage;
+import net.pingfang.iot.common.NetworkSession;
 import net.pingfang.iot.common.customizedsetting.values.DefaultCustomized;
 import net.pingfang.iot.common.manager.LaneConfigManager;
 import net.pingfang.iot.common.network.NetworkType;
-import net.pingfang.network.DefaultNetworkType;
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
@@ -36,7 +36,7 @@ import reactor.core.publisher.FluxSink;
  * @since 2022-09-28 8:58
  */
 @Slf4j
-public class VertxHttpServer implements HttpServer {
+public class VertxHttpServer implements HttpServer, NetworkSession {
 	final String id;
 	private final EmitterProcessor<NetworkMessage> processor = EmitterProcessor.create(false);
 	private final FluxSink<NetworkMessage> sink = processor.sink(FluxSink.OverflowStrategy.BUFFER);
@@ -87,7 +87,7 @@ public class VertxHttpServer implements HttpServer {
 
 	@Override
 	public NetworkType getType() {
-		return DefaultNetworkType.HTTP_SERVER;
+		return HttpServerNetworkType.HTTP_SERVER;
 	}
 
 	@Override
@@ -139,7 +139,7 @@ public class VertxHttpServer implements HttpServer {
 					log.info("http payload:{}", str);
 					received(NetworkMessage.builder()//
 							.payloadType(MessagePayloadType.JSON)//
-							.networkType(DefaultNetworkType.HTTP_SERVER)//
+							.networkType(HttpServerNetworkType.HTTP_SERVER)//
 							.payload(str)//
 							.deviceId(deviceId)//
 							.laneId(finalLaneId)//
@@ -159,7 +159,7 @@ public class VertxHttpServer implements HttpServer {
 					});
 					received(NetworkMessage.builder()//
 							.payloadType(MessagePayloadType.JSON)//
-							.networkType(DefaultNetworkType.HTTP_SERVER)//
+							.networkType(HttpServerNetworkType.HTTP_SERVER)//
 							.payload(JsonUtils.toJsonString(objectMap))//
 							.deviceId(deviceId)//
 							.laneId(finalLaneId)//
@@ -173,7 +173,7 @@ public class VertxHttpServer implements HttpServer {
 					log.info("http payload:{}", str);
 					received(NetworkMessage.builder()//
 							.payloadType(MessagePayloadType.JSON)//
-							.networkType(DefaultNetworkType.HTTP_SERVER)//
+							.networkType(HttpServerNetworkType.HTTP_SERVER)//
 							.payload(str)//
 							.deviceId(deviceId)//
 							.laneId(finalLaneId)//

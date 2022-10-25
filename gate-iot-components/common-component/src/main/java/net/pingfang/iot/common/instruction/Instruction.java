@@ -1,7 +1,7 @@
 package net.pingfang.iot.common.instruction;
 
 import net.pingfang.iot.common.NetworkMessage;
-import net.pingfang.iot.common.product.Product;
+import net.pingfang.iot.common.product.DeviceProduct;
 
 /**
  * @author 王超
@@ -38,7 +38,7 @@ public interface Instruction {
 	 */
 	InstructionType getInsType();
 
-	Product getProduct();
+	DeviceProduct getProduct();
 
 	default NetworkMessage decode(NetworkMessage networkMessage) {
 		return networkMessage;

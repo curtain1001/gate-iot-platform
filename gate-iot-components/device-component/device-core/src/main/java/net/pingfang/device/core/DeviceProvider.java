@@ -1,7 +1,6 @@
 package net.pingfang.device.core;
 
-import net.pingfang.iot.common.product.Product;
-import net.pingfang.network.DefaultNetworkType;
+import net.pingfang.iot.common.product.DeviceProduct;
 
 /**
  * 设备支持提供商
@@ -14,7 +13,7 @@ public interface DeviceProvider<P> {
 	 * @return 类型
 	 * @see DefaultNetworkType
 	 */
-	Product getType();
+	DeviceProduct getType();
 
 	/**
 	 * 使用配置创建一个网络组件

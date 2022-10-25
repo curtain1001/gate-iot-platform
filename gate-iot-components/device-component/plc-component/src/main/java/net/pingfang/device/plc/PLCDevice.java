@@ -8,11 +8,11 @@ import net.pingfang.device.core.DeviceState;
 import net.pingfang.iot.common.FunctionMessage;
 import net.pingfang.iot.common.MessagePayloadType;
 import net.pingfang.iot.common.instruction.InstructionManager;
-import net.pingfang.iot.common.product.Product;
-import net.pingfang.network.DefaultNetworkType;
+import net.pingfang.iot.common.product.DeviceProduct;
 import net.pingfang.network.NetworkManager;
 import net.pingfang.network.tcp.TcpMessage;
 import net.pingfang.network.tcp.client.TcpClient;
+import net.pingfang.network.tcp.client.TcpClientNetworkType;
 import net.pingfang.network.utils.BytesUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -55,24 +55,24 @@ public class PLCDevice implements DeviceOperator {
 	}
 
 	@Override
-	public Product getProduct() {
-		return PLCProduct.PLC;
+	public DeviceProduct getProduct() {
+		return PLCDeviceProduct.PLC;
 	}
 
 	@Override
 	public void shutdown() {
-		networkManager.shutdown(DefaultNetworkType.TCP_CLIENT, deviceId);
+		networkManager.shutdown(TcpClientNetworkType.TCP_CLIENT, deviceId);
 		this.tcpClient = null;
 	}
 
 	@Override
-	public Flux<FunctionMessage> subscribe(Long laneId) {
+	public Flux<FunctionMessage> subscribe() {
 		return tcpClient.subscribe() //
-				.map(x -> new FunctionMessage(this.laneId, deviceId, PLCProduct.PLC, //
+				.map(x -> new FunctionMessage(this.laneId, deviceId, PLCDeviceProduct.PLC, //
 						BytesUtils.getBufHexStr(ByteBufUtil.getBytes((ByteBuf) x.getPayload())),
 						MessagePayloadType.STRING, null)) //
 				.filterWhen(x -> {
-					if (laneId != null) {
+					if (this.laneId != null) {
 						return Mono.just(laneId.equals(x.getLaneId()));
 					} else {
 						return Mono.just(true);

@@ -3,7 +3,7 @@ package net.pingfang.iot.common.manager;
 import java.util.List;
 
 import net.pingfang.iot.common.instruction.InsEntity;
-import net.pingfang.iot.common.product.Product;
+import net.pingfang.iot.common.product.DeviceProduct;
 
 /**
  * @author 王超
@@ -11,5 +11,5 @@ import net.pingfang.iot.common.product.Product;
  * @date 2022-07-13 11:39
  */
 public interface InstructionConfigManager {
-	List<InsEntity> getInstruction(Product product);
+	List<InsEntity> getInstruction(DeviceProduct deviceProduct);
 }

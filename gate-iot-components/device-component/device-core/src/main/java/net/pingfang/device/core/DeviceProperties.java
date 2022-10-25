@@ -9,7 +9,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.pingfang.iot.common.product.Product;
+import net.pingfang.iot.common.network.NetworkType;
+import net.pingfang.iot.common.product.DeviceProduct;
 
 /**
  * @author 王超
@@ -38,7 +39,11 @@ public class DeviceProperties implements Serializable {
 	/**
 	 * 设备产品类型
 	 */
-	private Product product;
+	private DeviceProduct deviceProduct;
+	/**
+	 * 网络组件类型
+	 */
+	private NetworkType networkType;
 	/**
 	 * 开启关闭
 	 */
@@ -49,27 +54,4 @@ public class DeviceProperties implements Serializable {
 	 */
 	private Map<String, Object> configuration = new HashMap<>();
 
-	public DeviceProperties addConfig(String key, Object value) {
-		if (configuration == null) {
-			configuration = new HashMap<>();
-		}
-		configuration.put(key, value);
-		return this;
-	}
-
-	public DeviceProperties addConfigIfAbsent(String key, Object value) {
-		if (configuration == null) {
-			configuration = new HashMap<>();
-		}
-		configuration.putIfAbsent(key, value);
-		return this;
-	}
-
-	public DeviceProperties addConfigs(Map<String, ?> configs) {
-		if (configs == null) {
-			return this;
-		}
-		configs.forEach(this::addConfig);
-		return this;
-	}
 }

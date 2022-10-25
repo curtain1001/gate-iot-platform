@@ -19,7 +19,7 @@ import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.instruction.DeviceInstruction;
 import net.pingfang.device.core.utils.ByteUtils;
 import net.pingfang.device.plc.PLCDevice;
-import net.pingfang.device.plc.PLCProduct;
+import net.pingfang.device.plc.PLCDeviceProduct;
 import net.pingfang.iot.common.NetworkMessage;
 import net.pingfang.iot.common.instruction.InsEntity;
 import net.pingfang.iot.common.instruction.Instruction;
@@ -27,7 +27,7 @@ import net.pingfang.iot.common.instruction.InstructionProvider;
 import net.pingfang.iot.common.instruction.InstructionResult;
 import net.pingfang.iot.common.instruction.InstructionType;
 import net.pingfang.iot.common.manager.InstructionConfigManager;
-import net.pingfang.iot.common.product.Product;
+import net.pingfang.iot.common.product.DeviceProduct;
 import net.pingfang.network.tcp.TcpMessage;
 
 /**
@@ -43,12 +43,12 @@ public class PLCInstructionProvider implements InstructionProvider {
 
 	@Override
 	public String getName() {
-		return PLCProduct.PLC.name();
+		return PLCDeviceProduct.PLC.name();
 	}
 
 	@Override
 	public List<Instruction> getCommand() {
-		List<InsEntity> entities = instructionConfigManager.getInstruction(PLCProduct.PLC);
+		List<InsEntity> entities = instructionConfigManager.getInstruction(PLCDeviceProduct.PLC);
 
 		return entities.stream().map(x -> new DeviceInstruction() {
 
@@ -63,8 +63,8 @@ public class PLCInstructionProvider implements InstructionProvider {
 			}
 
 			@Override
-			public Product getProduct() {
-				return PLCProduct.PLC;
+			public DeviceProduct getProduct() {
+				return PLCDeviceProduct.PLC;
 			}
 
 			@Override

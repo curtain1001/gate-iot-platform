@@ -20,7 +20,7 @@ import net.pingfang.network.Control;
 public class ServerNetworkCreatedEvent {
 	final String id;
 	final String name;
-	final int enabled;
+	final boolean enabled;
 	final Map<String, Object> configurations;
 	final Control control;
 	final String type;

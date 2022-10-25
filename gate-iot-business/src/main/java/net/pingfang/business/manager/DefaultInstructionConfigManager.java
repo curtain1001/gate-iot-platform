@@ -15,7 +15,7 @@ import net.pingfang.business.service.IBtpInstructionService;
 import net.pingfang.iot.common.instruction.FormatType;
 import net.pingfang.iot.common.instruction.InsEntity;
 import net.pingfang.iot.common.manager.InstructionConfigManager;
-import net.pingfang.iot.common.product.Product;
+import net.pingfang.iot.common.product.DeviceProduct;
 
 /**
  * @author 王超
@@ -28,9 +28,9 @@ public class DefaultInstructionConfigManager implements InstructionConfigManager
 	public IBtpInstructionService instructionService;
 
 	@Override
-	public List<InsEntity> getInstruction(Product product) {
+	public List<InsEntity> getInstruction(DeviceProduct deviceProduct) {
 		LambdaQueryWrapper<BtpInstruction> queryWrapper = Wrappers.lambdaQuery();
-		queryWrapper.eq(BtpInstruction::getProduct, product.getValue());
+		queryWrapper.eq(BtpInstruction::getProduct, deviceProduct.getValue());
 		queryWrapper.eq(BtpInstruction::getStatus, 0);
 		List<BtpInstruction> instructions = instructionService.list(queryWrapper);
 		return instructions.stream().map(instruction -> InsEntity.builder() //

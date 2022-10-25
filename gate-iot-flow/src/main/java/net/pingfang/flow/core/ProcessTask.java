@@ -49,7 +49,6 @@ import net.pingfang.iot.common.instruction.InstructionManager;
 import net.pingfang.iot.common.instruction.InstructionResult;
 import net.pingfang.iot.common.instruction.InstructionType;
 import net.pingfang.iot.common.instruction.ObjectType;
-import net.pingfang.servicecomponent.core.BusinessInstruction;
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.FluxSink;
 
@@ -344,10 +343,6 @@ public class ProcessTask {
 					instructionResult = deviceInstruction.execution(deviceOperator,
 							node.getProperties() != null ? node.getProperties().getProperties() : Maps.newHashMap(),
 							this.result);
-				} else if (node.getProperties().getInstruction() instanceof BusinessInstruction) {
-					BusinessInstruction businessInstruction = (BusinessInstruction) node.getProperties()
-							.getInstruction();
-					instructionResult = businessInstruction.execution(this.result);
 				}
 			}
 			return instructionResult;
@@ -485,14 +480,14 @@ public class ProcessTask {
 	 */
 	public boolean checkNode(FunctionMessage functionMessage, FlowNode flowNode) {
 		boolean bln = false;
-		if (functionMessage.getProduct().getType() == flowNode.getProperties().getObjectType()) {
-			if (functionMessage.getProduct().getType() == ObjectType.device) {
-				bln = functionMessage.getDeviceId().equals(flowNode.getProperties().getDeviceId())
-						&& functionMessage.getInstruction() == flowNode.getProperties().getInstruction();
-			} else if (functionMessage.getProduct().getType() == ObjectType.service) {
-				bln = functionMessage.getInstruction() == flowNode.getProperties().getInstruction();
-			}
-		}
+//		if (functionMessage.getDeviceProduct().getType() == flowNode.getProperties().getObjectType()) {
+//			if (functionMessage.getDeviceProduct().getType() == ObjectType.device) {
+//				bln = functionMessage.getDeviceId().equals(flowNode.getProperties().getDeviceId())
+//						&& functionMessage.getInstruction() == flowNode.getProperties().getInstruction();
+//			} else if (functionMessage.getDeviceProduct().getType() == ObjectType.service) {
+//				bln = functionMessage.getInstruction() == flowNode.getProperties().getInstruction();
+//			}
+//		}
 		if (bln) {
 			// 流程触发时的节点
 			this.triggerNodes.add(flowNode);

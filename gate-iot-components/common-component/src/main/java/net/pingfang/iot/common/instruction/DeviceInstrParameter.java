@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -15,6 +16,7 @@ import lombok.Data;
  * @since 2022-08-29 18:32
  */
 @Data
+@Builder
 public class DeviceInstrParameter {
 	String deviceId;
 	Map<String, Object> properties;

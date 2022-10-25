@@ -10,8 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import net.pingfang.common.utils.JsonUtils;
 import net.pingfang.iot.common.MessagePayloadType;
 import net.pingfang.iot.common.NetworkMessage;
+import net.pingfang.iot.common.NetworkSession;
 import net.pingfang.iot.common.network.NetworkType;
-import net.pingfang.network.DefaultNetworkType;
+import net.pingfang.network.Network;
 import net.pingfang.network.dll.lp.config.SdkNet;
 import net.pingfang.network.dll.lp.values.ImageRecvInfo;
 import net.pingfang.network.dll.lp.values.ResultCode;
@@ -34,7 +35,7 @@ import reactor.core.publisher.FluxSink;
  * @since 2022-09-24 15:05
  */
 @Slf4j
-public class LicensePlateClient implements LpClient {
+public class LicensePlateClient implements Network, NetworkSession {
 	private final String id;
 	private final NET net;
 	private int handle;
@@ -52,17 +53,19 @@ public class LicensePlateClient implements LpClient {
 		this.net = SdkNet.net;
 	}
 
-	@Override
 	public String getId() {
 		return this.id;
 	}
 
-	@Override
 	public NetworkType getType() {
-		return DefaultNetworkType.LP_DLL;
+		return LpDllNetworkType.LP_DLL;
 	}
 
 	@Override
+	public boolean isAutoReload() {
+		return false;
+	}
+
 	public int getHandle() {
 		if (handle == -1) {
 			return -1;
@@ -96,25 +99,20 @@ public class LicensePlateClient implements LpClient {
 			handle = -1;
 		}
 	}
-
 	@Override
 	public boolean isAlive() {
 		return net.Net_QueryConnState(handle) == 0;
 	}
 
-	@Override
-	public boolean isAutoReload() {
-		return false;
-	}
 
 	public void setHandle(int handle) {
 		this.handle = handle;
 	}
 
 	/**
-	 * 接收TCP消息
+	 * 接收消息
 	 *
-	 * @param message TCP消息
+	 * @param message 消息
 	 */
 	protected void received(NetworkMessage message) {
 		if (processor.getPending() > processor.getBufferSize() / 2) {
@@ -206,7 +204,7 @@ public class LicensePlateClient implements LpClient {
 							.deviceId(deviceId)//
 							.payload(JsonUtils.toJsonString(recvInfo))//
 							.payloadType(MessagePayloadType.JSON)//
-							.networkType(DefaultNetworkType.LP_DLL)//
+							.networkType(LpDllNetworkType.LP_DLL)//
 							.build();
 					received(message);
 				} catch (UnsupportedEncodingException e) {

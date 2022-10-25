@@ -39,15 +39,12 @@ public class NetworkMessage {
 
 	public String payloadAsString() {
 		if (payloadType == MessagePayloadType.BINARY) {
-			return new String((byte[]) payload, StandardCharsets.UTF_8);
+			return ByteUtils.bytesToHexString((byte[]) payload);
 		} else if (payloadType == MessagePayloadType.STRING) {
-
 			return (String) payload;
 		} else if (payloadType == MessagePayloadType.JSON) {
-
 			return JsonUtils.toJsonString(payload);
 		} else if (payloadType == MessagePayloadType.HEX) {
-
 			return ByteUtils.hexStringToString((String) payload);
 		} else {
 			return (String) payload;

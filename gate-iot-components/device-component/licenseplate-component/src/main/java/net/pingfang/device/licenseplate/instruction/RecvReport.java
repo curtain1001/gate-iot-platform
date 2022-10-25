@@ -3,12 +3,12 @@ package net.pingfang.device.licenseplate.instruction;
 import lombok.extern.slf4j.Slf4j;
 import net.pingfang.common.utils.JsonUtils;
 import net.pingfang.device.core.instruction.DeviceInstruction;
-import net.pingfang.device.licenseplate.LicensePlateProduct;
+import net.pingfang.device.licenseplate.LicensePlateDeviceProduct;
 import net.pingfang.device.licenseplate.values.ImageRecvInfo;
 import net.pingfang.iot.common.NetworkMessage;
 import net.pingfang.iot.common.instruction.InstructionType;
 import net.pingfang.iot.common.instruction.ObjectType;
-import net.pingfang.iot.common.product.Product;
+import net.pingfang.iot.common.product.DeviceProduct;
 
 /**
  * @author 王超
@@ -34,8 +34,8 @@ public class RecvReport implements DeviceInstruction {
 	}
 
 	@Override
-	public Product getProduct() {
-		return LicensePlateProduct.OCR_License_Plate;
+	public DeviceProduct getProduct() {
+		return LicensePlateDeviceProduct.OCR_LICENSE_PLATE_III;
 	}
 
 	@Override
@@ -43,33 +43,13 @@ public class RecvReport implements DeviceInstruction {
 		return InstructionType.up;
 	}
 
-//	@Override
-//	public Flux<FunctionMessage> subscribe(Long laneId) {
-//		return processor.map(Function.identity()).cast(FunctionMessage.class).filterWhen(x -> {
-//			if (laneId != null) {
-//				return Mono.just(laneId.equals(x.getLaneId()));
-//			} else {
-//				return Mono.just(true);
-//			}
-//		});
-//	}
-
 	@Override
 	public boolean isSupport(NetworkMessage networkMessage) {
 		try {
-			ImageRecvInfo info = JsonUtils.convert(networkMessage.getPayload(), ImageRecvInfo.class);
+			JsonUtils.convert(networkMessage.getPayload(), ImageRecvInfo.class);
 			return true;
 		} catch (Exception e) {
 			return false;
 		}
 	}
-//
-//	@Override
-//	public void received(FunctionMessage functionMessage) {
-//		if (processor.getPending() > processor.getBufferSize() / 2) {
-//			log.warn(" message pending {} ,drop message:{}", processor.getPending(), functionMessage.toString());
-//			return;
-//		}
-//		sink.next(functionMessage);
-//	}
 }

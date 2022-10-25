@@ -2,7 +2,7 @@ package net.pingfang.device.core;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import net.pingfang.iot.common.product.Product;
+import net.pingfang.iot.common.product.DeviceProduct;
 
 /**
  * @author 王超
@@ -23,7 +23,7 @@ public class DeviceMessage {
 	 */
 	private MessageType type;
 
-	private Product product;
+	private DeviceProduct deviceProduct;
 
 	private JsonNode jsonNode;
 }

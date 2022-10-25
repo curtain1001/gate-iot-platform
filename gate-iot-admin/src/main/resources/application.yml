@@ -155,7 +155,7 @@ liquibase:
     - /database/business/btpDevice.xml
     - /database/business/btpInstruction.xml
     - /database/business/btpFlow.xml
-    - /database/business/btpSupportServer.xml
+    - /database/business/btpSupportService.xml
     - /database/flow/btpFlowEdge.xml
     - /database/flow/btpFlowNode.xml
     - /database/flow/btpFlowDeployment.xml

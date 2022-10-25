@@ -5,11 +5,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.compress.utils.Lists;
+
+import net.pingfang.iot.common.customizedsetting.values.CustomizedSettingData;
+
 /**
  * 网络组件类型，通常使用枚举实现
  *
  * @author zhouhao
- * @see DefaultNetworkType
  * @since 1.0
  */
 public interface NetworkType {
@@ -17,6 +20,10 @@ public interface NetworkType {
 	 * @return 类型唯一标识
 	 */
 	String getId();
+
+	default List<CustomizedSettingData> getBasicForm() {
+		return Lists.newArrayList();
+	}
 
 	/**
 	 * @return 类型名称
@@ -58,4 +65,5 @@ public interface NetworkType {
 	static Optional<NetworkType> lookup(String id) {
 		return NetworkTypes.lookup(id);
 	}
+
 }

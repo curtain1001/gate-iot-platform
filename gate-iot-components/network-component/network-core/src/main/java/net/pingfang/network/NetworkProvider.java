@@ -1,9 +1,7 @@
 package net.pingfang.network;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 
-import net.pingfang.iot.common.customizedsetting.values.CustomizedSettingData;
 import net.pingfang.iot.common.network.NetworkType;
 
 /**
@@ -43,5 +41,4 @@ public interface NetworkProvider<P> {
 	 */
 	P createConfig(NetworkProperties properties) throws InvocationTargetException, IllegalAccessException;
 
-	List<CustomizedSettingData> getBasicForm();
 }

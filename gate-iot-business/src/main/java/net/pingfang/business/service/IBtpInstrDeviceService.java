@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 
 import net.pingfang.business.domain.BtpInstrDevice;
 import net.pingfang.iot.common.instruction.Instruction;
-import net.pingfang.iot.common.product.Product;
+import net.pingfang.iot.common.product.DeviceProduct;
 
 /**
  * @author 王超
@@ -15,5 +15,5 @@ import net.pingfang.iot.common.product.Product;
  */
 public interface IBtpInstrDeviceService extends IService<BtpInstrDevice> {
 
-	List<Instruction> getInstructions(Product product);
+	List<Instruction> getInstructions(DeviceProduct deviceProduct);
 }

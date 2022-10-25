@@ -24,7 +24,6 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
 import lombok.extern.slf4j.Slf4j;
 import net.pingfang.business.domain.BtpNetwork;
-import net.pingfang.business.enums.NetworkEnabledState;
 import net.pingfang.business.enums.NetworkState;
 import net.pingfang.business.service.IBtpNetworkService;
 import net.pingfang.business.values.NetworkTypeInfo;
@@ -34,6 +33,7 @@ import net.pingfang.common.core.domain.AjaxResult;
 import net.pingfang.common.core.page.TableDataInfo;
 import net.pingfang.common.enums.BusinessType;
 import net.pingfang.common.utils.SecurityUtils;
+import net.pingfang.iot.common.network.NetworkType;
 import net.pingfang.network.Control;
 import net.pingfang.network.NetworkManager;
 
@@ -100,7 +100,7 @@ public class BtpNetworkController extends BaseController {
 	@GetMapping("/supports")
 	public AjaxResult getSupports() {
 		return AjaxResult.success(networkManager.getProviders().stream().map(network -> {
-			return NetworkTypeInfo.of(network.getType(), network.getBasicForm());
+			return NetworkTypeInfo.of(network.getType(), network.getType().getBasicForm());
 		}).collect(Collectors.toList()));
 	}
 
@@ -110,9 +110,10 @@ public class BtpNetworkController extends BaseController {
 	public AjaxResult create(@Validated @RequestBody BtpNetwork config) {
 		config.setStatus(NetworkState.disabled);
 		config.setControl(Control.system);
-		config.setEnabled(1);
+		config.setEnabled(true);
 		config.setCreateBy(SecurityUtils.getUsername());
 		config.setCreateTime(new Date());
+		networkManager.getNetwork(NetworkType.of(config.getType()), config.getNetworkId());
 		return toAjax(networkService.save(config));
 	}
 
@@ -129,7 +130,7 @@ public class BtpNetworkController extends BaseController {
 				.name(config.getName())//
 				.type(config.getType())//
 				.remark(config.getRemark())//
-				.enabled(config.getEnabled())//
+				.enabled(config.isEnabled())//
 				.updateBy(SecurityUtils.getUsername()) //
 				.updateTime(new Date())//
 				.build();
@@ -155,7 +156,7 @@ public class BtpNetworkController extends BaseController {
 		}
 		config = config.toBuilder() //
 				.status(NetworkState.enabled) //
-				.enabled(NetworkEnabledState.enabled.getValue())//
+				.enabled(true)//
 				.build();
 		networkService.updateById(config);
 		try {
@@ -164,7 +165,7 @@ public class BtpNetworkController extends BaseController {
 			log.error("网络组件启动失败：", e);
 			config = config.toBuilder() //
 					.status(NetworkState.disabled) //
-					.enabled(NetworkEnabledState.disabled.getValue())//
+					.enabled(false)//
 					.build();
 			networkService.updateById(config);
 			return AjaxResult.error("网络组件启动失败：" + e.getMessage());
@@ -185,7 +186,7 @@ public class BtpNetworkController extends BaseController {
 			return AjaxResult.error("网络配置不存在 id:" + id);
 		}
 		config = config.toBuilder() //
-				.enabled(1)//
+				.enabled(false)//
 				.build();
 		networkService.updateById(config);
 		try {

@@ -13,7 +13,7 @@ import net.pingfang.business.manager.DefaultInstructionManager;
 import net.pingfang.business.mapper.BtpInstructionMapper;
 import net.pingfang.business.service.IBtpInstructionService;
 import net.pingfang.iot.common.instruction.Instruction;
-import net.pingfang.iot.common.product.Product;
+import net.pingfang.iot.common.product.DeviceProduct;
 
 /**
  * @author 王超
@@ -27,7 +27,7 @@ public class BtpInstructionServiceImpl extends ServiceImpl<BtpInstructionMapper,
 	DefaultInstructionManager instructionManager;
 
 	@Override
-	public List<Instruction> getInstructions(Product product) {
-		return instructionManager.getInstruction(product);
+	public List<Instruction> getInstructions(DeviceProduct deviceProduct) {
+		return instructionManager.getInstruction(deviceProduct);
 	}
 }

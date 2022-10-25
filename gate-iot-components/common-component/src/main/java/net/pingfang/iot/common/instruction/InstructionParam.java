@@ -1,5 +1,6 @@
 package net.pingfang.iot.common.instruction;
 
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -11,6 +12,7 @@ import lombok.Data;
  * @since 2022-08-29 18:29
  */
 @Data
+@Builder
 public class InstructionParam {
 	/**
 	 * 车道id

@@ -2,7 +2,7 @@ package net.pingfang.device.core;
 
 import java.util.List;
 
-import net.pingfang.iot.common.product.Product;
+import net.pingfang.iot.common.product.DeviceProduct;
 import reactor.core.publisher.Flux;
 
 /**
@@ -27,10 +27,10 @@ public interface DeviceManager {
 	/**
 	 * 根据ID获取设备
 	 *
-	 * @param product 设备类型
+	 * @param deviceProduct 设备类型
 	 * @return 设备
 	 */
-	<T extends DeviceOperator> List<DeviceOperator> getDevices(Product product);
+	<T extends DeviceOperator> List<DeviceOperator> getDevices(DeviceProduct deviceProduct);
 
 	/**
 	 * 创建设备
@@ -40,7 +40,7 @@ public interface DeviceManager {
 	 * @param type     设备类型
 	 * @return 网络组件
 	 */
-	<T extends DeviceOperator> DeviceOperator create(Long laneId, String deviceId, Product type);
+	<T extends DeviceOperator> DeviceOperator create(Long laneId, String deviceId, DeviceProduct type);
 
 	/**
 	 * 获取所有的网络组件支持提供商

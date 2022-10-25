@@ -1,18 +1,14 @@
 package net.pingfang.network.dll.lp;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Lists;
 import com.sun.jna.Pointer;
 
 import lombok.extern.slf4j.Slf4j;
 import net.pingfang.common.utils.bean.BeanUtils;
-import net.pingfang.iot.common.customizedsetting.values.CustomizedSettingData;
 import net.pingfang.iot.common.network.NetworkType;
-import net.pingfang.network.DefaultNetworkType;
 import net.pingfang.network.Network;
 import net.pingfang.network.NetworkProperties;
 import net.pingfang.network.NetworkProvider;
@@ -37,11 +33,12 @@ public class LicensePlateClientProvider implements NetworkProvider<LicensePlateC
 
 	@Override
 	public NetworkType getType() {
-		return DefaultNetworkType.LP_DLL;
+		return LpDllNetworkType.LP_DLL;
 	}
 
 	@Override
 	public LicensePlateClient createNetwork(LicensePlateClientProperties properties) {
+
 		LicensePlateClient client = new LicensePlateClient(properties.getId(), properties.getLaneId());
 		int handle = init(properties.getHost(), (short) properties.getPort(), (short) properties.getTimeout(), client);
 		client.setHandle(handle);
@@ -94,8 +91,4 @@ public class LicensePlateClientProvider implements NetworkProvider<LicensePlateC
 		return config;
 	}
 
-	@Override
-	public List<CustomizedSettingData> getBasicForm() {
-		return Lists.newArrayList();
-	}
 }

@@ -3,6 +3,7 @@ package net.pingfang;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * 启动程序
@@ -11,14 +12,11 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
  */
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class }, scanBasePackages = "net.pingfang")
 //@Import(value = { VertxTcpClientProvider.class })
+@EnableTransactionManagement
 public class GateIotApplication {
 	public static void main(String[] args) {
 		// System.setProperty("spring.devtools.restart.enabled", "false");
 		SpringApplication.run(GateIotApplication.class, args);
-		System.out.println("(♥◠‿◠)ﾉﾞ  服务启动成功   ლ(´ڡ`ლ)ﾞ  \n" + " .-------.       ____     __        \n"
-				+ " |  _ _   \\      \\   \\   /  /    \n" + " | ( ' )  |       \\  _. /  '       \n"
-				+ " |(_ o _) /        _( )_ .'         \n" + " | (_,_).' __  ___(_ o _)'          \n"
-				+ " |  |\\ \\  |  ||   |(_,_)'         \n" + " |  | \\ `'   /|   `-'  /           \n"
-				+ " |  |  \\    /  \\      /           \n" + " ''-'   `'-'    `-..-'              ");
+		System.out.println("服务启动成功");
 	}
 }

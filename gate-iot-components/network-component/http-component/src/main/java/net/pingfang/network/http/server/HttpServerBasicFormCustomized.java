@@ -1,5 +1,6 @@
 package net.pingfang.network.http.server;
 
+import lombok.Getter;
 import net.pingfang.iot.common.customizedsetting.Customized;
 
 /**
@@ -10,6 +11,7 @@ import net.pingfang.iot.common.customizedsetting.Customized;
  * @author 王超
  * @since 2022-08-26 11:42
  */
+@Getter
 public enum HttpServerBasicFormCustomized implements Customized {
 	IP("host", "string", "", "ip地址", "", ""), //
 	PORT("port", "number", "", "端口号", "", ""), //
@@ -31,29 +33,5 @@ public enum HttpServerBasicFormCustomized implements Customized {
 	private final String label;
 	private final String customizeType;// 自定义大类
 	private final Object defaults;
-
-	public String getValue() {
-		return this.value;
-	}
-
-	public String getLabel() {
-		return this.label;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public String getCustomizeType() {
-		return customizeType;
-	}
-
-	public Object getDefaults() {
-		return defaults;
-	}
-
-	public String getOptions() {
-		return options;
-	}
 
 }

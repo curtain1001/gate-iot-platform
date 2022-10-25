@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import net.pingfang.iot.common.instruction.Instruction;
-import net.pingfang.iot.common.product.Product;
+import net.pingfang.iot.common.product.DeviceProduct;
 
 /**
  * @author 王超
@@ -23,8 +23,10 @@ public class FunctionMessage {
 	 * 设备id
 	 */
 	final String deviceId;
-
-	final Product product;
+	/**
+	 * 服务
+	 */
+	final DeviceProduct deviceProduct;
 	/**
 	 * 执行结果
 	 */

@@ -7,10 +7,10 @@ import org.springframework.stereotype.Component;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
-import net.pingfang.business.domain.BtpSupportServer;
-import net.pingfang.business.service.IBtpSupportServerService;
-import net.pingfang.servicecomponent.core.SupportServerManager;
-import net.pingfang.servicecomponent.values.SupportConfigure;
+import net.pingfang.business.domain.BtpSupportService;
+import net.pingfang.business.service.IBtpSupportServiceService;
+import net.pingfang.iot.common.SupportConfigure;
+import net.pingfang.iot.common.manager.SupportServiceConfigManager;
 
 /**
  * <p>
@@ -21,17 +21,22 @@ import net.pingfang.servicecomponent.values.SupportConfigure;
  * @since 2022-08-30 11:47
  */
 @Component
-public class DefaultSupportServerManager implements SupportServerManager {
+public class DefaultSupportServerManager implements SupportServiceConfigManager {
+
 	@Resource
-	public IBtpSupportServerService supportServerService;
+	public IBtpSupportServiceService supportService;
 
 	@Override
-	public SupportConfigure getConfigure(String product) {
-		LambdaQueryWrapper<BtpSupportServer> queryWrapper = Wrappers.lambdaQuery();
-		queryWrapper.eq(BtpSupportServer::getProduct, product);
-		BtpSupportServer supportServer = supportServerService.getOne(queryWrapper);
+	public SupportConfigure getConfigure(Long laneId, String serviceCode) {
+		LambdaQueryWrapper<BtpSupportService> queryWrapper = Wrappers.lambdaQuery();
+		queryWrapper.eq(BtpSupportService::getLaneId, laneId);
+		queryWrapper.eq(BtpSupportService::getServiceCode, serviceCode);
+		BtpSupportService support = supportService.getOne(queryWrapper);
 		return SupportConfigure.builder() //
-				.networkId(supportServer.getNetworkId())//
+				.laneId(laneId)//
+				.deviceIds(support.getDeviceIds())//
+				.configure(support.getConfiguration())//
+				.serviceCode(serviceCode)//
 				.build();
 	}
 }

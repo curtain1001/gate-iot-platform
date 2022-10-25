@@ -13,12 +13,10 @@ import net.pingfang.common.utils.JsonUtils;
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.DeviceProperties;
 import net.pingfang.device.core.DeviceProvider;
-import net.pingfang.iot.common.instruction.InstructionManager;
-import net.pingfang.iot.common.product.Product;
-import net.pingfang.network.DefaultNetworkType;
+import net.pingfang.iot.common.product.DeviceProduct;
 import net.pingfang.network.NetworkManager;
-import net.pingfang.network.NetworkProperties;
-import net.pingfang.network.dll.lp.LpClient;
+import net.pingfang.network.dll.lp.LicensePlateClient;
+import net.pingfang.network.dll.lp.LpDllNetworkType;
 
 /**
  * @author 王超
@@ -29,13 +27,11 @@ import net.pingfang.network.dll.lp.LpClient;
 @Component
 public class LicensePlateDeviceProvider implements DeviceProvider<LicensePlateDeviceProperties> {
 	@Resource
-	private InstructionManager instructionManager;
-	@Resource
 	private NetworkManager networkManager;
 
 	@Override
-	public Product getType() {
-		return LicensePlateProduct.OCR_License_Plate;
+	public DeviceProduct getType() {
+		return LicensePlateDeviceProduct.OCR_LICENSE_PLATE_III;
 	}
 
 	@Override
@@ -47,13 +43,7 @@ public class LicensePlateDeviceProvider implements DeviceProvider<LicensePlateDe
 
 	public LicensePlateDevice init(LicensePlateDevice lpDevice, LicensePlateDeviceProperties properties) {
 		Map<String, Object> lpProperties = JsonUtils.toObject(JsonUtils.toJsonString(properties), Map.class);
-		lpProperties.putAll(LicensePlateProduct.OCR_License_Plate.getDefaultProperties());
-		NetworkProperties networkProperties = new NetworkProperties();
-		networkProperties.setId(properties.getId());
-		networkProperties.setName("LPIII::DLL::CLIENT::" + properties.getName());
-		networkProperties.setEnabled(true);
-		networkProperties.setConfigurations(lpProperties);
-		LpClient lpClient = (LpClient) networkManager.getNetwork(DefaultNetworkType.LP_DLL, networkProperties,
+		LicensePlateClient lpClient = (LicensePlateClient) networkManager.getNetwork(LpDllNetworkType.LP_DLL,
 				properties.getId());
 		lpDevice.setLpClient(lpClient);
 		return lpDevice;

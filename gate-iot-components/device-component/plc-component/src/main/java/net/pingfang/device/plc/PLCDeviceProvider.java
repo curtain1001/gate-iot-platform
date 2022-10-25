@@ -1,7 +1,6 @@
 package net.pingfang.device.plc;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -9,16 +8,14 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
-import net.pingfang.common.utils.JsonUtils;
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.DeviceProperties;
 import net.pingfang.device.core.DeviceProvider;
 import net.pingfang.iot.common.instruction.InstructionManager;
-import net.pingfang.iot.common.product.Product;
-import net.pingfang.network.DefaultNetworkType;
+import net.pingfang.iot.common.product.DeviceProduct;
 import net.pingfang.network.NetworkManager;
-import net.pingfang.network.NetworkProperties;
 import net.pingfang.network.tcp.client.TcpClient;
+import net.pingfang.network.tcp.client.TcpClientNetworkType;
 
 /**
  * @author 王超
@@ -34,8 +31,8 @@ public class PLCDeviceProvider implements DeviceProvider<PLCDeviceProperties> {
 	private InstructionManager instructionManager;
 
 	@Override
-	public Product getType() {
-		return PLCProduct.PLC;
+	public DeviceProduct getType() {
+		return PLCDeviceProduct.PLC;
 	}
 
 	@Override
@@ -46,14 +43,7 @@ public class PLCDeviceProvider implements DeviceProvider<PLCDeviceProperties> {
 	}
 
 	public PLCDevice init(PLCDevice plcDevice, PLCDeviceProperties properties) {
-		Map<String, Object> tcpProperties = JsonUtils.toObject(JsonUtils.toJsonString(properties), Map.class);
-		tcpProperties.putAll(PLCProduct.PLC.getDefaultProperties());
-		NetworkProperties networkProperties = new NetworkProperties();
-		networkProperties.setId(properties.getId());
-		networkProperties.setName("PLC::TCP::CLIENT::" + properties.getName());
-		networkProperties.setEnabled(true);
-		networkProperties.setConfigurations(tcpProperties);
-		TcpClient tcpClient = (TcpClient) networkManager.getNetwork(DefaultNetworkType.TCP_CLIENT, networkProperties,
+		TcpClient tcpClient = (TcpClient) networkManager.getNetwork(TcpClientNetworkType.TCP_CLIENT,
 				properties.getId());
 		plcDevice.setTcpClient(tcpClient);
 		return plcDevice;

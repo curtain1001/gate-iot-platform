@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
@@ -25,18 +26,14 @@ import net.pingfang.device.core.event.MessageUpEvent;
 import net.pingfang.device.core.instruction.DeviceInstruction;
 import net.pingfang.iot.common.FunctionMessage;
 import net.pingfang.iot.common.NetworkMessage;
-import net.pingfang.iot.common.instruction.BusinessInstrParameter;
 import net.pingfang.iot.common.instruction.DeviceInstrParameter;
 import net.pingfang.iot.common.instruction.Instruction;
 import net.pingfang.iot.common.instruction.InstructionManager;
 import net.pingfang.iot.common.instruction.InstructionParam;
 import net.pingfang.iot.common.instruction.InstructionProvider;
 import net.pingfang.iot.common.instruction.InstructionResult;
-import net.pingfang.iot.common.instruction.ObjectType;
-import net.pingfang.iot.common.product.Product;
-import net.pingfang.iot.common.product.ProductSupports;
-import net.pingfang.servicecomponent.core.BusinessInstruction;
-import net.pingfang.servicecomponent.core.ServerManager;
+import net.pingfang.iot.common.product.DeviceProduct;
+import net.pingfang.iot.common.product.DeviceProductSupports;
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
@@ -55,7 +52,6 @@ public class DefaultInstructionManager implements InstructionManager, BeanPostPr
 	private final FluxSink<FunctionMessage> sink = processor.sink(FluxSink.OverflowStrategy.BUFFER);
 
 	private final DeviceManager deviceManager;
-	private final ServerManager serverManager;
 	private final EventBusCenter eventBusCenter;
 	/**
 	 * 指令缓存 key:指令value
@@ -68,10 +64,9 @@ public class DefaultInstructionManager implements InstructionManager, BeanPostPr
 	 */
 	private final Map<String, InstructionProvider> providerSupport = new ConcurrentHashMap<>();
 
-	public DefaultInstructionManager(DeviceManager deviceManager, ServerManager serverManager,
+	public DefaultInstructionManager(DeviceManager deviceManager,
 			EventBusCenter eventBusCenter) {
 		this.deviceManager = deviceManager;
-		this.serverManager = serverManager;
 		this.eventBusCenter = eventBusCenter;
 		this.processor.subscribe(x -> {
 			log.info("指令触发：{}", x.getInstruction().getValue());
@@ -80,14 +75,14 @@ public class DefaultInstructionManager implements InstructionManager, BeanPostPr
 //		deviceManager.subscribe().subscribe(device -> {
 //			device.subscribe(null).subscribe(x -> {
 //				try {
-//					List<Instruction> instructions = getInstruction(x.getProduct());
+//					List<Instruction> instructions = getInstruction(x.getDeviceProduct());
 //					if (CollectionUtils.isNotEmpty(instructions)) {
 //						Optional<Instruction> optional = instructions.stream()
 //								.filter(i -> i.getInsType() == InstructionType.up && i.isSupport(x.getPayload()))
 //								.findFirst();
 //						optional.ifPresent(instruction -> eventBusCenter.postAsync(MessageUpEvent.builder() //
 //								.laneId(x.getLaneId()) //
-//								.product(x.getProduct())//
+//								.DeviceProduct(x.getDeviceProduct())//
 //								.deviceId(x.getDeviceId()) //
 //								.instruction(instruction)//
 //								.message(x.getPayload()) //
@@ -102,14 +97,14 @@ public class DefaultInstructionManager implements InstructionManager, BeanPostPr
 //		serverManager.subscribe().subscribe(operator -> {
 //			operator.subscribe(null).subscribe(x -> {
 //				try {
-//					List<Instruction> instructions = getInstruction(x.getProduct());
+//					List<Instruction> instructions = getInstruction(x.getDeviceProduct());
 //					if (CollectionUtils.isNotEmpty(instructions)) {
 //						Optional<Instruction> optional = instructions.stream()
 //								.filter(i -> i.getInsType() == InstructionType.up && i.isSupport(x.getPayload()))
 //								.findFirst();
 //						optional.ifPresent(instruction -> eventBusCenter.postAsync(MessageUpEvent.builder() //
 //								.laneId(x.getLaneId()) //
-//								.product(x.getProduct())//
+//								.DeviceProduct(x.getDeviceProduct())//
 //								.deviceId(x.getDeviceId()) //
 //								.instruction(instruction)//
 //								.message(x.getPayload()) //
@@ -146,28 +141,25 @@ public class DefaultInstructionManager implements InstructionManager, BeanPostPr
 
 	@Override
 	public InstructionResult exec(InstructionParam param) {
-		InstructionResult result = null;
-		Product product = ProductSupports.getSupport(param.getProduct());
-		Instruction ins = instrStore.get(product.getValue()).get(param.getInstructionName());
-		if (param.getObjectType().equals(ObjectType.service)) {
-			BusinessInstrParameter parameter = JsonUtils.toObject(param.getPayload().toString(),
-					BusinessInstrParameter.class);
-			BusinessInstruction instruction = (BusinessInstruction) ins;
-			result = instruction.execution(parameter.getJsonNode());
-		} else {
-
+		Optional<DeviceProduct> deviceProduct = DeviceProductSupports.lookup(param.getProduct());
+		if (deviceProduct.isPresent()) {
+			Instruction ins = instrStore.get(deviceProduct.get().getValue()).get(param.getInstructionName());
 			DeviceInstrParameter parameter = JsonUtils.toObject(param.getPayload().toString(),
 					DeviceInstrParameter.class);
 			DeviceInstruction instruction = (DeviceInstruction) ins;
 			DeviceOperator operator = deviceManager.getDevice(param.getLaneId(), parameter.getDeviceId());
-			result = instruction.execution(operator, parameter.getProperties(), parameter.getJsonNode());
+			InstructionResult result = instruction.execution(operator, parameter.getProperties(),
+					parameter.getJsonNode());
+			eventBusCenter.postSync(MessageUpEvent.builder() //
+					.instruction(ins)//
+					.deviceProduct(deviceProduct.get())//
+					.message(result)//
+					.build());
+			return result;
+		} else {
+			return InstructionResult.fail(null, "不存在该设备类型");
 		}
-		eventBusCenter.postSync(MessageUpEvent.builder() //
-				.instruction(ins)//
-				.product(product)//
-				.message(result)//
-				.build());
-		return result;
+
 	}
 
 	public void receiveMessage(NetworkMessage message) {
@@ -176,7 +168,7 @@ public class DefaultInstructionManager implements InstructionManager, BeanPostPr
 			log.info("触发指令：{}", x.getValue());
 			received(FunctionMessage.builder() //
 					.laneId(msg.getLaneId())//
-					.product(x.getProduct())//
+					.deviceProduct(x.getProduct())//
 					.deviceId(msg.getDeviceId())//
 					.Payload(msg.getPayload())//
 					.type(msg.getPayloadType())//
@@ -194,8 +186,8 @@ public class DefaultInstructionManager implements InstructionManager, BeanPostPr
 				.findFirst().orElse(null);
 	}
 
-	public List<Instruction> getInstruction(Product product) {
-		ConcurrentMap<String, Instruction> store = instrStore.get(product.getValue());
+	public List<Instruction> getInstruction(DeviceProduct deviceProduct) {
+		ConcurrentMap<String, Instruction> store = instrStore.get(deviceProduct.getValue());
 		if (store != null) {
 			return new ArrayList<>(store.values());
 		}

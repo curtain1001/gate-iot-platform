@@ -5,10 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.licenseplate.values.StatusCode;
 import net.pingfang.iot.common.FunctionMessage;
-import net.pingfang.iot.common.product.Product;
-import net.pingfang.network.DefaultNetworkType;
+import net.pingfang.iot.common.product.DeviceProduct;
 import net.pingfang.network.NetworkManager;
-import net.pingfang.network.dll.lp.LpClient;
+import net.pingfang.network.dll.lp.LicensePlateClient;
+import net.pingfang.network.dll.lp.LpDllNetworkType;
 import net.pingfang.network.dll.lp.config.SdkNet;
 import net.sdk.bean.serviceconfig.imagesnap.Data_T_DCImageSnap.T_DCImageSnap;
 import reactor.core.publisher.Flux;
@@ -25,7 +25,7 @@ public class LicensePlateDevice implements DeviceOperator {
 	final Long laneId;
 	final String deviceId;
 	final String deviceName;
-	private LpClient client;
+	private LicensePlateClient client;
 	final NetworkManager networkManager;
 
 	public LicensePlateDevice(Long laneId, String deviceId, String deviceName, NetworkManager networkManager) {
@@ -52,20 +52,20 @@ public class LicensePlateDevice implements DeviceOperator {
 
 	@Override
 	public void shutdown() {
-		networkManager.shutdown(DefaultNetworkType.LP_DLL, deviceId);
+		networkManager.shutdown(LpDllNetworkType.LP_DLL, deviceId);
 	}
 
 	@Override
-	public Flux<FunctionMessage> subscribe(Long laneId) {
+	public Flux<FunctionMessage> subscribe() {
 		return client.subscribe().map(x -> FunctionMessage.builder()//
 				.type(x.getPayloadType())//
 				.Payload(x.getPayload())//
 				.deviceId(deviceId)//
-				.product(LicensePlateProduct.OCR_License_Plate)//
-				.laneId(laneId)//
+				.deviceProduct(LicensePlateDeviceProduct.OCR_LICENSE_PLATE_III)//
+				.laneId(this.laneId)//
 				.build()).filterWhen(x -> {
-					if (laneId != null) {
-						return Mono.just(laneId.equals(x.getLaneId()));
+					if (this.laneId != null) {
+						return Mono.just(this.laneId.equals(x.getLaneId()));
 					} else {
 						return Mono.just(true);
 					}
@@ -80,8 +80,8 @@ public class LicensePlateDevice implements DeviceOperator {
 	}
 
 	@Override
-	public Product getProduct() {
-		return LicensePlateProduct.OCR_License_Plate;
+	public DeviceProduct getProduct() {
+		return LicensePlateDeviceProduct.OCR_LICENSE_PLATE_III;
 	}
 
 	@Override
@@ -111,7 +111,7 @@ public class LicensePlateDevice implements DeviceOperator {
 		return is;
 	}
 
-	public void setLpClient(LpClient lpClient) {
+	public void setLpClient(LicensePlateClient lpClient) {
 		this.client = lpClient;
 	}
 

@@ -22,25 +22,19 @@ public class NetworkTypeInfo {
 	private List<CustomizedSettingData> basicForm;
 
 	public static NetworkTypeInfo of(NetworkType type) {
-
 		NetworkTypeInfo info = new NetworkTypeInfo();
-
 		info.setId(type.getId());
 		info.setName(type.getName());
-
 		return info;
 
 	}
 
 	public static NetworkTypeInfo of(NetworkType type, List<CustomizedSettingData> data) {
-
 		NetworkTypeInfo info = new NetworkTypeInfo();
-
 		info.setId(type.getId());
 		info.setName(type.getName());
 		info.setBasicForm(data);
 		return info;
-
 	}
 
 }

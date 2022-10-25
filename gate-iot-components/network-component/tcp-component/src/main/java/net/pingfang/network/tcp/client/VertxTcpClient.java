@@ -21,7 +21,6 @@ import net.pingfang.iot.common.EncodedMessage;
 import net.pingfang.iot.common.MessagePayloadType;
 import net.pingfang.iot.common.NetworkMessage;
 import net.pingfang.iot.common.network.NetworkType;
-import net.pingfang.network.DefaultNetworkType;
 import net.pingfang.network.tcp.TcpMessage;
 import net.pingfang.network.tcp.parser.PayloadParser;
 import reactor.core.publisher.EmitterProcessor;
@@ -154,7 +153,7 @@ public class VertxTcpClient implements TcpClient {
 
 	@Override
 	public NetworkType getType() {
-		return DefaultNetworkType.TCP_CLIENT;
+		return TcpClientNetworkType.TCP_CLIENT;
 	}
 
 	@Override
@@ -208,9 +207,9 @@ public class VertxTcpClient implements TcpClient {
 				received(NetworkMessage.builder() //
 						.deviceId(deviceId)//
 						.laneId(laneId)//
-						.payload(Hex.encodeHexString(buffer.getBytes()))//
-						.payloadType(MessagePayloadType.STRING)//
-						.networkType(DefaultNetworkType.TCP_CLIENT)//
+						.payload(buffer.getBytes())//
+						.payloadType(MessagePayloadType.BINARY)//
+						.networkType(TcpClientNetworkType.TCP_CLIENT)//
 						.build());
 			});
 		}

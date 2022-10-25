@@ -2,10 +2,11 @@ package net.pingfang.network.tcp.client;
 
 import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.beanutils.Converter;
 import org.springframework.stereotype.Component;
 
 import io.vertx.core.Vertx;
@@ -13,10 +14,7 @@ import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetClientOptions;
 import lombok.extern.slf4j.Slf4j;
 import net.pingfang.common.utils.bean.BeanUtils;
-import net.pingfang.iot.common.customizedsetting.repos.CustomizedSettingRepository;
-import net.pingfang.iot.common.customizedsetting.values.CustomizedSettingData;
 import net.pingfang.iot.common.network.NetworkType;
-import net.pingfang.network.DefaultNetworkType;
 import net.pingfang.network.Network;
 import net.pingfang.network.NetworkProperties;
 import net.pingfang.network.NetworkProvider;
@@ -24,6 +22,7 @@ import net.pingfang.network.security.Certificate;
 import net.pingfang.network.security.CertificateManager;
 import net.pingfang.network.security.VertxKeyCertTrustOptions;
 import net.pingfang.network.tcp.parser.PayloadParserBuilder;
+import net.pingfang.network.tcp.parser.PayloadParserType;
 
 @Slf4j
 @Component
@@ -45,7 +44,7 @@ public class VertxTcpClientProvider implements NetworkProvider<TcpClientProperti
 	@Nonnull
 	@Override
 	public NetworkType getType() {
-		return DefaultNetworkType.TCP_CLIENT;
+		return TcpClientNetworkType.TCP_CLIENT;
 	}
 
 	@Nonnull
@@ -88,7 +87,14 @@ public class VertxTcpClientProvider implements NetworkProvider<TcpClientProperti
 	public TcpClientProperties createConfig(NetworkProperties properties)
 			throws InvocationTargetException, IllegalAccessException {
 		TcpClientProperties config = new TcpClientProperties();
-		BeanUtils.copyBean(config, properties.getConfigurations());
+		config.setLaneId(properties.getLaneId());
+		ConvertUtils.register(new Converter() {
+			@Override
+			public Object convert(Class type, Object value) {
+				return PayloadParserType.valueOf(value.toString());
+			}
+		}, PayloadParserType.class);
+		BeanUtils.copyProperties(config, properties.getConfigurations());
 
 		config.setId(properties.getId());
 		if (config.getOptions() == null) {
@@ -104,8 +110,4 @@ public class VertxTcpClientProvider implements NetworkProvider<TcpClientProperti
 		return config;
 	}
 
-	@Override
-	public List<CustomizedSettingData> getBasicForm() {
-		return CustomizedSettingRepository.getValues(TcpClientBasicFormCustomized.values());
-	}
 }

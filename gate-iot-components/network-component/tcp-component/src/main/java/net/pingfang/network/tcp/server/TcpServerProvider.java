@@ -16,11 +16,8 @@ import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import lombok.extern.slf4j.Slf4j;
 import net.pingfang.common.utils.bean.BeanUtils;
-import net.pingfang.iot.common.customizedsetting.repos.CustomizedSettingRepository;
-import net.pingfang.iot.common.customizedsetting.values.CustomizedSettingData;
 import net.pingfang.iot.common.manager.LaneConfigManager;
 import net.pingfang.iot.common.network.NetworkType;
-import net.pingfang.network.DefaultNetworkType;
 import net.pingfang.network.Network;
 import net.pingfang.network.NetworkProperties;
 import net.pingfang.network.NetworkProvider;
@@ -58,7 +55,7 @@ public class TcpServerProvider implements NetworkProvider<TcpServerProperties> {
 	@Nonnull
 	@Override
 	public NetworkType getType() {
-		return DefaultNetworkType.TCP_SERVER;
+		return TcpServerNetworkType.TCP_SERVER;
 	}
 
 	@Nonnull
@@ -135,8 +132,4 @@ public class TcpServerProvider implements NetworkProvider<TcpServerProperties> {
 		return config;
 	}
 
-	@Override
-	public List<CustomizedSettingData> getBasicForm() {
-		return CustomizedSettingRepository.getValues(TcpServerBasicFormCustomized.values());
-	}
 }

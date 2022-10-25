@@ -99,7 +99,7 @@ public class FlowEngine {
 //					.laneId(event.getLaneId())//
 //					.instruction(event.getInstruction())//
 //					.deviceId(event.getDeviceId())//
-//					.product(event.getProduct())//
+//					.DeviceProduct(event.getDeviceProduct())//
 //					.type(event.getType())//
 //					.build();
 //			ProcessTask task = processStore.get(event.getLaneId());

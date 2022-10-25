@@ -2,13 +2,13 @@ package net.pingfang.device.novaled;
 
 import java.util.List;
 
-import net.pingfang.iot.common.customizedsetting.repos.CustomizedSettingRepository;
-import net.pingfang.iot.common.customizedsetting.values.CustomizedSettingData;
-import net.pingfang.iot.common.instruction.ObjectType;
+import com.google.common.collect.Lists;
+
 import net.pingfang.iot.common.network.NetworkType;
-import net.pingfang.iot.common.product.Product;
-import net.pingfang.iot.common.product.ProductSupports;
-import net.pingfang.network.DefaultNetworkType;
+import net.pingfang.iot.common.product.DeviceProduct;
+import net.pingfang.iot.common.product.DeviceProductSupports;
+import net.pingfang.network.nova.client.NovaClientNetworkType;
+import net.pingfang.network.nova.server.NovaServerNetworkType;
 
 /**
  * <p>
@@ -18,11 +18,11 @@ import net.pingfang.network.DefaultNetworkType;
  * @author 王超
  * @since 2022-08-17 15:59
  */
-public enum NovaLedDeviceProduct implements Product {
+public enum NovaLedDeviceProduct implements DeviceProduct {
 	NOVA_LED;
 
-	{
-		ProductSupports.registry(this);
+	static {
+		DeviceProductSupports.register(NOVA_LED);
 	}
 
 	@Override
@@ -36,17 +36,7 @@ public enum NovaLedDeviceProduct implements Product {
 	}
 
 	@Override
-	public NetworkType getNetwork() {
-		return DefaultNetworkType.INTERNAL;
-	}
-
-	@Override
-	public List<CustomizedSettingData> getBasicForm() {
-		return CustomizedSettingRepository.getValues(NovaLedBasicFormCustomized.values());
-	}
-
-	@Override
-	public ObjectType getType() {
-		return ObjectType.device;
+	public List<NetworkType> getNetwork() {
+		return Lists.newArrayList(NovaClientNetworkType.NOVA_CLIENT, NovaServerNetworkType.NOVA_SERVER);
 	}
 }

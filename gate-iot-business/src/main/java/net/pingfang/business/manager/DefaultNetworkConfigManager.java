@@ -41,12 +41,12 @@ public class DefaultNetworkConfigManager implements NetworkConfigManager {
 	}
 
 	@Override
-	public NetworkProperties getConfig(String configId) {
-		LambdaQueryWrapper<BtpNetwork> queryWrapper = Wrappers.lambdaQuery();
-		queryWrapper.eq(BtpNetwork::getNetworkId, configId);
-		BtpNetwork config = networkService.getOne(queryWrapper);
-		if (config != null) {
-			return config.toNetworkProperties();
+	public NetworkProperties getConfig(String deviceId) {
+		LambdaQueryWrapper<BtpDevice> lambdaQueryWrapper = Wrappers.lambdaQuery();
+		lambdaQueryWrapper.eq(BtpDevice::getDeviceId, deviceId);
+		BtpDevice d = deviceService.getOne(lambdaQueryWrapper);
+		if (d != null) {
+			return d.toNetworkProperties();
 		}
 		return new NetworkProperties();
 	}

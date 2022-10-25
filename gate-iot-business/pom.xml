@@ -112,21 +112,17 @@
             <version>1.0.0</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>net.pingfang</groupId>
-            <artifactId>containerocr-component</artifactId>
-            <version>1.0.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.pingfang</groupId>
-            <artifactId>wheelhubocr-component</artifactId>
-            <version>1.0.0</version>
-            <scope>compile</scope>
-        </dependency>
+
+
         <dependency>
             <groupId>net.pingfang</groupId>
             <artifactId>gate-iot-flow</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.pingfang</groupId>
+            <artifactId>service-component</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

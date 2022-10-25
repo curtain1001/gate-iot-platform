@@ -26,7 +26,6 @@ import net.pingfang.iot.common.NetworkMessage;
 import net.pingfang.iot.common.customizedsetting.values.DefaultCustomized;
 import net.pingfang.iot.common.manager.LaneConfigManager;
 import net.pingfang.iot.common.network.NetworkType;
-import net.pingfang.network.DefaultNetworkType;
 import net.pingfang.network.tcp.TcpMessage;
 import net.pingfang.network.tcp.parser.PayloadParser;
 import reactor.core.publisher.EmitterProcessor;
@@ -146,7 +145,7 @@ public class VertxTcpServer implements TcpServer {
 
 	@Override
 	public NetworkType getType() {
-		return DefaultNetworkType.TCP_SERVER;
+		return TcpServerNetworkType.TCP_SERVER;
 	}
 
 	@Override
@@ -211,7 +210,7 @@ public class VertxTcpServer implements TcpServer {
 						.laneId(laneId)//
 						.payload(buffer.getBytes())//
 						.payloadType(MessagePayloadType.BINARY)//
-						.networkType(DefaultNetworkType.TCP_SERVER)//
+						.networkType(TcpServerNetworkType.TCP_SERVER)//
 						.build());
 			});
 		}

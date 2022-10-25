@@ -1,7 +1,7 @@
 package net.pingfang.device.core;
 
 import net.pingfang.iot.common.FunctionMessage;
-import net.pingfang.iot.common.product.Product;
+import net.pingfang.iot.common.product.DeviceProduct;
 import reactor.core.publisher.Flux;
 
 /**
@@ -37,7 +37,7 @@ public interface DeviceOperator {
 	 *
 	 * @return 类型实例
 	 */
-	Product getProduct();
+	DeviceProduct getProduct();
 
 	/**
 	 *
@@ -48,7 +48,7 @@ public interface DeviceOperator {
 	/**
 	 * 订阅消息
 	 */
-	Flux<FunctionMessage> subscribe(Long laneId);
+	Flux<FunctionMessage> subscribe();
 
 	/**
 	 * 是否存活

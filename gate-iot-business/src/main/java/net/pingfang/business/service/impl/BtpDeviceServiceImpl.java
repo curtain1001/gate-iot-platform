@@ -1,5 +1,11 @@
 package net.pingfang.business.service.impl;
 
+import static net.pingfang.common.utils.SecurityUtils.getUsername;
+
+import java.util.Date;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
@@ -8,15 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import net.pingfang.business.domain.BtpDevice;
-import net.pingfang.business.events.ServerNetworkCreatedEvent;
-import net.pingfang.business.events.ServerNetworkDeleteEvent;
-import net.pingfang.business.events.ServerNetworkUpdateEvent;
 import net.pingfang.business.mapper.BtpDeviceMapper;
 import net.pingfang.business.service.IBtpDeviceService;
+import net.pingfang.business.values.DeviceStatus;
 import net.pingfang.common.event.EventBusCenter;
-import net.pingfang.iot.common.product.Product;
-import net.pingfang.iot.common.product.ProductSupports;
-import net.pingfang.network.Control;
+import net.pingfang.common.manager.AsyncManager;
+import net.pingfang.iot.common.network.NetworkTypes;
+import net.pingfang.network.Network;
+import net.pingfang.network.NetworkManager;
 
 /**
  * @author 王超
@@ -30,69 +35,42 @@ public class BtpDeviceServiceImpl extends ServiceImpl<BtpDeviceMapper, BtpDevice
 	public BtpDeviceMapper deviceMapper;
 
 	@Resource
+	private NetworkManager networkManager;
+
+	@Resource
 	EventBusCenter busCenter;
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public boolean save(BtpDevice device) {
+		device.setStatus(DeviceStatus.START);
 		int count = deviceMapper.insert(device);
 		if (count > 0) {
-			Product product = ProductSupports.getSupport(device.getProduct());
-			if (product != null && product.getNetwork() != null) {
-				ServerNetworkCreatedEvent event = ServerNetworkCreatedEvent.builder().id(device.getDeviceId())//
-						.name(device.getDeviceName())//
-						.configurations(device.getConfiguration())//
-						.control(Control.own)//
-						.type(ProductSupports.getSupport(device.getProduct()).getNetwork().getId()) //
-						.enabled(device.getEnabled())//
-						.createBy(device.getCreateBy()) //
-						.createTime(device.getUpdateTime())//
-						.build();
-				busCenter.postSync(event);
+			try {
+				Network network = networkManager.getNetwork(NetworkTypes.lookup(device.getNetworkType()).get(),
+						device.getDeviceId());
+
+				AsyncManager.me().execute(new TimerTask() {
+					@Override
+					public void run() {
+						if (network.isAlive()) {
+							device.setStatus(DeviceStatus.ONLINE);
+						} else {
+							device.setStatus(DeviceStatus.OFFLINE);
+						}
+						deviceMapper.updateById(device);
+					}
+				}, 5L, TimeUnit.SECONDS);
+			} catch (Exception e) {
+				log.error("设备启动失败：", e);
+				device.setUpdateBy(getUsername());
+				device.setUpdateTime(new Date());
+				device.setStatus(DeviceStatus.OFFLINE);
+				deviceMapper.updateById(device);
 			}
 			return true;
 		} else {
 			return false;
 		}
-	}
-
-	@Override
-	@Transactional(rollbackFor = Exception.class)
-	public boolean updateById(BtpDevice device) {
-		int count = deviceMapper.updateById(device);
-		if (count > 0) {
-			Product product = ProductSupports.getSupport(device.getProduct());
-			if (product != null && product.getNetwork() != null) {
-				ServerNetworkUpdateEvent event = ServerNetworkUpdateEvent.builder() //
-						.id(device.getDeviceId())//
-						.name(device.getDeviceName())//
-						.configurations(device.getConfiguration())//
-						.control(Control.own)//
-						.type(ProductSupports.getSupport(device.getProduct()).getNetwork().getId()) //
-						.enabled(device.getEnabled())//
-						.updateBy(device.getUpdateBy()) //
-						.updateTime(device.getUpdateTime())//
-						.build();
-				busCenter.postSync(event);
-			}
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	public boolean removeById(Long id) {
-		BtpDevice btpDevice = deviceMapper.selectById(id);
-		if (btpDevice == null) {
-			throw new RuntimeException("删除失败：该数据不存在");
-		}
-		int count = deviceMapper.deleteById(id);
-		if (count > 0) {
-			busCenter.postSync(ServerNetworkDeleteEvent.builder() //
-					.id(btpDevice.getDeviceId()) //
-					.build());
-		}
-		return false;
 	}
 }

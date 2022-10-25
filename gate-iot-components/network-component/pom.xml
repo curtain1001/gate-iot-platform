@@ -21,6 +21,7 @@
         <module>tcp-component</module>
         <module>dll-component</module>
         <module>http-component</module>
+        <module>nova-component</module>
     </modules>
 
     <dependencies>

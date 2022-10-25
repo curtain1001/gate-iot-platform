@@ -9,7 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.pingfang.iot.common.product.Product;
+import net.pingfang.iot.common.product.DeviceProduct;
 import net.pingfang.network.NetworkProperties;
 
 /**
@@ -38,7 +38,7 @@ public class DeviceInfo implements Serializable {
 	/**
 	 * 设备产品类型
 	 */
-	private Product product;
+	private DeviceProduct deviceProduct;
 	/**
 	 * 其他配置(key:network,value:NetworkProperties)
 	 */

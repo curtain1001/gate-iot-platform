@@ -4,7 +4,7 @@ import java.util.List;
 
 import net.pingfang.iot.common.FunctionMessage;
 import net.pingfang.iot.common.NetworkMessage;
-import net.pingfang.iot.common.product.Product;
+import net.pingfang.iot.common.product.DeviceProduct;
 import reactor.core.publisher.Flux;
 
 /**
@@ -25,7 +25,7 @@ public interface InstructionManager {
 
 	public Instruction getInstruction(String value);
 
-	public List<Instruction> getInstruction(Product product);
+	public List<Instruction> getInstruction(DeviceProduct deviceProduct);
 
 	public void register(InstructionProvider provider);
 }

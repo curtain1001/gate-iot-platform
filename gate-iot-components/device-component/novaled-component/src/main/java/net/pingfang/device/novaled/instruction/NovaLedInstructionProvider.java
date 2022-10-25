@@ -18,8 +18,8 @@ import net.pingfang.common.scripting.nashorn.NashornScriptRunner;
 import net.pingfang.common.utils.JsonUtils;
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.core.instruction.DeviceInstruction;
+import net.pingfang.device.novaled.NovaLedDevice;
 import net.pingfang.device.novaled.NovaLedDeviceProduct;
-import net.pingfang.device.novaled.core.NovaLedDevice;
 import net.pingfang.device.novaled.utils.ResultCode;
 import net.pingfang.iot.common.instruction.FormatType;
 import net.pingfang.iot.common.instruction.InsEntity;
@@ -28,7 +28,7 @@ import net.pingfang.iot.common.instruction.InstructionProvider;
 import net.pingfang.iot.common.instruction.InstructionResult;
 import net.pingfang.iot.common.instruction.InstructionType;
 import net.pingfang.iot.common.manager.InstructionConfigManager;
-import net.pingfang.iot.common.product.Product;
+import net.pingfang.iot.common.product.DeviceProduct;
 
 /**
  * <p>
@@ -72,7 +72,7 @@ public class NovaLedInstructionProvider implements InstructionProvider {
 			}
 
 			@Override
-			public Product getProduct() {
+			public DeviceProduct getProduct() {
 				return NovaLedDeviceProduct.NOVA_LED;
 			}
 
@@ -91,7 +91,7 @@ public class NovaLedInstructionProvider implements InstructionProvider {
 				String content = "";
 
 				if (x.getFormat() == FormatType.SCRIPT) {
-					String json = "{\"laneId\":1,\"deviceId\":\"008\",\"product\":\"OCR_License_Plate\",\"instruction\":{\"name\":\"车牌识别上报\",\"value\":\"RECV_REPORT\",\"objectType\":\"device\",\"product\":\"OCR_License_Plate\",\"insType\":\"up\"},\"type\":\"JSON\",\"messageId\":null,\"message\":{\"usWidth\":\"1920\",\"usHeight\":\"1080\",\"ucVehicleColor\":\"4\",\"ucVehicleBrand\":\"0\",\"ucVehicleSize\":\"1\",\"ucPlateColor\":\"1\",\"szLprResult\":\"粤ACM410\",\"usLpBox\":\"[569, 901, 668, 942]\",\"ucLprType\":\"3\",\"usSpeed\":\"0\",\"ucSnapType\":\"2\",\"ucHaveVehicle\":\"\",\"acSnapTime\":\"20220816180928000\\u0000\",\"ucViolateCode\":\"0\",\"ucLaneNo\":\"0\",\"uiVehicleId\":\"42815\",\"ucScore\":\"92\",\"ucDirection\":\"1\",\"ucTotalNum\":\"0\",\"ucSnapshotIndex\":\"0\"}}";
+					String json = "{\"laneId\":1,\"deviceId\":\"008\",\"DeviceProduct\":\"OCR_LICENSE_PLATE_III\",\"instruction\":{\"name\":\"车牌识别上报\",\"value\":\"RECV_REPORT\",\"objectType\":\"device\",\"DeviceProduct\":\"OCR_LICENSE_PLATE_III\",\"insType\":\"up\"},\"type\":\"JSON\",\"messageId\":null,\"message\":{\"usWidth\":\"1920\",\"usHeight\":\"1080\",\"ucVehicleColor\":\"4\",\"ucVehicleBrand\":\"0\",\"ucVehicleSize\":\"1\",\"ucPlateColor\":\"1\",\"szLprResult\":\"粤ACM410\",\"usLpBox\":\"[569, 901, 668, 942]\",\"ucLprType\":\"3\",\"usSpeed\":\"0\",\"ucSnapType\":\"2\",\"ucHaveVehicle\":\"\",\"acSnapTime\":\"20220816180928000\\u0000\",\"ucViolateCode\":\"0\",\"ucLaneNo\":\"0\",\"uiVehicleId\":\"42815\",\"ucScore\":\"92\",\"ucDirection\":\"1\",\"ucTotalNum\":\"0\",\"ucSnapshotIndex\":\"0\"}}";
 					JsonNode node = JsonUtils.toJsonNode(json);
 					NashornScriptRunner runner = new NashornScriptRunner();
 
