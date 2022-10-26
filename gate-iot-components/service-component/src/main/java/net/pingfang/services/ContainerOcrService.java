@@ -2,6 +2,8 @@ package net.pingfang.services;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+
 import lombok.extern.slf4j.Slf4j;
 import net.pingfang.device.core.DeviceManager;
 import net.pingfang.device.core.DeviceOperator;
@@ -22,15 +24,17 @@ import reactor.core.publisher.Mono;
  * @since 2022-10-17 10:39
  */
 @Slf4j
-public class ContainerOcrService implements DataCollect {
+public class ContainerOcrService extends IGateService implements DataCollect {
 	private final Long laneId;
 	private final String deviceId;
 	private final InstructionManager instructionManager;
 	private final DeviceManager deviceManager;
 	private final SupportServiceConfigManager configManager;
 
-	public ContainerOcrService(Long laneId, String deviceId, InstructionManager instructionManager,
-			DeviceManager deviceManager, SupportServiceConfigManager configManager) {
+	public ContainerOcrService(Long laneId, String deviceId, RabbitTemplate rabbitTemplate, String fanoutExchange,
+			InstructionManager instructionManager, DeviceManager deviceManager,
+			SupportServiceConfigManager configManager) {
+		super(rabbitTemplate, fanoutExchange);
 		this.laneId = laneId;
 		this.deviceId = deviceId;
 		this.instructionManager = instructionManager;
@@ -69,5 +73,15 @@ public class ContainerOcrService implements DataCollect {
 		} else {
 			return CompletableFuture.completedFuture(GateResult.fail("获取信息异常:" + result.getMessage()));
 		}
+	}
+
+	@Override
+	public void post(Long laneId) {
+
+	}
+
+	@Override
+	public void post() {
+
 	}
 }

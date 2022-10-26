@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,9 @@ public class LicensePlateDeviceProvider implements DeviceProvider<LicensePlateDe
 	@Resource
 	private NetworkManager networkManager;
 
+	@Resource
+	private RabbitTemplate rabbitTemplate;
+
 	@Override
 	public DeviceProduct getType() {
 		return LicensePlateDeviceProduct.OCR_LICENSE_PLATE_III;
@@ -37,7 +41,7 @@ public class LicensePlateDeviceProvider implements DeviceProvider<LicensePlateDe
 	@Override
 	public DeviceOperator createDevice(LicensePlateDeviceProperties properties) {
 		LicensePlateDevice device = new LicensePlateDevice(properties.getLaneId(), properties.getId(),
-				properties.getName(), networkManager);
+				properties.getName(), networkManager, rabbitTemplate);
 		return init(device, properties);
 	}
 

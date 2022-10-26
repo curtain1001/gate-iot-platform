@@ -31,7 +31,7 @@ public class DefaultSessionManager implements SessionManager {
 	public void register(String id, NetworkSession session) {
 		store.put(id, session);
 		session.subscribe().subscribe(x -> {
-			log.info("车道：{}；设备号：{}；网络组件消息：{}", x.getLaneId(), x.getDeviceId(), x.payloadAsString());
+			log.info("车道：{}；设备号：{}；", x.getLaneId(), x.getDeviceId());
 //			instructionManager.receiveMessage(x);
 		});
 	}

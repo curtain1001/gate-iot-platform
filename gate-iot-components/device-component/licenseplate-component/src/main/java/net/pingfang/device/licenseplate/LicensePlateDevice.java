@@ -1,10 +1,16 @@
 package net.pingfang.device.licenseplate;
 
+import java.util.Date;
+
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.pingfang.common.config.RabbitMQConfig;
 import net.pingfang.device.core.DeviceOperator;
 import net.pingfang.device.licenseplate.values.StatusCode;
 import net.pingfang.iot.common.FunctionMessage;
+import net.pingfang.iot.common.message.DeviceCollectMessage;
 import net.pingfang.iot.common.product.DeviceProduct;
 import net.pingfang.network.NetworkManager;
 import net.pingfang.network.dll.lp.LicensePlateClient;
@@ -12,7 +18,6 @@ import net.pingfang.network.dll.lp.LpDllNetworkType;
 import net.pingfang.network.dll.lp.config.SdkNet;
 import net.sdk.bean.serviceconfig.imagesnap.Data_T_DCImageSnap.T_DCImageSnap;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * @author 王超
@@ -27,12 +32,17 @@ public class LicensePlateDevice implements DeviceOperator {
 	final String deviceName;
 	private LicensePlateClient client;
 	final NetworkManager networkManager;
+	final RabbitTemplate rabbitTemplate;
 
-	public LicensePlateDevice(Long laneId, String deviceId, String deviceName, NetworkManager networkManager) {
+	public LicensePlateDevice(Long laneId, String deviceId, String deviceName, NetworkManager networkManager,
+			RabbitTemplate rabbitTemplate) {
 		this.deviceId = deviceId;
 		this.laneId = laneId;
 		this.deviceName = deviceName;
 		this.networkManager = networkManager;
+		this.client = (LicensePlateClient) networkManager.getNetwork(LpDllNetworkType.LP_DLL, deviceId);
+		this.rabbitTemplate = rabbitTemplate;
+
 	}
 
 	@Override
@@ -63,20 +73,11 @@ public class LicensePlateDevice implements DeviceOperator {
 				.deviceId(deviceId)//
 				.deviceProduct(LicensePlateDeviceProduct.OCR_LICENSE_PLATE_III)//
 				.laneId(this.laneId)//
-				.build()).filterWhen(x -> {
-					if (this.laneId != null) {
-						return Mono.just(this.laneId.equals(x.getLaneId()));
-					} else {
-						return Mono.just(true);
-					}
-				});
+				.build());
 	}
 
 	@Override
 	public void keepAlive() {
-		if (isAlive()) {
-			// todo 保持连接
-		}
 	}
 
 	@Override
@@ -98,7 +99,6 @@ public class LicensePlateDevice implements DeviceOperator {
 		int sitp = SdkNet.net.Net_SaveImageToJpeg(client.getHandle(), url);
 		log.info(StatusCode.getStatusCode(sitp, "Net_SaveImageToJpeg"));
 		return sitp;
-
 	}
 
 	public int imageSnap() {
@@ -113,6 +113,12 @@ public class LicensePlateDevice implements DeviceOperator {
 
 	public void setLpClient(LicensePlateClient lpClient) {
 		this.client = lpClient;
+		this.client.subscribe().subscribe(x -> {
+			DeviceCollectMessage message = new DeviceCollectMessage(x.getDeviceId(), x.getLaneId(), "789789",
+					new Date());
+			rabbitTemplate.convertAndSend(RabbitMQConfig.TOPIC_EXCHANGE_DEVICE_MSG, "topic.device." + getProduct(),
+					message);
+		});
 	}
 
 }

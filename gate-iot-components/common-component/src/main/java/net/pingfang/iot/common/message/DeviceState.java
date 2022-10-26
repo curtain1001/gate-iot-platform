@@ -1,4 +1,4 @@
-package net.pingfang.device.core;
+package net.pingfang.iot.common.message;
 
 /**
  * @author zhouhao
@@ -7,15 +7,15 @@ package net.pingfang.device.core;
 public enum DeviceState {
 
 	// 未知
-	unknown,
+	UNKNOWN,
 
 	// 在线
-	online,
+	ONLINE,
 
 	// 离线
-	offline,
+	OFFLINE,
 
 	// 检查状态超时
-	timeout;
+	TIMEOUT;
 
 }

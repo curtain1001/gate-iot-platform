@@ -7,8 +7,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
-import org.springframework.stereotype.Component;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
@@ -35,7 +33,7 @@ import reactor.core.publisher.Mono;
  */
 @AllArgsConstructor
 @Slf4j
-@Component
+//@Component
 //@EventBusListener(type = Type.ASYNC)
 public class FlowEngine {
 
@@ -68,7 +66,7 @@ public class FlowEngine {
 
 	@PostConstruct
 	public void sub() {
-		instructionManager.subscribe(null, null, null)
+		instructionManager.subscribe()
 				.filterWhen(x -> x.getLaneId() != null ? Mono.just(true) : Mono.just(false)).subscribe(x -> {
 					LambdaQueryWrapper<FlowProcessInstance> processQueryWrapper = Wrappers.lambdaQuery();
 					processQueryWrapper.eq(FlowProcessInstance::getLaneId, x.getLaneId());

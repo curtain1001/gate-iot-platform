@@ -2,6 +2,7 @@ package net.pingfang.iot.common.instruction;
 
 import java.util.List;
 
+import lombok.NonNull;
 import net.pingfang.iot.common.FunctionMessage;
 import net.pingfang.iot.common.NetworkMessage;
 import net.pingfang.iot.common.product.DeviceProduct;
@@ -19,7 +20,15 @@ public interface InstructionManager {
 
 	public void receiveMessage(NetworkMessage networkMessage);
 
-	public Flux<FunctionMessage> subscribe(Long laneId, String deviceId, String instrName);
+	public Flux<FunctionMessage> subscribe(long laneId, @NonNull String deviceId, @NonNull String instrName);
+
+	public Flux<FunctionMessage> subscribe(long laneId, @NonNull String deviceId);
+
+	public Flux<FunctionMessage> subscribe(@NonNull String instrName);
+
+	public Flux<FunctionMessage> subscribe(long laneId);
+
+	Flux<FunctionMessage> subscribe();
 
 	public InstructionResult exec(InstructionParam param);
 

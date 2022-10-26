@@ -45,6 +45,7 @@ public class LicensePlateClientProvider implements NetworkProvider<LicensePlateC
 		return client;
 	}
 
+
 	/**
 	 * 初始化连接
 	 *

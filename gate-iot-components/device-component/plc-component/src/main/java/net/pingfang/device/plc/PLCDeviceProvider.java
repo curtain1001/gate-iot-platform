@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import javax.annotation.Resource;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,8 @@ public class PLCDeviceProvider implements DeviceProvider<PLCDeviceProperties> {
 	private NetworkManager networkManager;
 	@Resource
 	private InstructionManager instructionManager;
+	@Resource
+	private RabbitTemplate rabbitTemplate;
 
 	@Override
 	public DeviceProduct getType() {
@@ -38,7 +41,7 @@ public class PLCDeviceProvider implements DeviceProvider<PLCDeviceProperties> {
 	@Override
 	public DeviceOperator createDevice(PLCDeviceProperties properties) {
 		PLCDevice device = new PLCDevice(properties.getLaneId(), properties.getId(), properties.getName(),
-				networkManager, instructionManager);
+				networkManager, instructionManager, rabbitTemplate);
 		return init(device, properties);
 	}
 

@@ -99,16 +99,17 @@ public class LicensePlateClient implements Network, NetworkSession {
 			handle = -1;
 		}
 	}
+
+	/**
+	 * 是否存活
+	 */
 	@Override
 	public boolean isAlive() {
 		return net.Net_QueryConnState(handle) == 0;
 	}
-
-
 	public void setHandle(int handle) {
 		this.handle = handle;
 	}
-
 	/**
 	 * 接收消息
 	 *
@@ -121,7 +122,6 @@ public class LicensePlateClient implements Network, NetworkSession {
 		}
 		sink.next(message);
 	}
-
 	/**
 	 * 消息上报回调
 	 *

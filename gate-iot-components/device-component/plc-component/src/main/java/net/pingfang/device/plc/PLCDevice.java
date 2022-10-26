@@ -1,13 +1,19 @@
 package net.pingfang.device.plc;
 
+import java.util.Date;
+
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.ByteBufUtil;
+import lombok.extern.slf4j.Slf4j;
+import net.pingfang.common.config.RabbitMQConfig;
 import net.pingfang.device.core.DeviceOperator;
-import net.pingfang.device.core.DeviceState;
 import net.pingfang.iot.common.FunctionMessage;
 import net.pingfang.iot.common.MessagePayloadType;
 import net.pingfang.iot.common.instruction.InstructionManager;
+import net.pingfang.iot.common.message.DeviceCollectMessage;
 import net.pingfang.iot.common.product.DeviceProduct;
 import net.pingfang.network.NetworkManager;
 import net.pingfang.network.tcp.TcpMessage;
@@ -22,6 +28,7 @@ import reactor.core.publisher.Mono;
  * @description TODO
  * @date 2022-06-27 17:06
  */
+@Slf4j
 public class PLCDevice implements DeviceOperator {
 	final String deviceId;
 	final Long laneId;
@@ -29,14 +36,16 @@ public class PLCDevice implements DeviceOperator {
 	private TcpClient tcpClient;
 	final NetworkManager networkManager;
 	final InstructionManager instructionManager;
+	final RabbitTemplate rabbitTemplate;
 
 	public PLCDevice(Long laneId, String deviceId, String deviceName, NetworkManager networkManager,
-			InstructionManager instructionManager) {
+			InstructionManager instructionManager, RabbitTemplate rabbitTemplate) {
 		this.deviceId = deviceId;
 		this.laneId = laneId;
 		this.deviceName = deviceName;
 		this.networkManager = networkManager;
 		this.instructionManager = instructionManager;
+		this.rabbitTemplate = rabbitTemplate;
 	}
 
 	@Override
@@ -70,31 +79,11 @@ public class PLCDevice implements DeviceOperator {
 		return tcpClient.subscribe() //
 				.map(x -> new FunctionMessage(this.laneId, deviceId, PLCDeviceProduct.PLC, //
 						BytesUtils.getBufHexStr(ByteBufUtil.getBytes((ByteBuf) x.getPayload())),
-						MessagePayloadType.STRING, null)) //
-				.filterWhen(x -> {
-					if (this.laneId != null) {
-						return Mono.just(laneId.equals(x.getLaneId()));
-					} else {
-						return Mono.just(true);
-					}
-				});
+						MessagePayloadType.STRING, null));
 	}
 
 	public Mono<Boolean> send(TcpMessage message) {
 		return tcpClient.send(message);
-	}
-
-	public DeviceState checkStatus() {
-		if (isAlive()) {
-			ByteBuf byteBuf = ByteBufAllocator.DEFAULT.ioBuffer();
-			byteBuf.writeBytes(new byte[] { (byte) 0xFE, (byte) 0xFF, (byte) 0xFF });
-			TcpMessage tcpMessage = new TcpMessage();
-			tcpMessage.setPayload(byteBuf);
-			Boolean bln = tcpClient.send(tcpMessage).block();
-			return bln != null && bln ? DeviceState.online : DeviceState.offline;
-		} else {
-			return DeviceState.offline;
-		}
 	}
 
 	@Override
@@ -123,5 +112,16 @@ public class PLCDevice implements DeviceOperator {
 
 	public void setTcpClient(TcpClient tcpClient) {
 		this.tcpClient = tcpClient;
+		this.tcpClient.subscribe().subscribe(x -> {
+			try {
+				DeviceCollectMessage message = new DeviceCollectMessage(x.getDeviceId(), x.getLaneId(),
+						x.payloadAsString(), new Date());
+				rabbitTemplate.convertAndSend(RabbitMQConfig.TOPIC_EXCHANGE_DEVICE_MSG, "topic.device." + getProduct(),
+						message);
+			} catch (Exception e) {
+				log.error("PLC处理订阅消息失败：", e);
+			}
+
+		});
 	}
 }

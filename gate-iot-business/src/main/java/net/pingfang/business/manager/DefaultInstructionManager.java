@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Maps;
 
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.pingfang.common.event.EventBusCenter;
 import net.pingfang.common.utils.JsonUtils;
@@ -37,7 +38,6 @@ import net.pingfang.iot.common.product.DeviceProductSupports;
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
-import reactor.core.publisher.Mono;
 
 /**
  * @author 王超
@@ -120,23 +120,48 @@ public class DefaultInstructionManager implements InstructionManager, BeanPostPr
 
 	}
 
+//	@Override
+//	public Flux<FunctionMessage> subscribe(Long laneId, String deviceId, String instrName) {
+//		return this.processor.filterWhen(x -> {
+//			if (laneId != null) {
+//				return Mono.just(x.getLaneId() != null || laneId.equals(x.getLaneId()));
+//			}
+////
+//			if (StringUtils.isNotEmpty(instrName) && instrName.equals(x.getInstruction().getValue())) {
+//				if (laneId != null && x.getLaneId() != null) {
+//					return Mono.just(laneId.equals(x.getLaneId()));
+//				} else {
+//					return Mono.just(true);
+//				}
+//			} else {
+//				return Mono.just(false);
+//			}
+//		});
+//	}
+
 	@Override
-	public Flux<FunctionMessage> subscribe(Long laneId, String deviceId, String instrName) {
-		return this.processor.filterWhen(x -> {
-			if (laneId != null) {
-				return Mono.just(x.getLaneId() != null || laneId.equals(x.getLaneId()));
-			}
-//todo
-			if (StringUtils.isNotEmpty(instrName) && instrName.equals(x.getInstruction().getValue())) {
-				if (laneId != null && x.getLaneId() != null) {
-					return Mono.just(laneId.equals(x.getLaneId()));
-				} else {
-					return Mono.just(true);
-				}
-			} else {
-				return Mono.just(false);
-			}
-		});
+	public Flux<FunctionMessage> subscribe(long laneId, @NonNull String deviceId, @NonNull String instrName) {
+		return null;
+	}
+
+	@Override
+	public Flux<FunctionMessage> subscribe(long laneId, @NonNull String deviceId) {
+		return null;
+	}
+
+	@Override
+	public Flux<FunctionMessage> subscribe(@NonNull String instrName) {
+		return null;
+	}
+
+	@Override
+	public Flux<FunctionMessage> subscribe(long laneId) {
+		return null;
+	}
+
+	@Override
+	public Flux<FunctionMessage> subscribe() {
+		return null;
 	}
 
 	@Override
