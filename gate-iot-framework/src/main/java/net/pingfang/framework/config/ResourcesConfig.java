@@ -1,7 +1,7 @@
 package net.pingfang.framework.config;
 
-import com.google.common.collect.Lists;
 import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

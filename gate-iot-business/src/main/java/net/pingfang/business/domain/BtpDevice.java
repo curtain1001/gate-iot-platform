@@ -1,6 +1,5 @@
 package net.pingfang.business.domain;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.validation.constraints.NotNull;
@@ -19,11 +18,6 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import net.pingfang.business.values.DeviceStatus;
 import net.pingfang.common.core.domain.BaseEntity;
-import net.pingfang.device.core.DeviceProperties;
-import net.pingfang.iot.common.instruction.Instruction;
-import net.pingfang.iot.common.network.NetworkType;
-import net.pingfang.iot.common.product.DeviceProductSupports;
-import net.pingfang.network.NetworkProperties;
 
 /**
  * @author 王超
@@ -78,29 +72,5 @@ public class BtpDevice extends BaseEntity {
 	@TableField(value = "configuration", typeHandler = JacksonTypeHandler.class)
 	private Map<String, Object> configuration;
 
-	private transient List<Instruction> instructions;
-
-	public DeviceProperties toProperties() {
-		DeviceProperties properties = new DeviceProperties();
-		properties.setDeviceId(this.deviceId);
-		properties.setDeviceName(this.deviceName);
-		properties.setDeviceProduct(DeviceProductSupports.lookup(this.product).orElse(null));
-		properties.setLaneId(this.laneId);
-		properties.setEnabled(this.enabled);
-		properties.setConfiguration(this.configuration);
-		properties.setNetworkType(NetworkType.of(this.networkType));
-		return properties;
-	}
-
-	public NetworkProperties toNetworkProperties() {
-		NetworkProperties properties = new NetworkProperties();
-		properties.setConfigurations(this.configuration);
-		properties.setEnabled(this.enabled);
-		properties.setId(this.deviceId);
-		properties.setName(this.deviceName);
-		properties.setLaneId(this.laneId);
-		properties.setNetworkType(NetworkType.of(this.networkType));
-		return properties;
-	}
 
 }

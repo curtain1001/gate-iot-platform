@@ -3,8 +3,6 @@ package net.pingfang.business.controller;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -25,23 +23,15 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
 import lombok.extern.slf4j.Slf4j;
+import net.pingfang.business.device.BasicFormSupport;
 import net.pingfang.business.domain.BtpDevice;
+import net.pingfang.business.manager.ClientDeviceManager;
 import net.pingfang.business.service.IBtpDeviceService;
-import net.pingfang.business.service.IBtpInstructionService;
-import net.pingfang.business.service.IBtpSupportServiceService;
-import net.pingfang.business.values.NetworkTypeInfo;
 import net.pingfang.common.annotation.Log;
 import net.pingfang.common.core.controller.BaseController;
 import net.pingfang.common.core.domain.AjaxResult;
 import net.pingfang.common.core.page.TableDataInfo;
 import net.pingfang.common.enums.BusinessType;
-import net.pingfang.device.core.DeviceManager;
-import net.pingfang.device.core.DeviceOperator;
-import net.pingfang.iot.common.network.NetworkType;
-import net.pingfang.iot.common.network.NetworkTypes;
-import net.pingfang.iot.common.product.DeviceProduct;
-import net.pingfang.iot.common.product.DeviceProductSupports;
-import net.pingfang.network.NetworkManager;
 
 /**
  * @author 王超
@@ -55,20 +45,14 @@ public class BtpDeviceController extends BaseController {
 
 	@Resource
 	IBtpDeviceService btpDeviceService;
-	@Resource
-	IBtpInstructionService instructionService;
-	@Resource
-	NetworkManager networkManager;
 
 	@Resource
-	DeviceManager deviceManager;
+	ClientDeviceManager clientDeviceManager;
 
-	@Resource
-	IBtpSupportServiceService supportService;
 
 	@GetMapping("/product/list")
 	public AjaxResult getDeviceProduct() {
-		return AjaxResult.success(DeviceProductSupports.getDeviceSupports());
+		return AjaxResult.success(BasicFormSupport.getSupports());
 	}
 
 	/**
@@ -78,9 +62,7 @@ public class BtpDeviceController extends BaseController {
 	 */
 	@GetMapping("/network/supports")
 	public AjaxResult getSupports() {
-		return AjaxResult.success(networkManager.getProviders().stream().map(network -> {
-			return NetworkTypeInfo.of(network.getType(), network.getType().getBasicForm());
-		}).collect(Collectors.toList()));
+		return AjaxResult.success(BasicFormSupport.getForms());
 	}
 
 	/**
@@ -103,11 +85,11 @@ public class BtpDeviceController extends BaseController {
 		queryWrapper.orderByDesc(BtpDevice::getCreateTime);
 		List<BtpDevice> list = btpDeviceService.list(queryWrapper);
 		TableDataInfo info = getDataTable(list);
-		info.setRows(info.getRows().stream().peek(x -> {
-			Optional<DeviceProduct> deviceProduct = DeviceProductSupports.lookup(((BtpDevice) x).getProduct());
-			deviceProduct
-					.ifPresent(product -> ((BtpDevice) x).setInstructions(instructionService.getInstructions(product)));
-		}).collect(Collectors.toList()));
+//		info.setRows(info.getRows().stream().peek(x -> {
+//			Optional<DeviceProduct> deviceProduct = DeviceProductSupports.lookup(((BtpDevice) x).getProduct());
+//			deviceProduct
+//					.ifPresent(product -> ((BtpDevice) x).setInstructions(instructionService.getInstructions(product)));
+//		}).collect(Collectors.toList()));
 		return info;
 	}
 
@@ -121,10 +103,10 @@ public class BtpDeviceController extends BaseController {
 		LambdaQueryWrapper<BtpDevice> queryWrapper = Wrappers.lambdaQuery();
 		queryWrapper.eq(BtpDevice::getLaneId, laneId);
 		List<BtpDevice> list = btpDeviceService.list(queryWrapper);
-		list = list.stream().peek(x -> {
-			Optional<DeviceProduct> deviceProduct = DeviceProductSupports.lookup(x.getProduct());
-			deviceProduct.ifPresent(product -> x.setInstructions(instructionService.getInstructions(product)));
-		}).collect(Collectors.toList());
+//		list = list.stream().peek(x -> {
+//			Optional<DeviceProduct> deviceProduct = DeviceProductSupports.lookup(x.getProduct());
+//			deviceProduct.ifPresent(product -> x.setInstructions(instructionService.getInstructions(product)));
+//		}).collect(Collectors.toList());
 		return AjaxResult.success(list);
 	}
 
@@ -186,17 +168,10 @@ public class BtpDeviceController extends BaseController {
 		if (btpDeviceService.count(wrapper) > 0) {
 			return AjaxResult.error("新增设备'" + device.getDeviceName() + "'失败，设备名称已存在");
 		}
-		Optional<NetworkType> networkType = NetworkTypes.lookup(device.getNetworkType());
-		if (!networkType.isPresent()) {
-			return AjaxResult.error("找不到该网络组件");
-		}
-		Optional<DeviceProduct> product = DeviceProductSupports.lookup(device.getProduct());
-		if (!product.isPresent() || !product.get().getNetwork().contains(networkType.get())) {
-			return AjaxResult.error("新建失败：所选网络组件不符合设备连接要求");
-		}
 		device.setEnabled(true);
 		device.setCreateBy(getUsername());
 		device.setCreateTime(new Date());
+		clientDeviceManager.add(device);
 		return toAjax(btpDeviceService.save(device));
 	}
 
@@ -237,29 +212,26 @@ public class BtpDeviceController extends BaseController {
 	 */
 	@PreAuthorize("@ss.hasPermi('business:device:open')")
 	@Log(title = "设备管理", businessType = BusinessType.UPDATE)
-	@PutMapping("{id}/{status:(?:on|off)}")
-	public AjaxResult openDevice(@Validated @PathVariable Long id, @Validated @PathVariable String status) {
-		BtpDevice device = btpDeviceService.getById(id);
-		if (device == null) {
-			return AjaxResult.error("设备不存在！");
+	@PutMapping("{id}/on")
+	public AjaxResult openDevice(@Validated @PathVariable Long id) {
+		try {
+			return toAjax(btpDeviceService.open(id));
+		} catch (Exception e) {
+			return AjaxResult.error("开启设备失败");
 		}
-		if ("on".equals(status)) {
-			device.setEnabled(true);
-			btpDeviceService.updateById(device);
-			Optional<DeviceProduct> p = DeviceProductSupports.lookup(device.getProduct());
-			if (p.isPresent()) {
-				DeviceOperator deviceOperator = deviceManager.create(device.getLaneId(), device.getDeviceId(), p.get());
-				if (deviceOperator != null) {
-					return AjaxResult.success("开启设备成功");
-				}
-			}
+	}
+
+	/**
+	 * 关闭设备
+	 */
+	@PreAuthorize("@ss.hasPermi('business:device:open')")
+	@Log(title = "设备管理", businessType = BusinessType.UPDATE)
+	@PutMapping("{id}/off")
+	public AjaxResult closeDevice(@Validated @PathVariable Long id) {
+		try {
+			return toAjax(btpDeviceService.close(id));
+		} catch (Exception e) {
+			return AjaxResult.error("关闭设备失败");
 		}
-		if ("off".equals(status)) {
-			deviceManager.shutdown(device.getLaneId(), device.getDeviceId());
-			device.setEnabled(false);
-			btpDeviceService.updateById(device);
-			return AjaxResult.success("关闭设备成功");
-		}
-		return AjaxResult.error("on".equals(status) ? "开启设备失败" : "关闭设备失败");
 	}
 }

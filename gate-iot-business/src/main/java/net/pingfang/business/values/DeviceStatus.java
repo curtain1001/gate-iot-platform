@@ -9,5 +9,5 @@ package net.pingfang.business.values;
  * @since 2022-10-19 10:32
  */
 public enum DeviceStatus {
-	START, ONLINE, OFFLINE, REBOOT
+	START, ONLINE, OFFLINE, REBOOT, CLOSE,
 }

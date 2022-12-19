@@ -36,6 +36,11 @@
             <column name="customs_lane_no" />
         </createIndex>
     </changeSet>
+    <changeSet id="btp_lane::addColumn::ip" author="wangchao">
+        <addColumn tableName="btp_lane">
+            <column name="ip" type="varchar(24)" remarks="车道IP地址" />
+        </addColumn>
+    </changeSet>
 
     <changeSet author="wangchao" id="btp_lane_config::create">
         <createTable tableName="btp_lane_config" remarks="车道配置信息表">

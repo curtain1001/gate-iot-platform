@@ -10,7 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import net.pingfang.business.enums.CertificateType;
 import net.pingfang.common.core.domain.BaseEntity;
 
 /**
@@ -32,7 +31,8 @@ public class BtpCertificate extends BaseEntity {
 
 	private String name;
 
-	private CertificateType instance;
+//	private CertificateType instance;
+	private String instance;
 
 	private CertificateConfig configs;
 

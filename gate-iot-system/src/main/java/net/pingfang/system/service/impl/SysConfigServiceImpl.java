@@ -3,9 +3,11 @@ package net.pingfang.system.service.impl;
 import java.util.Collection;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
 
 import net.pingfang.common.annotation.DataSource;
@@ -26,20 +28,14 @@ import net.pingfang.system.service.ISysConfigService;
  * @author ruoyi
  */
 @Service
-public class SysConfigServiceImpl implements ISysConfigService {
-	@Autowired
+public class SysConfigServiceImpl implements ISysConfigService, ApplicationListener<ApplicationStartedEvent> {
+	@Resource
 	private SysConfigMapper configMapper;
 
 	@Autowired
 	private RedisCache redisCache;
 
-	/**
-	 * 项目启动时，初始化参数到缓存
-	 */
-	@PostConstruct
-	public void init() {
-		loadingConfigCache();
-	}
+
 
 	/**
 	 * 查询参数配置信息
@@ -202,5 +198,13 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	 */
 	private String getCacheKey(String configKey) {
 		return Constants.SYS_CONFIG_KEY + configKey;
+	}
+
+	/**
+	 * 项目启动时，初始化参数到缓存
+	 */
+	@Override
+	public void onApplicationEvent(ApplicationStartedEvent event) {
+		loadingConfigCache();
 	}
 }

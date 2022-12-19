@@ -171,9 +171,17 @@ liquibase:
     - /database/business/btpDevice.xml
     - /database/business/btpInstruction.xml
     - /database/business/btpFlow.xml
-    - /database/business/btpSupportService.xml
+    - /database/business/btpModule.xml
     - /database/flow/btpFlowEdge.xml
     - /database/flow/btpFlowNode.xml
     - /database/flow/btpFlowDeployment.xml
     - /database/flow/btpFlowExecuteHistory.xml
     - /database/flow/btpFlowProcessInstance.xml
+gate-server:
+  port: 7899
+#hiksdk:
+#  net-path: ${HIKSDK-NET-PATH:E:\sdk\hc\HCNetSDK.dll}
+#  playctrl-path: ${HIKSDK-PLAYCTRL-PATH:E:\sdk\hc\PlayCtrl.dll}
+#ocrsdk:
+#  container-path: ${CONTAINER-OCR-SDK-PATH:E:\sdk\ocr\AILib_container.dll}
+#  trailer-path: ${TRAILER-OCR-SDK-PATH:E:\sdk\ocr\AILib_trailerlp.dll}

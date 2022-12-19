@@ -35,7 +35,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
+        <dependency>
+            <groupId>net.pingfang.gate</groupId>
+            <artifactId>gate-iot-protocol</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -62,7 +66,11 @@
             <groupId>net.pingfang</groupId>
             <artifactId>gate-iot-common</artifactId>
         </dependency>
-        <!-- 通用工具-->
+        <!-- 服务模块-->
+        <dependency>
+            <groupId>net.pingfang.application</groupId>
+            <artifactId>gate-iot-service</artifactId>
+        </dependency>
         <dependency>
             <groupId>net.pingfang</groupId>
             <artifactId>gate-iot-framework</artifactId>
@@ -71,58 +79,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>tcp-component</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>http-component</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>network-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.pingfang</groupId>
-            <artifactId>device-core</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>net.pingfang</groupId>
-            <artifactId>plc-component</artifactId>
-            <version>1.0.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.pingfang</groupId>
-            <artifactId>novaled-component</artifactId>
-            <version>1.0.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.pingfang</groupId>
-            <artifactId>licenseplate-component</artifactId>
-            <version>1.0.0</version>
-            <scope>compile</scope>
-        </dependency>
-
-
-        <dependency>
-            <groupId>net.pingfang</groupId>
-            <artifactId>gate-iot-flow</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.pingfang</groupId>
-            <artifactId>service-component</artifactId>
-            <version>1.0.0</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 

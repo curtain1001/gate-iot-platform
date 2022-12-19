@@ -53,6 +53,11 @@ public class BtpLane extends BaseEntity implements Serializable {
 	private String customsLaneNo;
 
 	/**
+	 * 通道ip
+	 */
+	private String ip;
+
+	/**
 	 * 进出类型（0:进；1：出）
 	 */
 	private String type;
@@ -114,5 +119,15 @@ public class BtpLane extends BaseEntity implements Serializable {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	@NotBlank(message = "IP地址不能为空")
+	@Size(min = 0, max = 24, message = "参数名称不能超过24个字符")
+	public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
 	}
 }

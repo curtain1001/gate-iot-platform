@@ -22,7 +22,6 @@ import net.pingfang.common.utils.StringUtils;
 /**
  * spring工具类 方便在非spring管理环境中获取bean
  *
- * @author ruoyi
  */
 @Component
 @Slf4j

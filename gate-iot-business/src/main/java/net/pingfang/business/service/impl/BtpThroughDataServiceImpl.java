@@ -3,12 +3,10 @@ package net.pingfang.business.service.impl;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import net.pingfang.business.domain.BtpThroughData;
 import net.pingfang.business.mapper.BtpThroughDataMapper;
 import net.pingfang.business.service.IBtpThroughDataService;
-import net.pingfang.iot.common.manager.ThroughDataManager;
 
 /**
  * <p>
@@ -20,14 +18,5 @@ import net.pingfang.iot.common.manager.ThroughDataManager;
  */
 @Service
 public class BtpThroughDataServiceImpl extends ServiceImpl<BtpThroughDataMapper, BtpThroughData>
-		implements IBtpThroughDataService, ThroughDataManager {
-	@Override
-	public JsonNode getData(Long laneNo) {
-		return null;
-	}
-
-	@Override
-	public void putData(JsonNode jsonNode) {
-
-	}
+		implements IBtpThroughDataService {
 }

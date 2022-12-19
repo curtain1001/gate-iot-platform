@@ -28,9 +28,9 @@ import net.pingfang.common.annotation.Log;
 import net.pingfang.common.core.controller.BaseController;
 import net.pingfang.common.core.domain.AjaxResult;
 import net.pingfang.common.core.page.TableDataInfo;
+import net.pingfang.common.customizedsetting.repos.CustomizedSettingRepository;
+import net.pingfang.common.customizedsetting.values.DefaultCustomized;
 import net.pingfang.common.enums.BusinessType;
-import net.pingfang.iot.common.customizedsetting.repos.CustomizedSettingRepository;
-import net.pingfang.iot.common.customizedsetting.values.DefaultCustomized;
 
 /**
  * @author 王超

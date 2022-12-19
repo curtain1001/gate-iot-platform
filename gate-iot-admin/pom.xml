@@ -71,24 +71,6 @@
             <groupId>net.pingfang</groupId>
             <artifactId>gate-iot-business</artifactId>
         </dependency>
-        <dependency>
-            <groupId>net.pingfang</groupId>
-            <artifactId>device-core</artifactId>
-            <version>${gate-iot.version}</version>
-        </dependency>
-
-        <!-- 业务模块-->
-        <dependency>
-            <groupId>net.pingfang</groupId>
-            <artifactId>network-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.pingfang</groupId>
-            <artifactId>service-component</artifactId>
-            <version>1.0.0</version>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
 
     <build>

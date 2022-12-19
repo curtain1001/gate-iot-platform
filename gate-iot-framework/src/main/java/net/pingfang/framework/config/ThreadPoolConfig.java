@@ -39,6 +39,10 @@ public class ThreadPoolConfig {
 		executor.setKeepAliveSeconds(keepAliveSeconds);
 		// 线程池对拒绝任务(无线程可用)的处理策略
 		executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+		// 告诉线程池，在销毁之前执行shutdown方法
+		executor.setWaitForTasksToCompleteOnShutdown(true);
+		// shutdown\shutdownNow 之后等待3秒
+		executor.setAwaitTerminationSeconds(3);
 		return executor;
 	}
 

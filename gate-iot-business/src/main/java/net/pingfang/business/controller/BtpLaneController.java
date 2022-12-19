@@ -62,6 +62,7 @@ public class BtpLaneController extends BaseController {
 		queryWrapper.like(StringUtils.checkValNotNull(lane.getLaneName()), BtpLane::getLaneName, lane.getLaneName());
 		queryWrapper.like(StringUtils.checkValNotNull(lane.getAreaId()), BtpLane::getAreaId, lane.getAreaId());
 		queryWrapper.like(StringUtils.checkValNotNull(lane.getType()), BtpLane::getType, lane.getType());
+		queryWrapper.like(StringUtils.checkValNotNull(lane.getIp()), BtpLane::getIp, lane.getIp());
 		queryWrapper.like(StringUtils.checkValNotNull(lane.getCustomsLaneNo()), BtpLane::getCustomsLaneNo,
 				lane.getCustomsLaneNo());
 		queryWrapper.orderByDesc(BtpLane::getCreateTime);
@@ -135,6 +136,11 @@ public class BtpLaneController extends BaseController {
 		if (laneService.count(wrapper) > 0) {
 			return AjaxResult.error("新增通道'" + lane.getLaneNo() + "'失败，通道号已存在");
 		}
+		wrapper = Wrappers.lambdaQuery();
+		wrapper.eq(BtpLane::getIp, lane.getIp());
+		if (laneService.count(wrapper) > 0) {
+			return AjaxResult.error("新增通道'" + lane.getLaneNo() + "'失败，IP地址已存在");
+		}
 		lane.setCreateBy(getUsername());
 		lane.setCreateTime(new Date());
 		return toAjax(laneService.save(lane));
@@ -158,6 +164,12 @@ public class BtpLaneController extends BaseController {
 		btpLane = laneService.getOne(wrapper);
 		if (btpLane != null && !btpLane.getLaneId().equals(lane.getLaneId())) {
 			return AjaxResult.error("修改通道'" + lane.getLaneNo() + "'失败，通道号已存在");
+		}
+		wrapper = Wrappers.lambdaQuery();
+		wrapper.eq(BtpLane::getIp, lane.getIp());
+		btpLane = laneService.getOne(wrapper);
+		if (btpLane != null && !btpLane.getLaneId().equals(lane.getLaneId())) {
+			return AjaxResult.error("修改通道'" + lane.getLaneNo() + "'失败，IP地址号已存在");
 		}
 		lane.setUpdateBy(getUsername());
 		lane.setUpdateTime(new Date());

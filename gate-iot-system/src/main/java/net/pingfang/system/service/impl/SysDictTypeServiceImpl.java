@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,20 +27,14 @@ import net.pingfang.system.service.ISysDictTypeService;
  * @author ruoyi
  */
 @Service
-public class SysDictTypeServiceImpl implements ISysDictTypeService {
+public class SysDictTypeServiceImpl implements ISysDictTypeService, ApplicationListener<ApplicationStartedEvent> {
 	@Autowired
 	private SysDictTypeMapper dictTypeMapper;
 
 	@Autowired
 	private SysDictDataMapper dictDataMapper;
 
-	/**
-	 * 项目启动时，初始化字典到缓存
-	 */
-	@PostConstruct
-	public void init() {
-		loadingDictCache();
-	}
+
 
 	/**
 	 * 根据条件分页查询字典类型
@@ -202,5 +196,13 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
 			return UserConstants.NOT_UNIQUE;
 		}
 		return UserConstants.UNIQUE;
+	}
+
+	/**
+	 * 项目启动时，初始化字典到缓存
+	 */
+	@Override
+	public void onApplicationEvent(ApplicationStartedEvent event) {
+		loadingDictCache();
 	}
 }

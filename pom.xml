@@ -42,8 +42,8 @@
     <!-- 依赖声明 -->
     <dependencyManagement>
 
-
         <dependencies>
+
             <!--            lombok-->
             <dependency>
                 <groupId>org.projectlombok</groupId>
@@ -199,6 +199,12 @@
                 <version>${fastjson.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>1.9.4</version>
+            </dependency>
+
             <!-- Token生成与解析-->
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
@@ -253,28 +259,35 @@
                 <artifactId>gate-iot-business</artifactId>
                 <version>${gate-iot.version}</version>
             </dependency>
-            <!--            业务服务-->
-            <dependency>
-                <groupId>net.pingfang</groupId>
-                <artifactId>device-component</artifactId>
-                <version>${gate-iot.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.pingfang</groupId>
-                <artifactId>network-component</artifactId>
-                <version>${gate-iot.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.pingfang</groupId>
-                <artifactId>service-component</artifactId>
-                <version>${gate-iot.version}</version>
-            </dependency>
 
+            <!-- 服务模块-->
             <dependency>
-                <groupId>net.pingfang</groupId>
-                <artifactId>gate-iot-flow</artifactId>
+                <groupId>net.pingfang.application</groupId>
+                <artifactId>gate-iot-service</artifactId>
                 <version>${gate-iot.version}</version>
             </dependency>
+            <!--            &lt;!&ndash;            业务服务&ndash;&gt;-->
+            <!--            <dependency>-->
+            <!--                <groupId>net.pingfang</groupId>-->
+            <!--                <artifactId>device-component</artifactId>-->
+            <!--                <version>${gate-iot.version}</version>-->
+            <!--            </dependency>-->
+            <!--            <dependency>-->
+            <!--                <groupId>net.pingfang</groupId>-->
+            <!--                <artifactId>network-component</artifactId>-->
+            <!--                <version>${gate-iot.version}</version>-->
+            <!--            </dependency>-->
+            <!--            <dependency>-->
+            <!--                <groupId>net.pingfang</groupId>-->
+            <!--                <artifactId>service-component</artifactId>-->
+            <!--                <version>${gate-iot.version}</version>-->
+            <!--            </dependency>-->
+
+            <!--            <dependency>-->
+            <!--                <groupId>net.pingfang</groupId>-->
+            <!--                <artifactId>gate-iot-flow</artifactId>-->
+            <!--                <version>${gate-iot.version}</version>-->
+            <!--            </dependency>-->
 
 
             <!-- mybatis-plus 增强CRUD -->
@@ -313,9 +326,9 @@
         <module>gate-iot-generator</module>
         <module>gate-iot-common</module>
         <module>gate-iot-business</module>
-        <module>gate-iot-components</module>
-        <module>gate-iot-manger</module>
-        <module>gate-iot-flow</module>
+        <!--        <module>gate-iot-components</module>-->
+        <!--        <module>gate-iot-manger</module>-->
+        <!--        <module>gate-iot-flow</module>-->
     </modules>
     <packaging>pom</packaging>
 
