@@ -179,9 +179,24 @@ liquibase:
     - /database/flow/btpFlowProcessInstance.xml
 gate-server:
   port: 7899
-#hiksdk:
-#  net-path: ${HIKSDK-NET-PATH:E:\sdk\hc\HCNetSDK.dll}
-#  playctrl-path: ${HIKSDK-PLAYCTRL-PATH:E:\sdk\hc\PlayCtrl.dll}
-#ocrsdk:
-#  container-path: ${CONTAINER-OCR-SDK-PATH:E:\sdk\ocr\AILib_container.dll}
-#  trailer-path: ${TRAILER-OCR-SDK-PATH:E:\sdk\ocr\AILib_trailerlp.dll}
+  #hiksdk:
+  #  net-path: ${HIKSDK-NET-PATH:E:\sdk\hc\HCNetSDK.dll}
+  #  playctrl-path: ${HIKSDK-PLAYCTRL-PATH:E:\sdk\hc\PlayCtrl.dll}
+  #ocrsdk:
+  #  container-path: ${CONTAINER-OCR-SDK-PATH:E:\sdk\ocr\AILib_container.dll}
+  #  trailer-path: ${TRAILER-OCR-SDK-PATH:E:\sdk\ocr\AILib_trailerlp.dll}
+
+
+cloud-gate:
+  host: http://192.168.1.37:9091
+  #  车辆到达或离开
+  arriveOrLeavePath: /ocrWorking/arriveOrLeave
+  #  命令报文
+  cmdPath: /ocrWorking/cmdInfo
+  #  新增作业识别报文
+  ocrWorkingPath: /ocrWorking/ocrWorking
+  #  web提交作业报文
+  webSubmitWorkingPath: /ocrWorking/webSubmitWorking
+  #  新增硬件状态
+  equipmentStateMsgPath: /equipmentStateMsg
+

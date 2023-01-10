@@ -260,12 +260,12 @@
                 <version>${gate-iot.version}</version>
             </dependency>
 
-            <!-- 服务模块-->
-            <dependency>
-                <groupId>net.pingfang.application</groupId>
-                <artifactId>gate-iot-service</artifactId>
-                <version>${gate-iot.version}</version>
-            </dependency>
+            <!--            &lt;!&ndash; 服务模块&ndash;&gt;-->
+            <!--            <dependency>-->
+            <!--                <groupId>net.pingfang.application</groupId>-->
+            <!--                <artifactId>gate-iot-service</artifactId>-->
+            <!--                <version>${gate-iot.version}</version>-->
+            <!--            </dependency>-->
             <!--            &lt;!&ndash;            业务服务&ndash;&gt;-->
             <!--            <dependency>-->
             <!--                <groupId>net.pingfang</groupId>-->

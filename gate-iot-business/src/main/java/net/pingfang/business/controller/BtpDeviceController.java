@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
@@ -107,6 +108,22 @@ public class BtpDeviceController extends BaseController {
 //			Optional<DeviceProduct> deviceProduct = DeviceProductSupports.lookup(x.getProduct());
 //			deviceProduct.ifPresent(product -> x.setInstructions(instructionService.getInstructions(product)));
 //		}).collect(Collectors.toList());
+		return AjaxResult.success(list);
+	}
+
+	/**
+	 * 获取该车道所有设备
+	 *
+	 * @return 所有设备
+	 */
+	@PostMapping("/ids")
+	public AjaxResult getDeviceByIds(@RequestBody List<String> ids) {
+		if (CollectionUtils.isEmpty(ids)) {
+			return AjaxResult.success();
+		}
+		LambdaQueryWrapper<BtpDevice> queryWrapper = Wrappers.lambdaQuery();
+		queryWrapper.in(BtpDevice::getDeviceId, ids);
+		List<BtpDevice> list = btpDeviceService.list(queryWrapper);
 		return AjaxResult.success(list);
 	}
 

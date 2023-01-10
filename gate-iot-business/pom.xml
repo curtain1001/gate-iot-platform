@@ -66,11 +66,6 @@
             <groupId>net.pingfang</groupId>
             <artifactId>gate-iot-common</artifactId>
         </dependency>
-        <!-- 服务模块-->
-        <dependency>
-            <groupId>net.pingfang.application</groupId>
-            <artifactId>gate-iot-service</artifactId>
-        </dependency>
         <dependency>
             <groupId>net.pingfang</groupId>
             <artifactId>gate-iot-framework</artifactId>
@@ -79,6 +74,12 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

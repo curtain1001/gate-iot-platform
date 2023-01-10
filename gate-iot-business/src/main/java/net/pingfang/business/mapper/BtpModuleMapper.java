@@ -16,4 +16,5 @@ import net.pingfang.business.domain.BtpModule;
  */
 @Mapper
 public interface BtpModuleMapper extends BaseMapper<BtpModule> {
+
 }

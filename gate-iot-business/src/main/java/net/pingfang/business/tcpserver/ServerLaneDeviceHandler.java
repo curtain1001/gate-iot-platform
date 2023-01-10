@@ -9,12 +9,15 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.pingfang.business.device.LaneDeviceSupport;
 import net.pingfang.business.domain.BtpDevice;
 import net.pingfang.business.domain.BtpLane;
+import net.pingfang.business.domain.BtpModule;
 import net.pingfang.business.service.IBtpDeviceService;
 import net.pingfang.business.service.IBtpLaneService;
+import net.pingfang.business.service.IBtpModuleService;
 import net.pingfang.common.utils.JsonUtils;
 import net.pingfang.common.utils.StringUtils;
 import net.pingfang.gate.protocol.codec.MessageType;
@@ -28,22 +31,26 @@ import net.pingfang.gate.protocol.response.DeviceInfoResponsePacket;
 import net.pingfang.gate.protocol.response.InitClientLaneResponsePacket;
 import net.pingfang.gate.protocol.response.LaneInfoResponsePacket;
 import net.pingfang.gate.protocol.values.DeviceInfo;
+import net.pingfang.gate.protocol.values.ModuleInfo;
 import net.pingfang.gate.protocol.values.SystemConfig;
 
 /**
  * 业务处理器
  */
 @Slf4j
-public class ServerBusinessHandler extends ChannelInboundHandlerAdapter {
+@AllArgsConstructor
+public class ServerLaneDeviceHandler extends ChannelInboundHandlerAdapter {
 
-	private IBtpLaneService laneService;
+	private final IBtpLaneService laneService;
 
-	private IBtpDeviceService deviceService;
+	private final IBtpDeviceService deviceService;
 
-	public ServerBusinessHandler(IBtpLaneService laneService, IBtpDeviceService deviceService) {
-		this.laneService = laneService;
-		this.deviceService = deviceService;
-	}
+	private final IBtpModuleService btpModuleService;
+
+//	public ServerLaneDeviceHandler(IBtpLaneService laneService, IBtpDeviceService deviceService) {
+//		this.laneService = laneService;
+//		this.deviceService = deviceService;
+//	}
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -51,6 +58,7 @@ public class ServerBusinessHandler extends ChannelInboundHandlerAdapter {
 		try {
 			Packet packet = (Packet) msg;
 			switch (MessageType.valueOf(packet.getCommand())) {
+			// 初始化车道客户端请求
 			case INIT_CLIENT_LANE_REQUEST: {
 				InitClientLaneResponsePacket responsePacket;
 				InitClientLaneRequestPacket initRequestPacket = (InitClientLaneRequestPacket) packet;
@@ -67,26 +75,47 @@ public class ServerBusinessHandler extends ChannelInboundHandlerAdapter {
 					ctx.writeAndFlush(responsePacket);
 					break;
 				}
-				List<BtpDevice> btpDevices = deviceService.selectByLaneId(b.getLaneId());
+//				List<BtpDevice> btpDevices = deviceService.selectByLaneId(b.getLaneId());
+				List<BtpModule> btpModules = btpModuleService.selectByLaneId(b.getLaneId());
 				responsePacket = InitClientLaneResponsePacket.builder()//
 						.messageId(packet.getMessageId())//
 						.success(true)//
 						.laneName(b.getLaneName())//
 						.laneNo(b.getLaneNo())//
-						.deviceInfoList(btpDevices.stream().map(x -> DeviceInfo.builder() //
-								.deviceNo(x.getDeviceId())//
-								.deviceName(x.getDeviceName())//
-								.deviceProduct(x.getProduct())//
-								.enabled(x.isEnabled())//
-								.configuration(x.getConfiguration())//
-								.build()).collect(Collectors.toList()))//
+						.moduleInfoList(btpModules.stream()//
+								.map(x -> ModuleInfo.builder() //
+										.id(x.getId())//
+										.laneId(x.getLaneId())//
+										.moduleName(x.getModuleName())//
+										.moduleCode(x.getModuleCode())//
+										.configuration(x.getConfiguration())//
+										.enabled(x.isEnabled())//
+										.devices(x.getDeviceList().stream() //
+												.map(d -> DeviceInfo.builder() //
+														.deviceNo(d.getDeviceId())//
+														.deviceName(d.getDeviceName())//
+														.deviceProduct(d.getProduct())//
+														.enabled(d.isEnabled())//
+														.configuration(d.getConfiguration())//
+														.build()) //
+												.collect(Collectors.toList()))
+										.build())
+								.collect(Collectors.toList()))//
+//						.deviceInfoList(btpDevices.stream() //
+//								.map(x -> DeviceInfo.builder() //
+//										.deviceNo(x.getDeviceId())//
+//										.deviceName(x.getDeviceName())//
+//										.deviceProduct(x.getProduct())//
+//										.enabled(x.isEnabled())//
+//										.configuration(x.getConfiguration())//
+//										.build()) //
+//								.collect(Collectors.toList()))//
 						.config(SystemConfig.builder()//
 								.build())
 						.build();
 				ctx.writeAndFlush(responsePacket);
 				break;
 			}
-
 			// 车道信息响应
 			case LANE_INFO_REQUEST: {
 				LaneInfoRequestPacket laneInfoRequestPacket = (LaneInfoRequestPacket) packet;
@@ -131,6 +160,7 @@ public class ServerBusinessHandler extends ChannelInboundHandlerAdapter {
 				log.info("发送设备信息响应报文：{}", JsonUtils.toJsonString(deviceInfoResponsePacket));
 				break;
 			}
+
 			// 所有设备信息响应
 			case ALL_DEVICE_INFO_REQUEST: {
 				AllDeviceInfoRequestPacket requestPacket = (AllDeviceInfoRequestPacket) packet;

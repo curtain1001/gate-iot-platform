@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import net.pingfang.common.core.domain.BaseEntity;
@@ -23,11 +24,12 @@ import net.pingfang.common.core.domain.BaseEntity;
  * @author 王超
  * @since 2022-12-02 15:32
  */
+@EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "btp_module")
+@TableName(value = "btp_module", autoResultMap = true)
 public class BtpModule extends BaseEntity {
 	private static final long serialVersionUID = -781372519309732797L;
 	/**
@@ -50,9 +52,12 @@ public class BtpModule extends BaseEntity {
 	/**
 	 * 设备列表
 	 */
-	private List<String> device;
+	@TableField(value = "device_ids", typeHandler = JacksonTypeHandler.class)
+	private List<String> deviceIds;
 
 	private transient String deviceId;
+
+	private transient List<BtpDevice> deviceList;
 
 	/**
 	 * 开关

@@ -23,6 +23,7 @@
             <column name="module_name" type="varchar(24)" remarks="模块名称" />
             <column name="module_code" type="varchar(24)" remarks="模块代码" />
             <column name="enabled" type="tinyint(1)" remarks="开关(1:开启；0：关闭)" defaultValue="0" />
+            <column name="device_ids" type="${clob.type}" remarks="设备id" />
             <column name="configuration" type="${clob.type}" remarks="配置属性" />
             <column name="create_by" defaultValue="" remarks="创建者" type="VARCHAR(64)" />
             <column name="create_time" remarks="创建时间" type="datetime(6)" />

@@ -15,9 +15,10 @@ import net.pingfang.common.utils.StringUtils;
 @Getter
 public enum HikBasicForm implements Customized {
 	IP("host", "string", "", "ip地址", "", ""), //
-	PORT("port", "number", "", "端口号", "", ""), //
-	USERNAME("username", "string", "", "用户名", "", ""), //
 	PASSWORD("password", "string", "", "密码", "", ""), //
+	PORT("port", "number", "", "端口号", "", ""), //
+	USERNAME("username", "string", "", "用户名", "", "") //
+	, //
 	;
 
 	HikBasicForm(String value, String type, String options, String label, String customizeType, Object defaults) {
