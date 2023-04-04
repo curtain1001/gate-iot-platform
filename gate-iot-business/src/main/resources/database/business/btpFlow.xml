@@ -13,7 +13,7 @@
 
     <changeSet author="wangchao" id="btp_flow::create">
         <createTable tableName="btp_flow" remarks="流程管理表">
-            <column name="flow_id" remarks="主键" type="BIGINT(20)" incrementBy="1" startWith="1" autoIncrement="true">
+            <column name="flow_id" remarks="主键" type="BIGINT(20)" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="lane_id" type="bigint(20)" remarks="车道id" />

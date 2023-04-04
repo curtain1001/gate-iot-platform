@@ -15,14 +15,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import net.pingfang.business.domain.BtpDevice;
 import net.pingfang.business.domain.BtpModule;
-import net.pingfang.business.events.ModuleClosedEvent;
-import net.pingfang.business.events.ModuleDeletedEvent;
 import net.pingfang.business.events.ModuleStartedEvent;
 import net.pingfang.business.events.ModuleUpdatedEvent;
 import net.pingfang.business.mapper.BtpDeviceMapper;
 import net.pingfang.business.mapper.BtpModuleMapper;
 import net.pingfang.business.service.IBtpModuleService;
-import net.pingfang.business.values.DeviceStatus;
 import net.pingfang.common.event.EventBusCenter;
 
 /**
@@ -79,72 +76,75 @@ public class BtpModuleServiceImpl extends ServiceImpl<BtpModuleMapper, BtpModule
 		if (module == null) {
 			throw new RuntimeException("设备不存在");
 		}
-		if (device.getStatus() != DeviceStatus.OFFLINE) {
-			throw new RuntimeException("删除设备前，请先关闭!");
-		}
-		int count = deviceMapper.deleteById(id);
-		if (count > 0) {
-			eventBusCenter.postAsync(ModuleDeletedEvent.builder()//
-					.deviceNo(device.getDeviceId())//
-					.laneId(device.getLaneId())//
-					.build());
-			return true;
-		} else {
-			return false;
-		}
+//		if (device.getStatus() != DeviceStatus.OFFLINE) {
+//			throw new RuntimeException("删除设备前，请先关闭!");
+//		}
+//		int count = deviceMapper.deleteById(id);
+//		if (count > 0) {
+//			eventBusCenter.postAsync(ModuleDeletedEvent.builder()//
+//					.deviceNo(device.getDeviceId())//
+//					.laneId(device.getLaneId())//
+//					.build());
+//			return true;
+//		} else {
+//			return false;
+//		}
+		return false;
 	}
 
 	@Override
 	public boolean open(Long id) {
-		BtpModule device = deviceMapper.selectById(id);
-		if (device == null) {
-			throw new RuntimeException("设备不存在");
-		}
-		if (device.getStatus() == DeviceStatus.ONLINE && device.isEnabled()) {
-			throw new RuntimeException("设备在线状态，请勿重复开启操作!");
-		}
-		if (device.getStatus() == DeviceStatus.START && device.isEnabled()) {
-			throw new RuntimeException("设备正在启动，请等待开启过程!");
-		}
-		device = device.toBuilder() //
-				.status(DeviceStatus.START) //
-				.enabled(true)//
-				.build();
-		int count = deviceMapper.updateById(device);
-		if (count > 0) {
-			eventBusCenter.postAsync(ModuleStartedEvent.builder()//
-					.deviceNo(device.getDeviceId())//
-					.laneId(device.getLaneId())//
-					.build());
-			return true;
-		} else {
-			return false;
-		}
+//		BtpModule device = deviceMapper.selectById(id);
+//		if (device == null) {
+//			throw new RuntimeException("设备不存在");
+//		}
+//		if (device.getStatus() == DeviceStatus.ONLINE && device.isEnabled()) {
+//			throw new RuntimeException("设备在线状态，请勿重复开启操作!");
+//		}
+//		if (device.getStatus() == DeviceStatus.START && device.isEnabled()) {
+//			throw new RuntimeException("设备正在启动，请等待开启过程!");
+//		}
+//		device = device.toBuilder() //
+//				.status(DeviceStatus.START) //
+//				.enabled(true)//
+//				.build();
+//		int count = deviceMapper.updateById(device);
+//		if (count > 0) {
+//			eventBusCenter.postAsync(ModuleStartedEvent.builder()//
+//					.deviceNo(device.getDeviceId())//
+//					.laneId(device.getLaneId())//
+//					.build());
+//			return true;
+//		} else {
+//			return false;
+//		}
+		return false;
 	}
 
 	@Override
 	public boolean close(Long id) {
-		BtpDevice device = deviceMapper.selectById(id);
-		if (device == null) {
-			throw new RuntimeException("设备不存在");
-		}
-		if (!device.isEnabled()) {
-			throw new RuntimeException("设备关闭状态，请勿重复关闭操作!");
-		}
-		device = device.toBuilder() //
-				.status(DeviceStatus.CLOSE) //
-				.enabled(false)//
-				.build();
-		int count = deviceMapper.updateById(device);
-		if (count > 0) {
-			eventBusCenter.postAsync(ModuleClosedEvent.builder()//
-					.deviceNo(device.getDeviceId())//
-					.laneId(device.getLaneId())//
-					.build());
-			return true;
-		} else {
-			return false;
-		}
+//		BtpDevice device = deviceMapper.selectById(id);
+//		if (device == null) {
+//			throw new RuntimeException("设备不存在");
+//		}
+//		if (!device.isEnabled()) {
+//			throw new RuntimeException("设备关闭状态，请勿重复关闭操作!");
+//		}
+//		device = device.toBuilder() //
+//				.status(DeviceStatus.CLOSE) //
+//				.enabled(false)//
+//				.build();
+//		int count = deviceMapper.updateById(device);
+//		if (count > 0) {
+//			eventBusCenter.postAsync(ModuleClosedEvent.builder()//
+//					.deviceNo(device.getDeviceId())//
+//					.laneId(device.getLaneId())//
+//					.build());
+//			return true;
+//		} else {
+//			return false;
+//		}
+		return false;
 	}
 
 	@Override

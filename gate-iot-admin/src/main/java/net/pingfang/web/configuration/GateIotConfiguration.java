@@ -15,7 +15,6 @@ import io.netty.handler.logging.LoggingHandler;
 import net.pingfang.business.service.IBtpDeviceService;
 import net.pingfang.business.service.IBtpLaneService;
 import net.pingfang.business.tcpserver.ServerHeartBeatRequestHandler;
-import net.pingfang.business.tcpserver.ServerLaneDeviceHandler;
 import net.pingfang.common.tcp.server.TcpServer;
 import net.pingfang.gate.protocol.codec.PacketDecoder;
 import net.pingfang.gate.protocol.codec.PacketEncoder;
@@ -60,7 +59,7 @@ public class GateIotConfiguration {
 				// 心跳处理
 				pipeline.addLast(new ServerHeartBeatRequestHandler(btpLaneService));
 				// 业务处理
-				pipeline.addLast(new ServerLaneDeviceHandler(btpLaneService, deviceService));
+//				pipeline.addLast(new ServerLaneDeviceHandler(btpLaneService, deviceService));
 			}
 		};
 		tcpServer.setInitializer(initializer);

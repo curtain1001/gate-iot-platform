@@ -12,7 +12,7 @@
 
     <changeSet author="wangchao" id="btp_lane::create">
         <createTable tableName="btp_lane" remarks="车道信息表">
-            <column name="lane_id" remarks="主键" type="BIGINT(20)" incrementBy="1" startWith="1" autoIncrement="true">
+            <column name="lane_id" remarks="主键" type="BIGINT(20)" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="lane_name" type="varchar(64)" remarks="车道名称" />
@@ -44,8 +44,7 @@
 
     <changeSet author="wangchao" id="btp_lane_config::create">
         <createTable tableName="btp_lane_config" remarks="车道配置信息表">
-            <column name="lane_config_id" remarks="主键" type="BIGINT(20)" incrementBy="1" startWith="1"
-                    autoIncrement="true">
+            <column name="lane_config_id" remarks="主键" type="BIGINT(20)" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="lane_id" type="BIGINT(20)" remarks="车道id">

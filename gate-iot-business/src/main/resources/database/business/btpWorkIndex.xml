@@ -13,7 +13,7 @@
 
     <changeSet author="wangchao" id="btpWorkIndex::create">
         <createTable tableName="btp_work_index" remarks="汽车过闸信息索引表">
-            <column name="data_id" remarks="主键" type="BIGINT(20)" startWith="1" autoIncrement="true">
+            <column name="data_id" remarks="主键" type="BIGINT(20)" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="work_id" type="varchar(64)" remarks="数据id" />

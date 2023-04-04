@@ -13,7 +13,7 @@
 
     <changeSet author="wangchao" id="btp_module::create">
         <createTable tableName="btp_module" remarks="服务模块信息表">
-            <column name="id" remarks="主键" type="BIGINT(20)" startWith="1" autoIncrement="true">
+            <column name="id" remarks="主键" type="BIGINT(20)" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="lane_id" type="BIGINT(20)" remarks="场站id">

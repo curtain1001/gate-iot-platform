@@ -12,7 +12,7 @@
 
     <changeSet author="wangchao" id="btp_device::create">
         <createTable tableName="btp_device">
-            <column name="id" remarks="主键" type="BIGINT(20)" startWith="1" autoIncrement="true">
+            <column name="id" remarks="主键" type="BIGINT(20)" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="device_id" remarks="设备号" type="varchar(36)">

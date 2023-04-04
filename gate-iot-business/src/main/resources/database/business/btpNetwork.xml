@@ -12,7 +12,7 @@
 
     <changeSet author="wangchao" id="btp_network::create">
         <createTable tableName="btp_network" remarks="网络组件配置信息表">
-            <column name="id" remarks="主键" type="BIGINT(20)" startWith="1" autoIncrement="true">
+            <column name="id" remarks="主键" type="BIGINT(20)" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="network_id" type="varchar(24)" remarks="组件号" />

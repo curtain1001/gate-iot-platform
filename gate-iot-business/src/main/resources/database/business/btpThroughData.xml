@@ -13,7 +13,7 @@
 
     <changeSet author="wangchao" id="btpThroughData::create">
         <createTable tableName="btp_through_data" remarks="过车流程数据">
-            <column name="data_id" remarks="主键" type="BIGINT(20)" startWith="1" autoIncrement="true">
+            <column name="data_id" remarks="主键" type="BIGINT(20)" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="work_id" type="varchar(64)" remarks="数据id" />
